@@ -10,6 +10,9 @@ var Queue={
 		this.queue.push(i);
 	},
 	dequeue: function(){
+		if(this.ieEmpty){
+			return false;
+		}
 		return this.queue.shift();
 	},
 	isEmpty: function(){
@@ -33,20 +36,40 @@ var Bot={
 	connection: null,
 	queue: Queue,
 	join: function(id){
-		if(typeof id == "undefined"){
-			return Bot.voice.channel.join();
-		}else{
-			Bot.voice.channel = Bot.client.channels.get(id);
-			return Bot.voice.channel.join();
+		if(!Bot.voice.connection){
+			if(typeof id == "undefined"){
+				return Bot.voice.channel.join();
+			}else{
+				Bot.voice.channel = Bot.client.channels.get(id);
+				return Bot.voice.channel.join();
+			}
 		}
 	},
 	leave: function(){
-		this.voice.channel.leave();
-		this.connection=null;
+		if(Bot.connection){
+			this.voice.channel.leave();
+			this.connection=null;
+		}else{
+			//check to see if it died
+			const conns = Bot.client.voiceConnections.array();
+			console.log(conns);
+			if(conns.length>0){
+				for (var i = conns.length - 1; i >= 0; i--) {
+					conns[i].leave();
+				};
+			}
+		}
 	},
 	_playAfterLoad: function(yturl){
-		const stream = ytdl(yturl, {filter : 'audioonly'});
-		console.log(Bot.connection);
+		var stream = null;
+		if(typeof yturl =="undefined"){
+			if(Bot.queue.isEmpty()){
+				return Bot.message("Queue is empty");
+			}
+			stream = ytdl(Bot.queue.dequeue(), {filter : 'audioonly'});
+		}else{
+			stream = ytdl(yturl, {filter : 'audioonly'});
+		}
 		try{
 			const dispatcher = Bot.connection.playStream(stream, Bot.streamOptions);
 			dispatcher.end(function(){
@@ -58,20 +81,22 @@ var Bot={
 			});
 		}catch(e){
 			console.log(e);
+			Bot.message("Something happened");
 		}
 	},
 	message: function(m){
 		Bot.text.channel.send(m);
 	},
 	play: function(yturl){
+		Bot.queue.enqueue(yturl);
 		if(!Bot.connection){
 			console.log("No connection, connecting...");
 			Bot.join().then(conn=>{
 				Bot.connection = conn;
-				Bot._playAfterLoad(yturl);
-			});
+				Bot._playAfterLoad();
+			}).catch(console.error);
 		}else{
-			Bot._playAfterLoad(yturl);
+			Bot._playAfterLoad();
 		}
 	}
 };
@@ -99,11 +124,6 @@ Bot.client.on('message', message => {
 	command=command.substring(1);
 	//play command
 	switch(command){
-		case "join":
-		Bot.join(message.member.voiceChannelID).then(conn=>{
-			Bot.connection = conn;
-		});
-		break;
 
 		case "play":
 		Bot.play(params);
@@ -123,6 +143,24 @@ Bot.client.on('message', message => {
 		break;
 
 	}
+});
+
+//handle some dirty windows things
+if (process.platform === "win32") {
+	var rl = require("readline").createInterface({
+		input: process.stdin,
+		output: process.stdout
+	});
+
+	rl.on("SIGINT", function () {
+		process.emit("SIGINT");
+	});
+}
+
+process.on("SIGINT", function () {
+  //graceful shutdown
+  Bot.leave();
+  process.exit();
 });
 
 Bot.client.login(process.env.BOT_TOKEN);
