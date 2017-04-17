@@ -66,19 +66,22 @@ var Bot={
 			if(Bot.queue.isEmpty()){
 				return Bot.message("Queue is empty");
 			}
-			stream = ytdl(Bot.queue.dequeue(), {filter : 'audioonly'});
+			const url = Bot.queue.dequeue();
+			stream = ytdl(url, {filter : 'audioonly'});
+			console.log("playing" +url);
 		}else{
+			console.log("provided param "+url);
 			stream = ytdl(yturl, {filter : 'audioonly'});
 		}
 		try{
 			const dispatcher = Bot.connection.playStream(stream, Bot.streamOptions);
-			dispatcher.end(function(){
-				if(Bot.queue.isEmpty){
-					Bot.leave();
-				}else{
-					Bot.play(Bot.queue.dequeue());
-				}
-			});
+			// dispatcher.end(function(){
+			// 	if(Bot.queue.isEmpty){
+			// 		Bot.leave();
+			// 	}else{
+			// 		Bot.play(Bot.queue.dequeue());
+			// 	}
+			// });
 		}catch(e){
 			console.log(e);
 			Bot.message("Something happened");
