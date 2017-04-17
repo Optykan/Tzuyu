@@ -4,6 +4,19 @@ const Discord = require('discord.js');
 
 const ytdl = require('ytdl-core');
 
+var Queue={
+	queue: [],
+	enqueue: function(i){
+		this.queue.push(i);
+	},
+	dequeue: function(){
+		return this.queue.shift();
+	},
+	isEmpty: function(){
+		return this.queue.length == 0;
+	}
+};
+
 var Bot={
 	client: new Discord.Client(),
 	streamOptions: { 
@@ -18,20 +31,48 @@ var Bot={
 	},
 	prefix: "%",
 	connection: null,
-}
-
-var Queue={
-	queue: [],
-	enqueue: function(i){
-		this.queue.push(i);
+	queue: Queue,
+	join: function(id){
+		if(typeof id == "undefined"){
+			return Bot.voice.channel.join();
+		}else{
+			Bot.voice.channel = Bot.client.channels.get(id);
+			return Bot.voice.channel.join();
+		}
 	},
-	dequeue: function(){
-		return this.queue.shift();
+	leave: function(){
+		this.voice.channel.leave();
+		this.connection=null;
 	},
-	isEmpty: function(){
-		return this.queue.length == 0;
+	_playAfterLoad: function(yturl){
+		const stream = ytdl(yturl, {filter : 'audioonly'});
+		console.log(Bot.connection);
+		try{
+			const dispatcher = Bot.connection.playStream(stream, Bot.streamOptions);
+		}catch(e){
+			console.log(e);
+		}
+	},
+	play: function(yturl){
+		if(!Bot.connection){
+			console.log("No connection, connecting...");
+			Bot.join().then(conn=>{
+				Bot.connection = conn;
+				Bot._playAfterLoad(yturl);
+			});
+		}else{
+			Bot._playAfterLoad(yturl);
+		}
 	}
-}
+};
+		// dispatcher.end(function(){
+		// 	if(Bot.queue.isEmpty){
+		// 		Bot.leave();
+		// 	}else{
+		// 		Bot.play(Bot.queue.dequeue());
+		// 	}
+		// });
+
 
 Bot.client.on('ready', () => {
 	console.log('I am ready!');
@@ -40,20 +81,34 @@ Bot.client.on('ready', () => {
 });
 
 Bot.client.on('message', message => {
-	//play command
-	if (message.content.startsWith(Bot.prefix+"play")) {
-		Bot.voice.channel.join()
-		.then(connection => {
-			Bot.connection = connection;
-			const stream = ytdl(message.content.split(" ")[1], {filter : 'audioonly'});
-			const dispatcher = connection.playStream(stream, Bot.streamOptions);
-		})
-		.catch(console.error);
+	var input = message.content.split(/\s(.+)/);
+	var command = input[0].toLowerCase();
+	const params = input[1];
+
+	console.log(command);
+	// console.log(message);
+
+	if(!command.startsWith(Bot.prefix)){
+		console.log("not a command");
+		return false;
 	}
 
-	//kill command
-	else if(message.content.startsWith(Bot.prefix+"kill")){
-		Bot.voice.channel.leave();
+	command=command.substring(1);
+	//play command
+	switch(command){
+		case "join":
+		Bot.join(message.member.voiceChannelID).then(conn=>{
+			Bot.connection = conn;
+		});
+		break;
+
+		case "play":
+		Bot.play(params);
+		break;
+
+		case "kill":
+		Bot.leave();
+		break;
 	}
 });
 
