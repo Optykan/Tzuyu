@@ -49,9 +49,19 @@ var Bot={
 		console.log(Bot.connection);
 		try{
 			const dispatcher = Bot.connection.playStream(stream, Bot.streamOptions);
+			dispatcher.end(function(){
+				if(Bot.queue.isEmpty){
+					Bot.leave();
+				}else{
+					Bot.play(Bot.queue.dequeue());
+				}
+			});
 		}catch(e){
 			console.log(e);
 		}
+	},
+	message: function(m){
+		Bot.text.channel.send(m);
 	},
 	play: function(yturl){
 		if(!Bot.connection){
@@ -65,13 +75,6 @@ var Bot={
 		}
 	}
 };
-		// dispatcher.end(function(){
-		// 	if(Bot.queue.isEmpty){
-		// 		Bot.leave();
-		// 	}else{
-		// 		Bot.play(Bot.queue.dequeue());
-		// 	}
-		// });
 
 
 Bot.client.on('ready', () => {
@@ -109,6 +112,16 @@ Bot.client.on('message', message => {
 		case "kill":
 		Bot.leave();
 		break;
+
+		case "leave":
+		Bot.leave();
+		break;
+
+		case "config_prefix":
+		Bot.prefix=params;
+		Bot.message("Changed prefix to "+params);
+		break;
+
 	}
 });
 
