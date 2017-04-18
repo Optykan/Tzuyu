@@ -1,13 +1,13 @@
 #TODOs
 
--[x] Skip
+- [x] Skip
 
--[x] Queue
+- [x] Queue
 
--[ ] Youtube search
+- [ ] Youtube search
 
--[ ] Youtube playlists
+- [ ] Youtube playlists
 
--[ ] Bot provides status updates
+- [ ] Bot provides status updates
 
 
