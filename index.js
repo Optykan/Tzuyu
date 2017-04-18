@@ -5,18 +5,21 @@ const Discord = require('discord.js');
 const ytdl = require('ytdl-core');
 
 var Queue={
-	queue: [],
+	q: [],
 	enqueue: function(i){
-		this.queue.push(i);
+		this.q.push(i);
 	},
 	dequeue: function(){
 		if(this.isEmpty()){
 			return false;
 		}
-		return this.queue.shift();
+		return this.q.shift();
 	},
 	isEmpty: function(){
-		return this.queue.length == 0;
+		return this.q.length == 0;
+	},
+	returnQ: function(){
+		return this.q;
 	}
 };
 
@@ -72,17 +75,18 @@ var Bot={
 			stream = ytdl(url, {filter : 'audioonly'});
 			console.log("playing" +url);
 		}else{
-			console.log("provided param "+url);
+			console.log("provided param "+yturl);
 			stream = ytdl(yturl, {filter : 'audioonly'});
 		}
 		try{
 			Bot.dispatcher = Bot.connection.playStream(stream, Bot.streamOptions);
 			Bot.dispatcher.on('end', function(){
 				dispatcher = null;																												
-				if(Bot.queue.isEmpty){
+				if(Bot.queue.isEmpty()){
+					Bot.message("Queue is empty, leaving...")
 					Bot.leave();
 				}else{
-					Bot.play(Bot.queue.dequeue());
+					Bot._playAfterLoad(Bot.queue.dequeue());
 				}
 			});
 		}catch(e){
@@ -102,19 +106,23 @@ var Bot={
 				Bot._playAfterLoad();
 			}).catch(console.error);
 		}else{
-			Bot._playAfterLoad();
+			// Bot._playAfterLoad();
+			//do nothing...
 		}
 	},
 	stop: function(){
 		if(Bot.dispatcher){
-			dispatcher.end();
+			Bot.dispatcher.end();
 		}
 		Bot.leave();
 	},
 	skip: function(){
 		if(Bot.dispatcher){
-			dispatcher.end();
+			Bot.dispatcher.end();
 		}
+	},
+	listQ: function(){
+		Bot.message(Bot.queue.returnQ());
 	}
 
 };
@@ -131,16 +139,18 @@ Bot.client.on('message', message => {
 	var command = input[0].toLowerCase();
 	const params = input[1];
 
-	console.log(message.author.voiceChannelID);
-	if(!message.author.voiceChannelID){
+	Bot.text.channel = Bot.client.channels.get(message.channel.id);
+
+	// console.log(message.member.voiceChannelID);
+	if(!message.member.voiceChannelID){
 		return false;
 	}
 
-	console.log(command);
+	// console.log(command);
 	// console.log(message);
 
 	if(!command.startsWith(Bot.prefix)){
-		console.log("not a command");
+		// console.log("not a command");
 		return false;
 	}
 
@@ -149,7 +159,7 @@ Bot.client.on('message', message => {
 	switch(command){
 
 		case "play":
-		Bot.voice.channel = message.author.voiceChannelID;
+		Bot.voice.channel = Bot.client.channels.get(message.member.voiceChannelID);
 		Bot.play(params);
 		break;
 
@@ -163,6 +173,10 @@ Bot.client.on('message', message => {
 
 		case "skip":
 		Bot.skip();
+		break;
+
+		case 'queue':
+		Bot.listQ();
 		break;
 
 		case "config_prefix":
