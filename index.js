@@ -10,7 +10,7 @@ var Queue={
 		this.queue.push(i);
 	},
 	dequeue: function(){
-		if(this.ieEmpty){
+		if(this.isEmpty()){
 			return false;
 		}
 		return this.queue.shift();
@@ -38,7 +38,7 @@ var Bot={
 	dispatcher: null,
 	join: function(id){
 		if(!Bot.voice.connection){
-			if(typeof id == "undefined"){
+			if(!id){
 				return Bot.voice.channel.join();
 			}else{
 				Bot.voice.channel = Bot.client.channels.get(id);
@@ -63,7 +63,8 @@ var Bot={
 	},
 	_playAfterLoad: function(yturl){
 		var stream = null;
-		if(typeof yturl =="undefined"){
+		if(!yturl){
+			//no url provided, just play from queue
 			if(Bot.queue.isEmpty()){
 				return Bot.message("Queue is empty");
 			}
@@ -120,7 +121,7 @@ var Bot={
 
 
 Bot.client.on('ready', () => {
-	console.log('I am ready!');
+	console.log('Loaded!');
 	Bot.text.channel = Bot.client.channels.get(process.env.BOT_CHANNEL);
 	Bot.voice.channel = Bot.client.channels.get(process.env.BOT_VOICE_CHANNEL);
 });
@@ -129,6 +130,10 @@ Bot.client.on('message', message => {
 	var input = message.content.split(/\s(.+)/);
 	var command = input[0].toLowerCase();
 	const params = input[1];
+
+	if(!message.author.voiceChannelID){
+		return Bot.message("Must be in a voice channel to use commands");
+	}
 
 	console.log(command);
 	// console.log(message);
@@ -143,6 +148,7 @@ Bot.client.on('message', message => {
 	switch(command){
 
 		case "play":
+		Bot.voice.channel = message.author.voiceChannelID;
 		Bot.play(params);
 		break;
 
@@ -155,7 +161,7 @@ Bot.client.on('message', message => {
 		break;
 
 		case "skip":
-
+		Bot.skip();
 		break;
 
 		case "config_prefix":
