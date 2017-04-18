@@ -63,6 +63,8 @@ class Bot {
 			let url = next.url;
 			let title = next.title;
 
+			this.message("Now playing: **"+title+"**");
+
 			this.setPlaying(title);
 			stream = ytdl(url, {filter : 'audioonly', quality: "lowest"});
 
@@ -92,6 +94,9 @@ class Bot {
 	}
 	message(m){
 		this.text.channel.send(m);
+		setTimeout(()=>{
+			this.text.bulkDelete(1);
+		});
 	}
 	play(yturl, message, tries){
 		if(message.embeds[0] && message.embeds[0].title){
@@ -126,7 +131,7 @@ class Bot {
 			// this._playAfterLoad();
 			//do nothing...
 			if(message.embeds[0] && message.embeds[0].title){
-				this.message("Added *"+message.embeds[0].title+"* to the queue");
+				this.message("Added **"+message.embeds[0].title+"** to the queue");
 			}else{
 				this.message("Added unknown song to the queue");
 			}
