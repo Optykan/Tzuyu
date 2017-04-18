@@ -3,25 +3,21 @@ require('dotenv').config();
 const Bot = require('./modules/Bot');
 const Discord = require('discord.js');
 
-var Tzuyu = new Bot(new Discord.Client());
+var Tzuyu = new Bot();
 
 Tzuyu.client.on('ready', () => {
 	console.log('Loaded!');
-	Tzuyu.text.channel = Tzuyu.client.channels.get(process.env.BOT_CHANNEL);
-	Tzuyu.voice.channel = Tzuyu.client.channels.get(process.env.BOT_VOICE_CHANNEL);
+	Tzuyu.setTextChannel(process.env.BOT_CHANNEL);
+	Tzuyu.setVoiceChannel(process.env.BOT_VOICE_CHANNEL);
 	Tzuyu.setPlaying("Overwatch"); //hehe
 });
 
+//handle message events (really the only thing we need to do)
 Tzuyu.client.on('message', message => {
 	var input = message.content.split(/\s(.+)/);
 	var command = input[0].toLowerCase();
 	const params = input[1];
 
-
-	// console.log(message.member.voiceChannelID);
-	//if the message member is null or the voice channel id doesnt exist (hello)
-
-	// console.log(message);
 	if(message.channel.type == 'dm'){
 		//do something for dm's
 		// Tzuyu.text.channel = Tzuyu.client.channels.get(message.channel.id);
@@ -33,21 +29,21 @@ Tzuyu.client.on('message', message => {
 		return false;
 	}
 
-	Tzuyu.text.channel = Tzuyu.client.channels.get(message.channel.id);
-	// console.log(command);
-	// console.log(message);
+	Tzuyu.setTextChannel(message.channel.id);
 
 	if(!command.startsWith(Tzuyu.prefix)){
 		// console.log("not a command");
 		return false;
 	}
 
+	console.log("message");
+
 	command=command.substring(1);
 	//play command
 	switch(command){
 
 		case "play":
-		Tzuyu.voice.channel = Tzuyu.client.channels.get(message.member.voiceChannelID);
+		Tzuyu.setVoiceChannel(message.member.voiceChannelID);
 		Tzuyu.play(params);
 		break;
 
@@ -93,4 +89,4 @@ process.on("SIGINT", function () {
   process.exit();
 });
 
-Tzuyu.client.login(process.env.BOT_TOKEN);
+Tzuyu.login(process.env.BOT_TOKEN);

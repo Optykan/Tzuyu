@@ -2,24 +2,25 @@
 
 const ytdl = require('ytdl-core');
 const Queue = require('./Queue');
+const Discord = require("discord.js");
 
 class Bot {
-	constructor(client){
+	constructor(){
 		this.streamOptions = { 
 			seek: 0, 
 			volume: 1 
 		};
 		this.voice ={
 			channel : null
-		},
+		};
 		this.text = {
 			channel: null
-		},
+		};
 		this.prefix = "%";
 		this.connection= null;
 		this.queue = new Queue();
 		this.dispatcher = null;
-		this.client = client;
+		this.client = new Discord.Client();
 	}
 	
 	join(id){
@@ -117,6 +118,15 @@ class Bot {
 	}
 	setStatus(status){
 		this.client.user.setStatus(status);
+	}
+	setVoiceChannel(chanID){
+		this.voice.channel = this.client.channels.get(chanID);
+	}
+	setTextChannel(chanID){
+		this.text.channel = this.client.channels.get(chanID);	
+	}
+	login(token){
+		this.client.login(token);
 	}
 }
 
