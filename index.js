@@ -131,8 +131,9 @@ Bot.client.on('message', message => {
 	var command = input[0].toLowerCase();
 	const params = input[1];
 
+	console.log(message.author.voiceChannelID);
 	if(!message.author.voiceChannelID){
-		return Bot.message("Must be in a voice channel to use commands");
+		return false;
 	}
 
 	console.log(command);
