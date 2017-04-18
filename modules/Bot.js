@@ -65,14 +65,14 @@ class Bot {
 		try{
 			this.dispatcher = this.connection.playStream(stream, this.streamOptions);
 			this.dispatcher.on('end', function(){
-				dispatcher = null;																												
+				this.dispatcher = null;																												
 				if(this.queue.isEmpty()){
 					this.message("Queue is empty, leaving...")
 					this.leave();
 				}else{
 					this._playAfterLoad(this.queue.dequeue());
 				}
-			});
+			}.bind(this));
 		}catch(e){
 			console.log(e);
 			this.message("Something happened");
