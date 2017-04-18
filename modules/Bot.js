@@ -93,15 +93,19 @@ class Bot {
 	message(m){
 		this.text.channel.send(m);
 	}
-	play(yturl, message, hasTried){
+	play(yturl, message, tries){
 		if(message.embeds[0] && message.embeds[0].title){
 			this.queue.enqueue(yturl, message.embeds[0].title);
-		}else if(!hasTried){
+		}else if(!tries || tries < 3){
+			//turns 
 			var that=this;//resolve setTimeOut scope
 
 			//wait 500ms to see if discord will resolve the embed, and return to prevent further code execution
+			if(!tries){
+				tries=0;
+			}
 			return setTimeout(function(){
-				that.play(yturl, message, true);
+				that.play(yturl, message, tries+1);
 			}, 500);
 		}else{
 			//nothign we can doo
@@ -122,7 +126,7 @@ class Bot {
 			// this._playAfterLoad();
 			//do nothing...
 			if(message.embeds[0] && message.embeds[0].title){
-				this.message("Added "+message.embeds[0].title+" to the queue");
+				this.message("Added *"+message.embeds[0].title+"* to the queue");
 			}else{
 				this.message("Added unknown song to the queue");
 			}
@@ -141,7 +145,16 @@ class Bot {
 		}
 	}
 	listQ(){
-		this.message(this.queue.returnQ());
+		var output = "";
+
+		if(this.queue.isEmpty()){
+			return this.message("Queue is empty");
+		}
+		var q = this.queue.returnQ();
+		for(let i=0; i<q.length; i++){
+			output += (i+1).toString()+q[i].title+"\n";
+		}
+		this.message(output);
 	}
 	setPlaying(status){
 		this.client.user.setGame(status);
