@@ -35,6 +35,7 @@ var Bot={
 	prefix: "%",
 	connection: null,
 	queue: Queue,
+	dispatcher: null,
 	join: function(id){
 		if(!Bot.voice.connection){
 			if(typeof id == "undefined"){
@@ -74,14 +75,15 @@ var Bot={
 			stream = ytdl(yturl, {filter : 'audioonly'});
 		}
 		try{
-			const dispatcher = Bot.connection.playStream(stream, Bot.streamOptions);
-			// dispatcher.end(function(){
-			// 	if(Bot.queue.isEmpty){
-			// 		Bot.leave();
-			// 	}else{
-			// 		Bot.play(Bot.queue.dequeue());
-			// 	}
-			// });
+			Bot.dispatcher = Bot.connection.playStream(stream, Bot.streamOptions);
+			Bot.dispatcher.on('end', function(){
+				dispatcher = null;																												
+				if(Bot.queue.isEmpty){
+					Bot.leave();
+				}else{
+					Bot.play(Bot.queue.dequeue());
+				}
+			});
 		}catch(e){
 			console.log(e);
 			Bot.message("Something happened");
@@ -101,7 +103,19 @@ var Bot={
 		}else{
 			Bot._playAfterLoad();
 		}
+	},
+	stop: function(){
+		if(Bot.dispatcher){
+			dispatcher.end();
+		}
+		Bot.leave();
+	},
+	skip: function(){
+		if(Bot.dispatcher){
+			dispatcher.end();
+		}
 	}
+
 };
 
 
@@ -138,6 +152,10 @@ Bot.client.on('message', message => {
 
 		case "leave":
 		Bot.leave();
+		break;
+
+		case "skip":
+
 		break;
 
 		case "config_prefix":
