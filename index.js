@@ -139,13 +139,23 @@ Bot.client.on('message', message => {
 	var command = input[0].toLowerCase();
 	const params = input[1];
 
-	Bot.text.channel = Bot.client.channels.get(message.channel.id);
 
 	// console.log(message.member.voiceChannelID);
-	if(!message.member.voiceChannelID){
+	//if the message member is null or the voice channel id doesnt exist (hello)
+
+	// console.log(message);
+	if(message.channel.type == 'dm'){
+		//do something for dm's
+		// Bot.text.channel = Bot.client.channels.get(message.channel.id);
+		// //go away... 
+		// Bot.message("zzz...");
+		return false;
+	}
+	if(!message.member || !message.member.voiceChannelID){
 		return false;
 	}
 
+	Bot.text.channel = Bot.client.channels.get(message.channel.id);
 	// console.log(command);
 	// console.log(message);
 
