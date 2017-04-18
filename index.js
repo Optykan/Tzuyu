@@ -9,6 +9,7 @@ Tzuyu.client.on('ready', () => {
 	console.log('Loaded!');
 	Tzuyu.text.channel = Tzuyu.client.channels.get(process.env.BOT_CHANNEL);
 	Tzuyu.voice.channel = Tzuyu.client.channels.get(process.env.BOT_VOICE_CHANNEL);
+	Tzuyu.setPlaying("Overwatch"); //hehe
 });
 
 Tzuyu.client.on('message', message => {

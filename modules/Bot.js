@@ -88,7 +88,10 @@ class Bot {
 			this.join().then(conn=>{
 				this.connection = conn;
 				this._playAfterLoad();
-			}).catch(console.error);
+			}).catch(e => {
+				console.error(e);
+				this.leave();
+			});
 		}else{
 			// this._playAfterLoad();
 			//do nothing...
@@ -108,6 +111,12 @@ class Bot {
 	}
 	listQ(){
 		this.message(this.queue.returnQ());
+	}
+	setPlaying(status){
+		this.client.user.setGame(status);
+	}
+	setStatus(status){
+		this.client.user.setStatus(status);
 	}
 }
 
