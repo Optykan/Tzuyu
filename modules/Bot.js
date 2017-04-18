@@ -48,16 +48,24 @@ class Bot {
 				};
 			}
 		}
+		this.setPlaying("Overwatch"); //well...
 	}
 	_playAfterLoad(yturl){
+		//assumes we are connected to voice and plays the top of the queue or whatever is specified
 		var stream = null;
 		if(!yturl){
 			//no url provided, just play from queue
 			if(this.queue.isEmpty()){
-				return this.message("Queue is empty");
+				this.message("Queue is empty, leaving...");
+				return this.leave();
 			}
-			const url = this.queue.dequeue();
+			let next= this.queue.dequeue();
+			let url = next.url;
+			let title = next.title;
+
+			this.setPlaying(title);
 			stream = ytdl(url, {filter : 'audioonly', quality: "lowest"});
+
 			console.log("playing" +url);
 		}else{
 			console.log("provided param "+yturl);
@@ -65,27 +73,44 @@ class Bot {
 		}
 		try{
 			this.dispatcher = this.connection.playStream(stream, this.streamOptions);
+
+			//bind a callback to do something when the song ends
 			this.dispatcher.on('end', function(){
 				this.dispatcher = null;																												
 				if(this.queue.isEmpty()){
 					this.message("Queue is empty, leaving...")
-					this.leave();
+					return this.leave();
 				}else{
-					this._playAfterLoad(this.queue.dequeue());
+					this._playAfterLoad();
 				}
 			}.bind(this));
 		}catch(e){
 			console.log(e);
 			this.message("Something happened");
+			this.leave();
 		}
 	}
 	message(m){
 		this.text.channel.send(m);
 	}
-	play(yturl){
-		this.queue.enqueue(yturl);
+	play(yturl, message, hasTried){
+		if(message.embeds[0] && message.embeds[0].title){
+			this.queue.enqueue(yturl, message.embeds[0].title);
+		}else if(!hasTried){
+			var that=this;//resolve setTimeOut scope
+
+			//wait 500ms to see if discord will resolve the embed, and return to prevent further code execution
+			return setTimeout(function(){
+				that.play(yturl, message, true);
+			}, 500);
+		}else{
+			//nothign we can doo
+			this.queue.enqueue(yturl, "???");
+		}
+
 		if(!this.connection){
 			console.log("No connection, connecting...");
+
 			this.join().then(conn=>{
 				this.connection = conn;
 				this._playAfterLoad();
@@ -96,6 +121,11 @@ class Bot {
 		}else{
 			// this._playAfterLoad();
 			//do nothing...
+			if(message.embeds[0] && message.embeds[0].title){
+				this.message("Added "+message.embeds[0].title+" to the queue");
+			}else{
+				this.message("Added unknown song to the queue");
+			}
 		}
 	}
 

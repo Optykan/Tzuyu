@@ -4,8 +4,8 @@ class Queue{
 	constructor(){
 		this.q = [];
 	}
-	enqueue(i){
-		this.q.push(i);
+	enqueue(url, title){
+		this.q.push({'url': url, 'title': title});
 	}
 	dequeue(){
 		if(this.isEmpty()){

@@ -36,7 +36,7 @@ Tzuyu.client.on('message', message => {
 		return false;
 	}
 
-	console.log("message");
+	// console.log(message);
 
 	command=command.substring(1);
 	//play command
@@ -44,7 +44,7 @@ Tzuyu.client.on('message', message => {
 
 		case "play":
 		Tzuyu.setVoiceChannel(message.member.voiceChannelID);
-		Tzuyu.play(params);
+		Tzuyu.play(params, message);
 		break;
 
 		case "kill":
