@@ -94,9 +94,7 @@ class Bot {
 	}
 	message(m){
 		this.text.channel.send(m).then(message=>{
-			setTimeout(()=>{
-				this.text.channel.bulkDelete([message]);
-			}, 1000);
+			this.client.deleteMessage(message, {wait: 1500});
 		});
 	}
 	play(yturl, message, tries){
@@ -158,7 +156,7 @@ class Bot {
 		}
 		var q = this.queue.returnQ();
 		for(let i=0; i<q.length; i++){
-			output += (i+1).toString()+q[i].title+"\n";
+			output += (i+1).toString()+". **"+q[i].title+"**\n";
 		}
 		this.message(output);
 	}
