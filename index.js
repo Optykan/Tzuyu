@@ -72,7 +72,7 @@ var Bot={
 				return Bot.message("Queue is empty");
 			}
 			const url = Bot.queue.dequeue();
-			stream = ytdl(url, {filter : 'audioonly'});
+			stream = ytdl(url, {filter : 'audioonly', quality: "lowest"});
 			console.log("playing" +url);
 		}else{
 			console.log("provided param "+yturl);
