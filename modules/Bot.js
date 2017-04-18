@@ -93,10 +93,11 @@ class Bot {
 		}
 	}
 	message(m){
-		this.text.channel.send(m);
-		setTimeout(()=>{
-			this.text.channel.bulkDelete(1);
-		}, 1000);
+		this.text.channel.send(m).then(message=>{
+			setTimeout(()=>{
+				this.text.channel.bulkDelete([message]);
+			}, 1000);
+		});
 	}
 	play(yturl, message, tries){
 		if(message.embeds[0] && message.embeds[0].title){
