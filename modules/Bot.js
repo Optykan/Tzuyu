@@ -95,8 +95,8 @@ class Bot {
 	message(m){
 		this.text.channel.send(m);
 		setTimeout(()=>{
-			this.text.bulkDelete(1);
-		});
+			this.text.chennel.bulkDelete(1);
+		}, 1000);
 	}
 	play(yturl, message, tries){
 		if(message.embeds[0] && message.embeds[0].title){
