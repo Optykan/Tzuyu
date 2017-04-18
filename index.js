@@ -7,8 +7,8 @@ var Tzuyu = new Bot(new Discord.Client());
 
 Tzuyu.client.on('ready', () => {
 	console.log('Loaded!');
-	Tzuyu.text.channel = Tzuyu.client.channels.get(process.env.Tzuyu_CHANNEL);
-	Tzuyu.voice.channel = Tzuyu.client.channels.get(process.env.Tzuyu_VOICE_CHANNEL);
+	Tzuyu.text.channel = Tzuyu.client.channels.get(process.env.BOT_CHANNEL);
+	Tzuyu.voice.channel = Tzuyu.client.channels.get(process.env.BOT_VOICE_CHANNEL);
 });
 
 Tzuyu.client.on('message', message => {
@@ -92,4 +92,4 @@ process.on("SIGINT", function () {
   process.exit();
 });
 
-Tzuyu.client.login(process.env.Tzuyu_TOKEN);
+Tzuyu.client.login(process.env.BOT_TOKEN);
