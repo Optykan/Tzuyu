@@ -101,7 +101,7 @@ class Bot {
 	}
 	message(m){
 		this.text.channel.send(m).then(message=>{
-			message.delete(10000);
+			message.delete(this.config.messageDelay);
 		});
 	}
 	play(yturl, message, tries){
