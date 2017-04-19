@@ -69,7 +69,7 @@ Tzuyu.client.on('message', message => {
 		break;
 
 		case "config_delete_delay":
-		if(Tzuyu.setPrefix(params)){
+		if(Tzuyu.setMessageDeleteDelay(params)){
 			Tzuyu.message("Changed delay to `"+params+"`ms");
 		}else{
 			Tzuyu.message("Sorry! Something went wrong");
