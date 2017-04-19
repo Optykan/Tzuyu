@@ -16,11 +16,14 @@ class Bot {
 		this.text = {
 			channel: null
 		};
-		this.prefix = "%";
 		this.connection= null;
 		this.queue = new Queue();
 		this.dispatcher = null;
 		this.client = new Discord.Client();
+		this.config = {
+			prefix: "%",
+			messageDelay: 10000
+		}
 	}
 	
 	join(id){
@@ -98,7 +101,7 @@ class Bot {
 	}
 	message(m){
 		this.text.channel.send(m).then(message=>{
-			message.delete(1500);
+			message.delete(10000);
 		});
 	}
 	play(yturl, message, tries){
@@ -175,6 +178,16 @@ class Bot {
 	}
 	setTextChannel(chanID){
 		this.text.channel = this.client.channels.get(chanID);	
+	}
+	setPrefix(pfx){
+		this.config.prefix = pfx;
+	}
+	setMessageDeleteDelay(i){
+		if(!isNan(parseInt(i))){
+			this.config.messageDelay = parseInt(i);
+			return true;
+		}
+		return false;
 	}
 	login(token){
 		this.client.login(token);

@@ -31,7 +31,7 @@ Tzuyu.client.on('message', message => {
 
 	Tzuyu.setTextChannel(message.channel.id);
 
-	if(!command.startsWith(Tzuyu.prefix)){
+	if(!command.startsWith(Tzuyu.config.prefix)){
 		// console.log("not a command");
 		return false;
 	}
@@ -64,8 +64,16 @@ Tzuyu.client.on('message', message => {
 		break;
 
 		case "config_prefix":
-		Tzuyu.prefix=params;
-		Tzuyu.message("Changed prefix to "+params);
+		Tzuyu.setPrefix(params);
+		Tzuyu.message("Changed prefix to `"+params+"`");
+		break;
+
+		case "config_delete_delay":
+		if(Tzuyu.setPrefix(params)){
+			Tzuyu.message("Changed prefix to `"+params+"`");
+		}else{
+			Tzuyu.message("Sorry! Something went wrong");
+		}
 		break;
 
 	}
