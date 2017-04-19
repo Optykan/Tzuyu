@@ -29,13 +29,12 @@ Tzuyu.client.on('message', message => {
 		return false;
 	}
 
-	Tzuyu.setTextChannel(message.channel.id);
-
 	if(!command.startsWith(Tzuyu.config.prefix)){
 		// console.log("not a command");
 		return false;
 	}
 
+	Tzuyu.setTextChannel(message.channel.id);
 	// console.log(message);
 
 	command=command.substring(1);
