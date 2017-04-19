@@ -70,7 +70,7 @@ Tzuyu.client.on('message', message => {
 
 		case "config_delete_delay":
 		if(Tzuyu.setPrefix(params)){
-			Tzuyu.message("Changed prefix to `"+params+"`");
+			Tzuyu.message("Changed delay to `"+params+"`ms");
 		}else{
 			Tzuyu.message("Sorry! Something went wrong");
 		}
