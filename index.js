@@ -2,8 +2,10 @@ require('dotenv').config();
 
 const Bot = require('./modules/Bot');
 const Discord = require('discord.js');
+const YouTube = require('./modules/YouTube');
 
 var Tzuyu = new Bot();
+var Search = new YouTube(process.env.YT_API_KEY);
 
 Tzuyu.client.on('ready', () => {
 	console.log('Loaded!');
@@ -45,6 +47,11 @@ Tzuyu.client.on('message', message => {
 		case "play":
 		Tzuyu.setVoiceChannel(message.member.voiceChannelID);
 		Tzuyu.play(params, message);
+		break;
+		
+		case "search":
+			Tuyu.search (params, message);
+			Tzuyu.play('http://www.youtube.com/watch?v='+Youtube.search(params));
 		break;
 
 		case "kill":
