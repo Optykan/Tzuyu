@@ -35,6 +35,10 @@ class Bot {
 	}
 	
 	leave(){
+		this.queue.dumpQ();
+		if(this.dispatcher){
+			this.dispatcher.end();
+		}
 		if(this.connection){
 			this.voice.channel.leave();
 			this.connection=null;
@@ -94,7 +98,7 @@ class Bot {
 	}
 	message(m){
 		this.text.channel.send(m).then(message=>{
-			this.client.deleteMessage(message, {wait: 1500});
+			message.delete(1500);
 		});
 	}
 	play(yturl, message, tries){

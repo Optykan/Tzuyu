@@ -19,6 +19,9 @@ class Queue{
 	returnQ(){
 		return this.q;
 	}
+	dumpQ(){
+		this.q=[];
+	}
 }
 
 module.exports = Queue;
