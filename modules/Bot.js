@@ -143,6 +143,10 @@ class Bot {
 			}
 		}
 	}
+	search(term){
+		
+		
+	}
 
 	stop(){
 		if(this.dispatcher){
