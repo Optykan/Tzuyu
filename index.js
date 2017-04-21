@@ -32,6 +32,10 @@ Tzuyu.client.on('message', message => {
 		//if the user is not in a voice channel
 		return false;
 	}
+	if(!blacklist(message.member)){
+		//config files? Where would I out this. I'll ask at lunch
+		return false;
+	}
 
 	if(!command.startsWith(Tzuyu.config.prefix)){
 		// console.log("not a command");
@@ -61,7 +65,12 @@ Tzuyu.client.on('message', message => {
 				Tzuyu.play(request.payload);
 			}
 		break;
-
+		
+		case "playing":
+		//Remind me to collect the ID of user who added the playlist as well (later tho)
+			Tzuyu.currentSong();
+		break;
+		
 		case "kill":
 			Tzuyu.leave();
 		break;

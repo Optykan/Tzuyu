@@ -57,6 +57,15 @@ class Bot {
 		}
 		this.setPlaying("Overwatch"); //well...
 	}
+	currentSong(){
+		//basically copied from below, but hey, posterity (and learning)
+		//There is PROBABLY a way to get this into a simpler function, and then have _playAfterLoad use it instead???
+		if(this.queue.isEmpty()){
+			this.message("Queue is empty, leaving...");
+		}else{
+			this.message("Now playing: **"+this.queue.peek().title+"** with URL:\n"+this.queue.peek.url);
+		}
+	}
 	_playAfterLoad(yturl){
 		//assumes we are connected to voice and plays the top of the queue or whatever is specified
 		var stream = null;
@@ -99,7 +108,6 @@ class Bot {
 			this.leave();
 		}
 	}
-
 	message(m){
 		this.text.channel.send(m).then(message=>{
 			message.delete(this.config.messageDelay);
