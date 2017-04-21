@@ -13,6 +13,15 @@ class Queue{
 		}
 		return this.q.shift();
 	}
+	peek(){
+		return this.q[0];
+	}
+	peekLast(){
+		if(this.q.length==0){
+			return false;
+		}
+		return this.q[this.q.length-1];
+	}
 	isEmpty(){
 		return this.q.length == 0;
 	}

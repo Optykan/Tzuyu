@@ -2,10 +2,10 @@ require('dotenv').config();
 
 const Bot = require('./modules/Bot');
 const Discord = require('discord.js');
-const YouTube = require('./modules/YouTube');
+const YouTubeInterface = require('./modules/YouTube');
 
 var Tzuyu = new Bot();
-var Search = new YouTube(process.env.YT_API_KEY);
+var YouTube = new YouTubeInterface(process.env.YT_API_KEY);
 
 Tzuyu.client.on('ready', () => {
 	console.log('Loaded!');
@@ -27,7 +27,9 @@ Tzuyu.client.on('message', message => {
 		// Tzuyu.message("zzz...");
 		return false;
 	}
+
 	if(!message.member || !message.member.voiceChannelID){
+		//if the user is not in a voice channel
 		return false;
 	}
 
@@ -44,42 +46,49 @@ Tzuyu.client.on('message', message => {
 	switch(command){
 
 		case "play":
-		Tzuyu.setVoiceChannel(message.member.voiceChannelID);
-		Tzuyu.play(params, message);
-		break;
-		
-		case "search":
-			Tuyu.search (params, message);
-			Tzuyu.play('http://www.youtube.com/watch?v='+Youtube.search(params));
+			Tzuyu.setVoiceChannel(message.member.voiceChannelID);
+			var request = YouTube.parsePlayRequest(params);
+			if(request.type=='playlist'){
+				YouTube.parsePlayList(request.payload, (videos)=>{
+					Tzuyu.playList(videos);
+				});
+			}else if(request.type=='search'){
+				YouTube.search(request.payload, (url, title)=>{
+					Tzuyu.playGivenTitle(url, title);
+				});
+			}else{
+				//direct request
+				Tzuyu.play(request.payload);
+			}
 		break;
 
 		case "kill":
-		Tzuyu.leave();
+			Tzuyu.leave();
 		break;
 
 		case "leave":
-		Tzuyu.leave();
+			Tzuyu.leave();
 		break;
 
 		case "skip":
-		Tzuyu.skip();
+			Tzuyu.skip();
 		break;
 
 		case 'queue':
-		Tzuyu.listQ();
+			Tzuyu.listQ();
 		break;
 
 		case "config_prefix":
-		Tzuyu.setPrefix(params);
-		Tzuyu.message("Changed prefix to `"+params+"`");
+			Tzuyu.setPrefix(params);
+			Tzuyu.message("Changed prefix to `"+params+"`");
 		break;
 
 		case "config_delete_delay":
-		if(Tzuyu.setMessageDeleteDelay(params)){
-			Tzuyu.message("Changed delay to `"+params+"`ms");
-		}else{
-			Tzuyu.message("Sorry! Something went wrong");
-		}
+			if(Tzuyu.setMessageDeleteDelay(params)){
+				Tzuyu.message("Changed delay to `"+params+"`ms");
+			}else{
+				Tzuyu.message("Sorry! Something went wrong");
+			}
 		break;
 
 	}

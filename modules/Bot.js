@@ -99,10 +99,48 @@ class Bot {
 			this.leave();
 		}
 	}
+
 	message(m){
 		this.text.channel.send(m).then(message=>{
 			message.delete(this.config.messageDelay);
 		});
+	}
+	_ensureConnectionAfterRequest(){
+		if(!this.connection){
+			console.log("No connection, connecting...");
+
+			this.join().then(conn=>{
+				this.connection = conn;
+				this._playAfterLoad();
+			}).catch(e => {
+				console.error(e);
+				this.leave();
+			});
+		}else{
+			// this._playAfterLoad();
+			//do nothing...
+			var latest=this.queue.peekLast();
+			if(latest){
+				let title=latest.title;
+				let url = latest.url;
+				this.message("Added **"+title+"** to the queue");
+			}else{
+				this.message("Something happened.");
+			}
+		}
+	}
+	playList(listArray){
+		if(listArray){
+			for(let i=0; i<listArray.length; i++){
+				this.playGivenTitle(listArray[i].url, listArray[i].title);
+			}
+		}else{
+			this.message("Something went wrong");
+		}
+	}
+	playGivenTitle(yturl, title, isPlayList){
+		this.queue.enqueue(yturl, title);
+		this._ensureConnectionAfterRequest();
 	}
 	play(yturl, message, tries){
 		if(message.embeds[0] && message.embeds[0].title){
@@ -123,31 +161,8 @@ class Bot {
 			this.queue.enqueue(yturl, "???");
 		}
 
-		if(!this.connection){
-			console.log("No connection, connecting...");
-
-			this.join().then(conn=>{
-				this.connection = conn;
-				this._playAfterLoad();
-			}).catch(e => {
-				console.error(e);
-				this.leave();
-			});
-		}else{
-			// this._playAfterLoad();
-			//do nothing...
-			if(message.embeds[0] && message.embeds[0].title){
-				this.message("Added **"+message.embeds[0].title+"** to the queue");
-			}else{
-				this.message("Added unknown song to the queue");
-			}
-		}
+		this._ensureConnectionAfterRequest();
 	}
-	search(term){
-		
-		
-	}
-
 	stop(){
 		if(this.dispatcher){
 			this.dispatcher.end();
@@ -167,35 +182,35 @@ class Bot {
 		}
 		var q = this.queue.returnQ();
 		for(let i=0; i<q.length; i++){
-			output += (i+1).toString()+". **"+q[i].title+"**\n";
-		}
-		this.message(output);
+	output += (i+1).toString()+". **"+q[i].title+"**\n";
+}
+this.message(output);
+}
+setPlaying(status){
+	this.client.user.setGame(status);
+}
+setStatus(status){
+	this.client.user.setStatus(status);
+}
+setVoiceChannel(chanID){
+	this.voice.channel = this.client.channels.get(chanID);
+}
+setTextChannel(chanID){
+	this.text.channel = this.client.channels.get(chanID);	
+}
+setPrefix(pfx){
+	this.config.prefix = pfx;
+}
+setMessageDeleteDelay(i){
+	if(!isNan(parseInt(i))){
+		this.config.messageDelay = parseInt(i);
+		return true;
 	}
-	setPlaying(status){
-		this.client.user.setGame(status);
-	}
-	setStatus(status){
-		this.client.user.setStatus(status);
-	}
-	setVoiceChannel(chanID){
-		this.voice.channel = this.client.channels.get(chanID);
-	}
-	setTextChannel(chanID){
-		this.text.channel = this.client.channels.get(chanID);	
-	}
-	setPrefix(pfx){
-		this.config.prefix = pfx;
-	}
-	setMessageDeleteDelay(i){
-		if(!isNan(parseInt(i))){
-			this.config.messageDelay = parseInt(i);
-			return true;
-		}
-		return false;
-	}
-	login(token){
-		this.client.login(token);
-	}
+	return false;
+}
+login(token){
+	this.client.login(token);
+}
 }
 
 module.exports = Bot;

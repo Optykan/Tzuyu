@@ -10,6 +10,43 @@ class YouTube {
 			key:key
 		};
 	}
+	parsePlayRequest(params){
+		//accepts the part after the %play command
+		if(/https?:\/\/(?:www\.)?youtube\.(?:.+?)\/watch/.exec(params)){
+			//its a youtube url
+			var playlist = /https?:\/\/(?:www\.)?youtube\.(?:.+?)\/watch(?:.*?)&list=(.*)/.exec(params);
+			if(playlist){
+				return {
+					type: 'playlist',
+					payload: playlist[1]
+				}
+			}else{
+				return {
+					type: 'direct',
+					payload: params
+				};
+			}
+		}else if(/https?:\/\/(?:www\.)?youtu\.be\//.exec(params)){
+			//its a youtu.be url
+			if(/https?:\/\/(?:www\.)?youtu\.be\/(?:.*?)&list=(.*)/.exec(params)){
+				return {
+					type: 'playlist',
+					payload: playlist[1]
+				}
+			}else{
+				return {
+					type: 'direct',
+					payload: params
+				};
+			}
+		}else{
+			return {
+				type: 'search',
+				payload: params
+			};
+		}
+	}
+
 	_fetch(url, params, callback){
 		if (typeof callback !== 'function'){
 			console.warn("no callback function defined for "+url);
@@ -38,8 +75,9 @@ class YouTube {
 
 		_fetch("https://www.googleapis.com/youtube/v3/search", params, json=>{
 			var url =""; //the result url
+			var title = "song title";
 			//do stuff
-			callback(url);
+			callback(url, title);
 		});
 	}
 	parsePlaylist(playlistId, callback){
@@ -54,9 +92,12 @@ class YouTube {
 				for(let i=0; i<json.items.length; i++){
 					res.push({
 						title: json.items[i].snippet.title,
-						url: json.items[i].snippet.resourceId.videoId
+						url: "https://www.youtube.com/watch?v="+json.items[i].snippet.resourceId.videoId
 					});
 				}
+				callback(res);
+			}else{
+				callback([]);
 			}
 		});
 	}
