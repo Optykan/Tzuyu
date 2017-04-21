@@ -85,12 +85,11 @@ class YouTube {
 		this._fetch("https://www.googleapis.com/youtube/v3/playlistItems", params, json=>{
 			if(!json.errors && json.items[0]){
 				for(let i=0; i<json.items.length; i++){
-					res.push({
+					result.push({
 						title: json.items[i].snippet.title,
 						url: "https://www.youtube.com/watch?v="+json.items[i].snippet.resourceId.videoId
 					});
 				}
-				result.push(res);
 			}
 			if(json.nextPageToken){
 				_parsePlaylistThroughPages(result);
@@ -105,15 +104,15 @@ class YouTube {
 			maxResults: 50
 		};
 		this._fetch("https://www.googleapis.com/youtube/v3/playlistItems", params, json=>{
-			if(json.nextPageToken){
-
-			}
 			if(!json.errors && json.items[0]){
 				for(let i=0; i<json.items.length; i++){
 					res.push({
 						title: json.items[i].snippet.title,
 						url: "https://www.youtube.com/watch?v="+json.items[i].snippet.resourceId.videoId
 					});
+				}
+				if(json.nextPageToken){
+					_parsePlaylistThroughPages(res);
 				}
 				callback(res);
 			}else{
