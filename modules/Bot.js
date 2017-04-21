@@ -204,8 +204,6 @@ class Bot {
 	listQ(){
 		var output = "";
 
-		console.log(this.queue);
-
 		if(this.queue.isEmpty()){
 			return this.message("Queue is empty");
 		}

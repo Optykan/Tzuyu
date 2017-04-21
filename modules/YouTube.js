@@ -85,7 +85,6 @@ class YouTube {
 	}
 
 	_parsePlaylistThroughPages(token, playlistId, callback){
-		console.log("LETS GOOOOO");
 		var params = {
 			part: 'snippet',
 			playlistId: playlistId,
