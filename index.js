@@ -58,7 +58,7 @@ Tzuyu.client.on('message', message => {
 				});
 			}else{
 				//direct request
-				Tzuyu.play(request.payload);
+				Tzuyu.play(request.payload, message);
 			}
 		break;
 
