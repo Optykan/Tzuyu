@@ -32,10 +32,6 @@ Tzuyu.client.on('message', message => {
 		//if the user is not in a voice channel
 		return false;
 	}
-	if(!blacklist(message.member)){
-		//config files? Where would I out this. I'll ask at lunch
-		return false;
-	}
 
 	if(!command.startsWith(Tzuyu.config.prefix)){
 		// console.log("not a command");
