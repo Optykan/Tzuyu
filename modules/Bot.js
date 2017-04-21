@@ -24,10 +24,37 @@ class Bot {
 			prefix: "%",
 			messageDelay: 10000
 		}
+		this.isConnecting = false;
+
+		this.permlist={
+			users: [116399321661833218, 304780284077801472],
+			isActive: true,
+			type: 'blacklist'
+		};
+	}
+
+	addToPermlist(id){
+		this.whitelist.push(id);
+	}
+
+	isPermitted(id){
+		if(this.permlist.isActive){
+			if(this.permlist.type=="whitelist"){
+				return this.permlist.users.includes(id);
+			}else{
+				return !this.permlist.users.includes(id);
+			}
+		}else{
+			return true;
+		}
+	}
+	setPermlistStatus(status){
+		this.permlist.type = status;
 	}
 	
 	join(id){
 		if(!this.voice.connection){
+			this.isConnecting = true;
 			if(!id){
 				return this.voice.channel.join();
 			}else{
@@ -105,42 +132,42 @@ class Bot {
 			message.delete(this.config.messageDelay);
 		});
 	}
-	_ensureConnectionAfterRequest(){
-		if(!this.connection){
+	_ensureConnectionAfterRequest(isPlaylist){
+		if(!this.connection && !this.isConnecting){
 			console.log("No connection, connecting...");
 
 			this.join().then(conn=>{
+				this.isConnecting = false;
 				this.connection = conn;
 				this._playAfterLoad();
 			}).catch(e => {
 				console.error(e);
 				this.leave();
 			});
-		}else{
-			// this._playAfterLoad();
-			//do nothing...
+		}else if(!isPlaylist){
 			var latest=this.queue.peekLast();
-			if(latest){
+			if(latest && !isPlaylist){
 				let title=latest.title;
 				let url = latest.url;
 				this.message("Added **"+title+"** to the queue");
 			}else{
-				this.message("Something happened.");
+				this.message("Something happened");
 			}
 		}
 	}
 	playList(listArray){
+		this.message("Adding playlist to queue");
 		if(listArray){
 			for(let i=0; i<listArray.length; i++){
-				this.playGivenTitle(listArray[i].url, listArray[i].title);
+				this.playGivenTitle(listArray[i].url, listArray[i].title, true);
 			}
 		}else{
 			this.message("Something went wrong");
 		}
 	}
-	playGivenTitle(yturl, title, isPlayList){
+	playGivenTitle(yturl, title, isPlaylist){
 		this.queue.enqueue(yturl, title);
-		this._ensureConnectionAfterRequest();
+		this._ensureConnectionAfterRequest(isPlaylist);
 	}
 	play(yturl, message, tries){
 		if(message.embeds[0] && message.embeds[0].title){
@@ -182,35 +209,41 @@ class Bot {
 		}
 		var q = this.queue.returnQ();
 		for(let i=0; i<q.length; i++){
-	output += (i+1).toString()+". **"+q[i].title+"**\n";
-}
-this.message(output);
-}
-setPlaying(status){
-	this.client.user.setGame(status);
-}
-setStatus(status){
-	this.client.user.setStatus(status);
-}
-setVoiceChannel(chanID){
-	this.voice.channel = this.client.channels.get(chanID);
-}
-setTextChannel(chanID){
-	this.text.channel = this.client.channels.get(chanID);	
-}
-setPrefix(pfx){
-	this.config.prefix = pfx;
-}
-setMessageDeleteDelay(i){
-	if(!isNan(parseInt(i))){
-		this.config.messageDelay = parseInt(i);
-		return true;
+			output += (i+1).toString()+". **"+q[i].title+"**\n";
+		}
+		this.message(output);
 	}
-	return false;
-}
-login(token){
-	this.client.login(token);
-}
+	shuffle(){
+		this.queue.shuffle();
+	}
+	setPlaying(status){
+		this.client.user.setGame(status);
+	}
+	setStatus(status){
+		this.client.user.setStatus(status);
+	}
+	setVoiceChannel(chanID){
+		this.voice.channel = this.client.channels.get(chanID);
+	}
+	setTextChannel(chanID){
+		this.text.channel = this.client.channels.get(chanID);	
+	}
+	setPrefix(pfx){
+		this.config.prefix = pfx;
+	}
+	getPrefix(){
+		return this.config.prefix;
+	}
+	setMessageDeleteDelay(i){
+		if(!isNan(parseInt(i))){
+			this.config.messageDelay = parseInt(i);
+			return true;
+		}
+		return false;
+	}
+	login(token){
+		this.client.login(token);
+	}
 }
 
 module.exports = Bot;

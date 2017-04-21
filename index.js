@@ -20,6 +20,7 @@ Tzuyu.client.on('message', message => {
 	var command = input[0].toLowerCase();
 	const params = input[1];
 
+
 	if(message.channel.type == 'dm'){
 		//do something for dm's
 		// Tzuyu.text.channel = Tzuyu.client.channels.get(message.channel.id);
@@ -33,8 +34,12 @@ Tzuyu.client.on('message', message => {
 		return false;
 	}
 
-	if(!command.startsWith(Tzuyu.config.prefix)){
+	if(!command.startsWith(Tzuyu.getPrefix())){
 		// console.log("not a command");
+		return false;
+	}
+
+	if(!Tzuyu.isPermitted(message.author.id)){
 		return false;
 	}
 
@@ -49,7 +54,7 @@ Tzuyu.client.on('message', message => {
 			Tzuyu.setVoiceChannel(message.member.voiceChannelID);
 			var request = YouTube.parsePlayRequest(params);
 			if(request.type=='playlist'){
-				YouTube.parsePlayList(request.payload, (videos)=>{
+				YouTube.parsePlaylist(request.payload, (videos)=>{
 					Tzuyu.playList(videos);
 				});
 			}else if(request.type=='search'){
@@ -72,15 +77,25 @@ Tzuyu.client.on('message', message => {
 
 		case "skip":
 			Tzuyu.skip();
+			Tzuyu.message("Skipped song");
 		break;
 
 		case 'queue':
 			Tzuyu.listQ();
 		break;
 
+		case 'shuffle':
+			Tzuyu.shuffle();
+			Tzuyu.message("Shuffled queue");
+		break;
+
 		case "config_prefix":
 			Tzuyu.setPrefix(params);
 			Tzuyu.message("Changed prefix to `"+params+"`");
+		break;
+
+		case "help":
+			Tzuyu.message("Available commands: \n\n play, kill, leave, skip, queue, config_prefix, config_delete_delay \n\n Current prefix: `"+Tzuyu.getPrefix()+"`");
 		break;
 
 		case "config_delete_delay":

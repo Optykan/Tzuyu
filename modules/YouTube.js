@@ -73,11 +73,28 @@ class YouTube {
 			q: term
 		};
 
-		_fetch("https://www.googleapis.com/youtube/v3/search", params, json=>{
+		this._fetch("https://www.googleapis.com/youtube/v3/search", params, json=>{
 			var url =""; //the result url
 			var title = "song title";
 			//do stuff
 			callback(url, title);
+		});
+	}
+
+	_parsePlaylistThroughPages(result){
+		this._fetch("https://www.googleapis.com/youtube/v3/playlistItems", params, json=>{
+			if(!json.errors && json.items[0]){
+				for(let i=0; i<json.items.length; i++){
+					res.push({
+						title: json.items[i].snippet.title,
+						url: "https://www.youtube.com/watch?v="+json.items[i].snippet.resourceId.videoId
+					});
+				}
+				result.push(res);
+			}
+			if(json.nextPageToken){
+				_parsePlaylistThroughPages(result);
+			}
 		});
 	}
 	parsePlaylist(playlistId, callback){
@@ -87,7 +104,10 @@ class YouTube {
 			playlistId: playlistId,
 			maxResults: 50
 		};
-		_fetch(" https://www.googleapis.com/youtube/v3/playlistItems", params, json=>{
+		this._fetch("https://www.googleapis.com/youtube/v3/playlistItems", params, json=>{
+			if(json.nextPageToken){
+
+			}
 			if(!json.errors && json.items[0]){
 				for(let i=0; i<json.items.length; i++){
 					res.push({
