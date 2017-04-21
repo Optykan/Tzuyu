@@ -9,6 +9,7 @@ class YouTube {
 		this.opts={
 			key:key
 		};
+		this.playlistStore=[];
 	}
 	parsePlayRequest(params){
 		//accepts the part after the %play command
@@ -61,11 +62,13 @@ class YouTube {
 
 		urlencoded = "?"+urlencoded.substring(1);
 
-			fetch(url+urlencoded+'&key='+this.opts.key).then(result => {
+		fetch(url+urlencoded+'&key='+this.opts.key).then(result => {
 			return result.json(); //ensure a search isn't resulting no videos, making items[0] nil
 		}).then(json => {
 			callback(json);
-		}).catch(console.error);
+		}).catch(e=>{
+			console.error(e);
+		});
 	}
 	search (term,callback){
 		var params = {
@@ -81,23 +84,33 @@ class YouTube {
 		});
 	}
 
-	_parsePlaylistThroughPages(result){
+	_parsePlaylistThroughPages(token, playlistId, callback){
+		console.log("LETS GOOOOO");
+		var params = {
+			part: 'snippet',
+			playlistId: playlistId,
+			maxResults: 50,
+			pageToken: token
+		};
+
 		this._fetch("https://www.googleapis.com/youtube/v3/playlistItems", params, json=>{
 			if(!json.errors && json.items && json.items[0]){
 				for(let i=0; i<json.items.length; i++){
-					result.push({
+					this.playlistStore.push({
 						title: json.items[i].snippet.title,
 						url: "https://www.youtube.com/watch?v="+json.items[i].snippet.resourceId.videoId
 					});
 				}
 			}
 			if(json.nextPageToken){
-				_parsePlaylistThroughPages(result);
+				this._parsePlaylistThroughPages(json.nextPageToken, playlistId);
+			}else{
+				callback(this.playlistStore);
 			}
 		});
 	}
 	parsePlaylist(playlistId, callback){
-		var res = [];
+		this.playlistStore=[];
 		var params = {
 			part: 'snippet',
 			playlistId: playlistId,
@@ -106,15 +119,17 @@ class YouTube {
 		this._fetch("https://www.googleapis.com/youtube/v3/playlistItems", params, json=>{
 			if(!json.errors && json.items && json.items[0]){
 				for(let i=0; i<json.items.length; i++){
-					res.push({
+					this.playlistStore.push({
 						title: json.items[i].snippet.title,
 						url: "https://www.youtube.com/watch?v="+json.items[i].snippet.resourceId.videoId
 					});
 				}
 				if(json.nextPageToken){
-					_parsePlaylistThroughPages(res);
+					console.log("searching through token:"+json.nextPageToken);
+					this._parsePlaylistThroughPages(json.nextPageToken, playlistId, callback);
+				}else{
+					callback(this.playlistStore);
 				}
-				callback(res);
 			}else{
 				callback([]);
 			}

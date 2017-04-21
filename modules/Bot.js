@@ -22,7 +22,7 @@ class Bot {
 		this.client = new Discord.Client();
 		this.config = {
 			prefix: "%",
-			messageDelay: 10000
+			messageDelay: 15000
 		}
 		this.isConnecting = false;
 
@@ -130,7 +130,7 @@ class Bot {
 	message(m){
 		this.text.channel.send(m).then(message=>{
 			message.delete(this.config.messageDelay);
-		});
+		}).catch(console.error);
 	}
 	_ensureConnectionAfterRequest(isPlaylist){
 		if(!this.connection && !this.isConnecting){
@@ -204,14 +204,23 @@ class Bot {
 	listQ(){
 		var output = "";
 
+		console.log(this.queue);
+
 		if(this.queue.isEmpty()){
 			return this.message("Queue is empty");
 		}
 		var q = this.queue.returnQ();
-		for(let i=0; i<q.length; i++){
-			output += (i+1).toString()+". **"+q[i].title+"**\n";
+
+		for(var j=0; j<Math.ceil((q.length)/25); j++){
+			for(let i=j*25; i<(j*25)+25; i++){
+				if(!q[i])
+					break;
+
+				output += (i+1).toString()+". **"+q[i].title+"**\n";
+			}	
+			this.message(output);
+			output="";
 		}
-		this.message(output);
 	}
 	shuffle(){
 		this.queue.shuffle();
