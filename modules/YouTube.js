@@ -83,7 +83,7 @@ class YouTube {
 
 	_parsePlaylistThroughPages(result){
 		this._fetch("https://www.googleapis.com/youtube/v3/playlistItems", params, json=>{
-			if(!json.errors && json.items[0]){
+			if(!json.errors && json.items && json.items[0]){
 				for(let i=0; i<json.items.length; i++){
 					result.push({
 						title: json.items[i].snippet.title,
@@ -104,7 +104,7 @@ class YouTube {
 			maxResults: 50
 		};
 		this._fetch("https://www.googleapis.com/youtube/v3/playlistItems", params, json=>{
-			if(!json.errors && json.items[0]){
+			if(!json.errors && json.items && json.items[0]){
 				for(let i=0; i<json.items.length; i++){
 					res.push({
 						title: json.items[i].snippet.title,
