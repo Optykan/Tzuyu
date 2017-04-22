@@ -8,7 +8,7 @@ class Bot {
 	constructor(){
 		this.streamOptions = { 
 			seek: 0, 
-			volume: 0.2 
+			volume: 0.05 
 		};
 		this.voice ={
 			channel : null
