@@ -98,7 +98,7 @@ Tzuyu.client.on('message', message => {
 			Tzuyu.message("Available commands: \n\n play, kill, leave, skip, queue, config_prefix, config_delete_delay \n\n Current prefix: `"+Tzuyu.getPrefix()+"`");
 		break;
 
-		case "bump";
+		case "bump":
 			Tzuyu.bump(params);
 		break;
 
