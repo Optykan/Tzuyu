@@ -3,6 +3,7 @@
 const ytdl = require('ytdl-core');
 const Queue = require('./Queue');
 const Discord = require("discord.js");
+const Song = require("./Song");
 
 class Bot {
 	constructor(){
@@ -31,6 +32,10 @@ class Bot {
 			isActive: true,
 			type: 'blacklist'
 		};
+		this.currentSong={
+			'title': "",
+			'url': ""
+		}
 	}
 
 	addToPermlist(id){
@@ -93,9 +98,12 @@ class Bot {
 				this.message("Queue is empty, leaving...");
 				return this.leave();
 			}
+
 			let next= this.queue.dequeue();
-			let url = next.url;
-			let title = next.title;
+			let url = next.getUrl();
+			let title = next.getTitle();
+
+			this.currentSong = next;
 
 			this.message("Now playing: **"+title+"**");
 
@@ -111,7 +119,7 @@ class Bot {
 			this.dispatcher = this.connection.playStream(stream, this.streamOptions);
 
 			//bind a callback to do something when the song ends
-			this.dispatcher.on('end', function(){
+			this.dispatcher.on('end', ()=>{
 				this.dispatcher = null;																												
 				if(this.queue.isEmpty()){
 					this.message("Queue is empty, leaving...")
@@ -119,9 +127,9 @@ class Bot {
 				}else{
 					this._playAfterLoad();
 				}
-			}.bind(this));
+			});
 		}catch(e){
-			console.log(e);
+			console.error(e);
 			this.message("Something happened");
 			this.leave();
 		}
@@ -132,6 +140,7 @@ class Bot {
 			message.delete(this.config.messageDelay);
 		}).catch(console.error);
 	}
+
 	_ensureConnectionAfterRequest(isPlaylist){
 		if(!this.connection && !this.isConnecting){
 			console.log("No connection, connecting...");
@@ -147,48 +156,46 @@ class Bot {
 		}else if(!isPlaylist){
 			var latest=this.queue.peekLast();
 			if(latest && !isPlaylist){
-				let title=latest.title;
-				let url = latest.url;
+				let title=latest.getTitle();
+				let url = latest.getUrl();
 				this.message("Added **"+title+"** to the queue");
 			}else{
 				this.message("Something happened");
 			}
 		}
 	}
+
+	//make sure you only send this boy a song object
+	_queue(song, isPlaylist){
+		this.queue.enqueue(song);
+		this._ensureConnectionAfterRequest(isPlaylist);
+	}
 	playList(listArray){
 		this.message("Adding playlist to queue");
 		if(listArray){
 			for(let i=0; i<listArray.length; i++){
-				this.playGivenTitle(listArray[i].url, listArray[i].title, true);
+				let song = new Song();
+				song.setTitle(listArray[i].title);
+				song.setUrl(listArray);
+
+				this._queue(song, true);
 			}
 		}else{
 			this.message("Something went wrong");
 		}
 	}
-	playGivenTitle(yturl, title, isPlaylist){
-		this.queue.enqueue(yturl, title);
-		this._ensureConnectionAfterRequest(isPlaylist);
+	playGivenTitle(yturl, title){
+		var song = new Song();
+		song.setTitle(title);
+		song.setUrl(yturl);
+		this._queue(song);
 	}
+
 	play(yturl, message, tries){
-		if(message.embeds[0] && message.embeds[0].title){
-			this.queue.enqueue(yturl, message.embeds[0].title);
-		}else if(!tries || tries < 3){
-			//turns 
-			var that=this;//resolve setTimeOut scope
-
-			//wait 500ms to see if discord will resolve the embed, and return to prevent further code execution
-			if(!tries){
-				tries=0;
-			}
-			return setTimeout(function(){
-				that.play(yturl, message, tries+1);
-			}, 500);
-		}else{
-			//nothign we can doo
-			this.queue.enqueue(yturl, "???");
-		}
-
-		this._ensureConnectionAfterRequest();
+		var song = new Song();
+		song.resolveTitleFromMessage(message, s=>{
+			this._queue(s);
+		});
 	}
 	stop(){
 		if(this.dispatcher){
@@ -214,7 +221,7 @@ class Bot {
 				if(!q[i])
 					break;
 
-				output += (i+1).toString()+". **"+q[i].title+"**\n";
+				output += (i+1).toString()+". **"+q[i].getTitle()+"**\n";
 			}	
 			this.message(output);
 			output="";
@@ -224,7 +231,7 @@ class Bot {
 		if(!isNaN(parseInt(songIndex))){
 			let res = this.queue.bump(parseInt(songIndex));
 			if(typeof res == "object" && res[0]){
-				this.message("Bumped "+res[0].title+" to front of queue");
+				this.message("Bumped "+res[0].getTitle()+" to front of queue");
 			}else{
 				this.message("No song found at index `"+songIndex+"`");
 			}
@@ -234,7 +241,7 @@ class Bot {
 		if(!isNaN(parseInt(songIndex))){
 			let t = this.queue.removeFromQueue(parseInt(songIndex));
 			if(typeof t =="object" &&t[0]){
-				this.message("Removed "+t[0].title+" from queue");
+				this.message("Removed "+t[0].getTitle()+" from queue");
 			}else{
 				this.message("No song found at index "+songIndex);
 			}
