@@ -103,7 +103,7 @@ Tzuyu.client.on('message', message => {
 		break;
 
 		case "remove":
-			Tzuyu.remove(params);
+			Tzuyu.removeFromQueue(params);
 		break;
 
 		case "config_delete_delay":
