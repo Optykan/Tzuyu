@@ -38,17 +38,17 @@ class Queue{
 	dumpQ(){
 		this.q=[];
 	}
-	bump(index){
-		let t=removeFromQueue(index);
-		if(t){
-			this.q.unshift(t);
-			return t;
-		}
-		return false;
-	}
 	removeFromQueue(index){
 		if(index>0 && index<this.q.length){
 			return this.q.splice(index-1,1);
+		}
+		return false;
+	}
+	bump(index){
+		let t=this.removeFromQueue(index);
+		if(t){
+			this.q.unshift(t);
+			return t;
 		}
 		return false;
 	}
