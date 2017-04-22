@@ -221,7 +221,7 @@ class Bot {
 		}
 	}
 	bump(songIndex){
-		if(!isNan(parseInt(songIndex))){
+		if(!isNaN(parseInt(songIndex))){
 			let res = this.queue.bump(parseInt(songIndex));
 			if(typeof res == "object" && res[0]){
 				this.message("Bumped "+res[0].title+" to front of queue");
@@ -231,7 +231,7 @@ class Bot {
 		}
 	}
 	removeFromQueue(songIndex){
-		if(!isNan(parseInt(songIndex))){
+		if(!isNaN(parseInt(songIndex))){
 			let t = this.queue.removeFromQueue(parseInt(songIndex));
 			if(typeof t =="object" &&t[0]){
 				this.message("Removed "+t[0].title+" from queue");
@@ -262,7 +262,7 @@ class Bot {
 		return this.config.prefix;
 	}
 	setMessageDeleteDelay(i){
-		if(!isNan(parseInt(i))){
+		if(!isNaN(parseInt(i))){
 			this.config.messageDelay = parseInt(i);
 			return true;
 		}
