@@ -91,6 +91,8 @@ class Bot {
 	}
 	_playAfterLoad(yturl){
 		//assumes we are connected to voice and plays the top of the queue or whatever is specified
+		// console.log(this.voice.channel.members);
+
 		var stream = null;
 		if(!yturl){
 			//no url provided, just play from queue
@@ -100,6 +102,7 @@ class Bot {
 			}
 
 			let next= this.queue.dequeue();
+			console.log(next);
 			let url = next.getUrl();
 			let title = next.getTitle();
 
@@ -176,7 +179,7 @@ class Bot {
 			for(let i=0; i<listArray.length; i++){
 				let song = new Song();
 				song.setTitle(listArray[i].title);
-				song.setUrl(listArray);
+				song.setUrl(listArray[i].url);
 
 				this._queue(song, true);
 			}
@@ -193,6 +196,7 @@ class Bot {
 
 	play(yturl, message, tries){
 		var song = new Song();
+		song.setUrl(yturl);
 		song.resolveTitleFromMessage(message, s=>{
 			this._queue(s);
 		});
