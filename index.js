@@ -98,6 +98,14 @@ Tzuyu.client.on('message', message => {
 			Tzuyu.message("Available commands: \n\n play, kill, leave, skip, queue, config_prefix, config_delete_delay \n\n Current prefix: `"+Tzuyu.getPrefix()+"`");
 		break;
 
+		case "bump";
+			Tzuyu.bump(params);
+		break;
+
+		case "remove":
+			Tzuyu.remove(params);
+		break;
+
 		case "config_delete_delay":
 			if(Tzuyu.setMessageDeleteDelay(params)){
 				Tzuyu.message("Changed delay to `"+params+"`ms");

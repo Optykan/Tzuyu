@@ -220,6 +220,26 @@ class Bot {
 			output="";
 		}
 	}
+	bump(songIndex){
+		if(!isNan(parseInt(songIndex))){
+			let res = this.queue.bump(parseInt(songIndex));
+			if(typeof res == "object" && res[0]){
+				this.message("Bumped "+res[0].title+" to front of queue");
+			}else{
+				this.message("No song found at index `"+songIndex+"`");
+			}
+		}
+	}
+	removeFromQueue(songIndex){
+		if(!isNan(parseInt(songIndex))){
+			let t = this.queue.removeFromQueue(parseInt(songIndex));
+			if(typeof t =="object" &&t[0]){
+				this.message("Removed "+t[0].title+" from queue");
+			}else{
+				this.message("No song found at index "+songIndex);
+			}
+		}
+	}
 	shuffle(){
 		this.queue.shuffle();
 	}
