@@ -47,7 +47,7 @@ class Queue{
 	bump(index){
 		let t=this.removeFromQueue(index);
 		if(t){
-			this.q.unshift(t);
+			this.q.unshift(t[0]);
 			return t;
 		}
 		return false;
