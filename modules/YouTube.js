@@ -29,7 +29,8 @@ class YouTube {
 			}
 		}else if(/https?:\/\/(?:www\.)?youtu\.be\//.exec(params)){
 			//its a youtu.be url
-			if(/https?:\/\/(?:www\.)?youtu\.be\/(?:.*?)&list=(.*)/.exec(params)){
+			var playlist = /https?:\/\/(?:www\.)?youtu\.be\/(?:.*?)&list=(.*)/.exec(params);
+			if(playlist){
 				return {
 					type: 'playlist',
 					payload: playlist[1]
@@ -40,7 +41,14 @@ class YouTube {
 					payload: params
 				};
 			}
-		}else{
+		}else if(/https?:\/\/(?:www)?\.youtube\.com\/playlist\?list=(.*)/.exec(params)){
+			var playlist = /https?:\/\/(?:www)?\.youtube\.com\/playlist\?list=(.*)/.exec(params);
+			return {
+				type: 'playlist',
+				payload: playlist[1]
+			}
+		}
+		else{
 			return {
 				type: 'search',
 				payload: params
@@ -50,8 +58,7 @@ class YouTube {
 
 	_fetch(url, params, callback){
 		if (typeof callback !== 'function'){
-			console.warn("no callback function defined for "+url);
-			return false;
+			return console.warn("no callback function defined for "+url);
 		}
 		var urlencoded = "";
 		
