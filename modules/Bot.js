@@ -36,10 +36,11 @@ class Bot {
 			'title': "",
 			'url': ""
 		}
+		this.mediaPlayer = new MediaPlayer();
 	}
 
 	addToPermlist(id){
-		this.whitelist.push(id);
+		this.permlist.users.push(id);
 	}
 
 	isPermitted(id){
@@ -89,35 +90,30 @@ class Bot {
 		}
 		this.setPlaying("Overwatch"); //well...
 	}
-	_playAfterLoad(yturl){
+	_playAfterLoad(){
 		//assumes we are connected to voice and plays the top of the queue or whatever is specified
 		// console.log(this.voice.channel.members);
 
 		var stream = null;
-		if(!yturl){
-			//no url provided, just play from queue
-			if(this.queue.isEmpty()){
-				this.message("Queue is empty, leaving...");
-				return this.leave();
-			}
-
-			let next= this.queue.dequeue();
-			console.log(next);
-			let url = next.getUrl();
-			let title = next.getTitle();
-
-			this.currentSong = next;
-
-			this.message("Now playing: **"+title+"**");
-
-			this.setPlaying(title);
-			stream = ytdl(url, {filter : 'audioonly', quality: "lowest"});
-
-			console.log("playing" +url);
-		}else{
-			console.log("provided param "+yturl);
-			stream = ytdl(yturl, {filter : 'audioonly'});
+		//no url provided, just play from queue
+		if(this.queue.isEmpty()){
+			this.message("Queue is empty, leaving...");
+			return this.leave();
 		}
+
+		let next= this.queue.dequeue();
+		let url = next.getUrl();
+		let title = next.getTitle();
+		// console.log(next);
+
+		this.currentSong = next;
+		this.message("Now playing: **"+title+"**");
+		this.setPlaying(title);
+
+		stream = ytdl(url, {filter : 'audioonly', quality: "lowest"});
+
+		console.log("playing" +url);
+
 		try{
 			this.dispatcher = this.connection.playStream(stream, this.streamOptions);
 
