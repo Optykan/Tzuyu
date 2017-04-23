@@ -4,6 +4,7 @@ const ytdl = require('ytdl-core');
 const Queue = require('./Queue');
 const Discord = require("discord.js");
 const Song = require("./Song");
+// const MediaPlayer = require('./MediaPlayer');
 
 class Bot {
 	constructor(){
@@ -36,7 +37,7 @@ class Bot {
 			'title': "",
 			'url': ""
 		}
-		this.mediaPlayer = new MediaPlayer();
+		// this.mediaPlayer = new MediaPlayer();
 	}
 
 	addToPermlist(id){

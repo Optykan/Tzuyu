@@ -64,3 +64,5 @@ class MediaPlayer{
 		this.eventEmitter.on(event, callback.bind());
 	}
 }
+
+module.exports = MediaPlayer;
