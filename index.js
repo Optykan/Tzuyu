@@ -66,7 +66,13 @@ Tzuyu.client.on('message', message => {
 				Tzuyu.play(request.payload, message);
 			}
 		break;
-
+		
+		case "playing":
+		//Remind me to collect the ID of user who added the playlist as well (later tho)
+			//Tzuyu.currentSong();
+			//does this overlap with listQ?
+		break;
+		
 		case "kill":
 			Tzuyu.leave();
 		break;

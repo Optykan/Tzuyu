@@ -134,7 +134,6 @@ class Bot {
 			this.leave();
 		}
 	}
-
 	message(m){
 		this.text.channel.send(m).then(message=>{
 			message.delete(this.config.messageDelay);
