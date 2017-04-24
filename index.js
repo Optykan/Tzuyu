@@ -66,7 +66,13 @@ Tzuyu.client.on('message', message => {
 				Tzuyu.play(request.payload, message);
 			}
 		break;
-
+		
+		case "playing":
+		//Remind me to collect the ID of user who added the playlist as well (later tho)
+			//Tzuyu.currentSong();
+			//does this overlap with listQ?
+		break;
+		
 		case "kill":
 			Tzuyu.leave();
 		break;
@@ -76,8 +82,8 @@ Tzuyu.client.on('message', message => {
 		break;
 
 		case "skip":
-			Tzuyu.skip();
 			Tzuyu.message("Skipped song");
+			Tzuyu.skip();
 		break;
 
 		case 'queue':
@@ -95,7 +101,15 @@ Tzuyu.client.on('message', message => {
 		break;
 
 		case "help":
-			Tzuyu.message("Available commands: \n\n play, kill, leave, skip, queue, config_prefix, config_delete_delay \n\n Current prefix: `"+Tzuyu.getPrefix()+"`");
+			Tzuyu.message("Available commands: \n\n play, kill, leave, skip, queue, bump, remove, config_prefix, config_delete_delay \n\n Current prefix: `"+Tzuyu.getPrefix()+"`");
+		break;
+
+		case "bump":
+			Tzuyu.bump(params);
+		break;
+
+		case "remove":
+			Tzuyu.removeFromQueue(params);
 		break;
 
 		case "config_delete_delay":

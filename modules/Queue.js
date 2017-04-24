@@ -4,8 +4,8 @@ class Queue{
 	constructor(){
 		this.q = [];
 	}
-	enqueue(url, title){
-		this.q.push({'url': url, 'title': title});
+	enqueue(song){
+		this.q.push(song);
 	}
 	dequeue(){
 		if(this.isEmpty()){
@@ -37,6 +37,20 @@ class Queue{
 	}
 	dumpQ(){
 		this.q=[];
+	}
+	removeFromQueue(index){
+		if(index>0 && index<this.q.length+1){
+			return this.q.splice(index-1,1);
+		}
+		return false;
+	}
+	bump(index){
+		let t=this.removeFromQueue(index);
+		if(t){
+			this.q.unshift(t[0]);
+			return t;
+		}
+		return false;
 	}
 }
 
