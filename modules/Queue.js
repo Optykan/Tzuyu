@@ -4,8 +4,8 @@ class Queue{
 	constructor(){
 		this.q = [];
 	}
-	enqueue(url, title){
-		this.q.push({'url': url, 'title': title});
+	enqueue(song){
+		this.q.push(song);
 	}
 	dequeue(){
 		if(this.isEmpty()){
@@ -22,6 +22,13 @@ class Queue{
 		}
 		return this.q[this.q.length-1];
 	}
+	shuffle(){
+		//blatantly ripped from http://stackoverflow.com/questions/6274339/how-can-i-shuffle-an-array
+	    for (let i = this.q.length; i; i--) {
+	        let j = Math.floor(Math.random() * i);
+	        [this.q[i - 1], this.q[j]] = [this.q[j], this.q[i - 1]];
+	    }
+	}
 	isEmpty(){
 		return this.q.length == 0;
 	}
@@ -30,6 +37,20 @@ class Queue{
 	}
 	dumpQ(){
 		this.q=[];
+	}
+	removeFromQueue(index){
+		if(index>0 && index<this.q.length+1){
+			return this.q.splice(index-1,1);
+		}
+		return false;
+	}
+	bump(index){
+		let t=this.removeFromQueue(index);
+		if(t){
+			this.q.unshift(t[0]);
+			return t;
+		}
+		return false;
 	}
 }
 

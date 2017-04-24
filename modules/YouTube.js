@@ -9,6 +9,7 @@ class YouTube {
 		this.opts={
 			key:key
 		};
+		this.playlistStore=[];
 	}
 	parsePlayRequest(params){
 		//accepts the part after the %play command
@@ -28,7 +29,8 @@ class YouTube {
 			}
 		}else if(/https?:\/\/(?:www\.)?youtu\.be\//.exec(params)){
 			//its a youtu.be url
-			if(/https?:\/\/(?:www\.)?youtu\.be\/(?:.*?)&list=(.*)/.exec(params)){
+			var playlist = /https?:\/\/(?:www\.)?youtu\.be\/(?:.*?)&list=(.*)/.exec(params);
+			if(playlist){
 				return {
 					type: 'playlist',
 					payload: playlist[1]
@@ -39,7 +41,14 @@ class YouTube {
 					payload: params
 				};
 			}
-		}else{
+		}else if(/https?:\/\/(?:www)?\.youtube\.com\/playlist\?list=(.*)/.exec(params)){
+			var playlist = /https?:\/\/(?:www)?\.youtube\.com\/playlist\?list=(.*)/.exec(params);
+			return {
+				type: 'playlist',
+				payload: playlist[1]
+			}
+		}
+		else{
 			return {
 				type: 'search',
 				payload: params
@@ -49,8 +58,7 @@ class YouTube {
 
 	_fetch(url, params, callback){
 		if (typeof callback !== 'function'){
-			console.warn("no callback function defined for "+url);
-			return false;
+			return console.warn("no callback function defined for "+url);
 		}
 		var urlencoded = "";
 		
@@ -61,11 +69,13 @@ class YouTube {
 
 		urlencoded = "?"+urlencoded.substring(1);
 
-			fetch(url+urlencoded+'&key='+this.opts.key).then(result => {
+		fetch(url+urlencoded+'&key='+this.opts.key).then(result => {
 			return result.json(); //ensure a search isn't resulting no videos, making items[0] nil
 		}).then(json => {
 			callback(json);
-		}).catch(console.error);
+		}).catch(e=>{
+			console.error(e);
+		});
 	}
 	search (term,callback){
 		var params = {
@@ -73,29 +83,59 @@ class YouTube {
 			q: term
 		};
 
-		_fetch("https://www.googleapis.com/youtube/v3/search", params, json=>{
-			var url =""+json.items[0].videoID; //the result url
-			var title = json.items[0].title;
+		this._fetch("https://www.googleapis.com/youtube/v3/search", params, json=>{
+			var url =""; //the result url
+			var title = "song title";
 			//do stuff
 			callback(url, title);
 		});
 	}
+
+	_parsePlaylistThroughPages(token, playlistId, callback){
+		var params = {
+			part: 'snippet',
+			playlistId: playlistId,
+			maxResults: 50,
+			pageToken: token
+		};
+
+		this._fetch("https://www.googleapis.com/youtube/v3/playlistItems", params, json=>{
+			if(!json.errors && json.items && json.items[0]){
+				for(let i=0; i<json.items.length; i++){
+					this.playlistStore.push({
+						title: json.items[i].snippet.title,
+						url: "https://www.youtube.com/watch?v="+json.items[i].snippet.resourceId.videoId
+					});
+				}
+			}
+			if(json.nextPageToken){
+				this._parsePlaylistThroughPages(json.nextPageToken, playlistId);
+			}else{
+				callback(this.playlistStore);
+			}
+		});
+	}
 	parsePlaylist(playlistId, callback){
-		var res = [];
+		this.playlistStore=[];
 		var params = {
 			part: 'snippet',
 			playlistId: playlistId,
 			maxResults: 50
 		};
-		_fetch(" https://www.googleapis.com/youtube/v3/playlistItems", params, json=>{
-			if(!json.errors && json.items[0]){
+		this._fetch("https://www.googleapis.com/youtube/v3/playlistItems", params, json=>{
+			if(!json.errors && json.items && json.items[0]){
 				for(let i=0; i<json.items.length; i++){
-					res.push({
+					this.playlistStore.push({
 						title: json.items[i].snippet.title,
 						url: "https://www.youtube.com/watch?v="+json.items[i].snippet.resourceId.videoId
 					});
 				}
-				callback(res);
+				if(json.nextPageToken){
+					console.log("searching through token:"+json.nextPageToken);
+					this._parsePlaylistThroughPages(json.nextPageToken, playlistId, callback);
+				}else{
+					callback(this.playlistStore);
+				}
 			}else{
 				callback([]);
 			}

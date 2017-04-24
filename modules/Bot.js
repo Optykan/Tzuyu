@@ -3,12 +3,14 @@
 const ytdl = require('ytdl-core');
 const Queue = require('./Queue');
 const Discord = require("discord.js");
+const Song = require("./Song");
+// const MediaPlayer = require('./MediaPlayer');
 
 class Bot {
 	constructor(){
 		this.streamOptions = { 
 			seek: 0, 
-			volume: 1 
+			volume: 0.05 
 		};
 		this.voice ={
 			channel : null
@@ -22,12 +24,44 @@ class Bot {
 		this.client = new Discord.Client();
 		this.config = {
 			prefix: "%",
-			messageDelay: 10000
+			messageDelay: 15000
 		}
+		this.isConnecting = false;
+
+		this.permlist={
+			users: [116399321661833218, 304780284077801472],
+			isActive: true,
+			type: 'blacklist'
+		};
+		this.currentSong={
+			'title': "",
+			'url': ""
+		}
+		// this.mediaPlayer = new MediaPlayer();
+	}
+
+	addToPermlist(id){
+		this.permlist.users.push(id);
+	}
+
+	isPermitted(id){
+		if(this.permlist.isActive){
+			if(this.permlist.type=="whitelist"){
+				return this.permlist.users.includes(id);
+			}else{
+				return !this.permlist.users.includes(id);
+			}
+		}else{
+			return true;
+		}
+	}
+	setPermlistStatus(status){
+		this.permlist.type = status;
 	}
 	
 	join(id){
 		if(!this.voice.connection){
+			this.isConnecting = true;
 			if(!id){
 				return this.voice.channel.join();
 			}else{
@@ -57,43 +91,35 @@ class Bot {
 		}
 		this.setPlaying("Overwatch"); //well...
 	}
-	currentSong(){
-		//basically copied from below, but hey, posterity (and learning)
-		//There is PROBABLY a way to get this into a simpler function, and then have _playAfterLoad use it instead???
+	_playAfterLoad(){
+		//assumes we are connected to voice and plays the top of the queue or whatever is specified
+		// console.log(this.voice.channel.members);
+
+		var stream = null;
+		//no url provided, just play from queue
 		if(this.queue.isEmpty()){
 			this.message("Queue is empty, leaving...");
-		}else{
-			this.message("Now playing: **"+this.queue.peek().title+"** with URL:\n"+this.queue.peek.url);
+			return this.leave();
 		}
-	}
-	_playAfterLoad(yturl){
-		//assumes we are connected to voice and plays the top of the queue or whatever is specified
-		var stream = null;
-		if(!yturl){
-			//no url provided, just play from queue
-			if(this.queue.isEmpty()){
-				this.message("Queue is empty, leaving...");
-				return this.leave();
-			}
-			let next= this.queue.dequeue();
-			let url = next.url;
-			let title = next.title;
 
-			this.message("Now playing: **"+title+"**");
+		let next= this.queue.dequeue();
+		let url = next.getUrl();
+		let title = next.getTitle();
+		// console.log(next);
 
-			this.setPlaying(title);
-			stream = ytdl(url, {filter : 'audioonly', quality: "lowest"});
+		this.currentSong = next;
+		this.message("Now playing: **"+title+"**");
+		this.setPlaying(title);
 
-			console.log("playing" +url);
-		}else{
-			console.log("provided param "+yturl);
-			stream = ytdl(yturl, {filter : 'audioonly'});
-		}
+		stream = ytdl(url, {filter : 'audioonly', quality: "lowest"});
+
+		console.log("playing" +url);
+
 		try{
 			this.dispatcher = this.connection.playStream(stream, this.streamOptions);
 
 			//bind a callback to do something when the song ends
-			this.dispatcher.on('end', function(){
+			this.dispatcher.on('end', ()=>{
 				this.dispatcher = null;																												
 				if(this.queue.isEmpty()){
 					this.message("Queue is empty, leaving...")
@@ -101,9 +127,9 @@ class Bot {
 				}else{
 					this._playAfterLoad();
 				}
-			}.bind(this));
+			});
 		}catch(e){
-			console.log(e);
+			console.error(e);
 			this.message("Something happened");
 			this.leave();
 		}
@@ -111,65 +137,65 @@ class Bot {
 	message(m){
 		this.text.channel.send(m).then(message=>{
 			message.delete(this.config.messageDelay);
-		});
+		}).catch(console.error);
 	}
-	_ensureConnectionAfterRequest(){
-		if(!this.connection){
+
+	_ensureConnectionAfterRequest(isPlaylist){
+		if(!this.connection && !this.isConnecting){
 			console.log("No connection, connecting...");
 
 			this.join().then(conn=>{
+				this.isConnecting = false;
 				this.connection = conn;
 				this._playAfterLoad();
 			}).catch(e => {
 				console.error(e);
 				this.leave();
 			});
-		}else{
-			// this._playAfterLoad();
-			//do nothing...
+		}else if(!isPlaylist){
 			var latest=this.queue.peekLast();
-			if(latest){
-				let title=latest.title;
-				let url = latest.url;
+			if(latest && !isPlaylist){
+				let title=latest.getTitle();
+				let url = latest.getUrl();
 				this.message("Added **"+title+"** to the queue");
 			}else{
-				this.message("Something happened.");
+				this.message("Something happened");
 			}
 		}
 	}
+
+	//make sure you only send this boy a song object
+	_queue(song, isPlaylist){
+		this.queue.enqueue(song);
+		this._ensureConnectionAfterRequest(isPlaylist);
+	}
 	playList(listArray){
+		this.message("Adding playlist to queue");
 		if(listArray){
 			for(let i=0; i<listArray.length; i++){
-				this.playGivenTitle(listArray[i].url, listArray[i].title);
+				let song = new Song();
+				song.setTitle(listArray[i].title);
+				song.setUrl(listArray[i].url);
+
+				this._queue(song, true);
 			}
 		}else{
 			this.message("Something went wrong");
 		}
 	}
-	playGivenTitle(yturl, title, isPlayList){
-		this.queue.enqueue(yturl, title);
-		this._ensureConnectionAfterRequest();
+	playGivenTitle(yturl, title){
+		var song = new Song();
+		song.setTitle(title);
+		song.setUrl(yturl);
+		this._queue(song);
 	}
+
 	play(yturl, message, tries){
-		if(message.embeds[0] && message.embeds[0].title){
-			this.queue.enqueue(yturl, message.embeds[0].title);
-		}else if(!tries || tries < 3){
-			//turns 
-			var that=this;//resolve setTimeOut scope
-
-			//wait 500ms to see if discord will resolve the embed, and return to prevent further code execution
-			if(!tries){
-				tries=0;
-			}
-			return setTimeout(function(){
-				that.play(yturl, message, tries+1);
-			}, 500);
-		}else{
-			//nothign we can doo
-			this.queue.enqueue(yturl, "???");
-		}
-
-		this._ensureConnectionAfterRequest();
+		var song = new Song();
+		song.setUrl(yturl);
+		song.resolveTitleFromMessage(message, s=>{
+			this._queue(s);
+		});
 	}
 	stop(){
 		if(this.dispatcher){
@@ -189,36 +215,69 @@ class Bot {
 			return this.message("Queue is empty");
 		}
 		var q = this.queue.returnQ();
-		for(let i=0; i<q.length; i++){
-	output += (i+1).toString()+". **"+q[i].title+"**\n";
-}
-this.message(output);
-}
-setPlaying(status){
-	this.client.user.setGame(status);
-}
-setStatus(status){
-	this.client.user.setStatus(status);
-}
-setVoiceChannel(chanID){
-	this.voice.channel = this.client.channels.get(chanID);
-}
-setTextChannel(chanID){
-	this.text.channel = this.client.channels.get(chanID);	
-}
-setPrefix(pfx){
-	this.config.prefix = pfx;
-}
-setMessageDeleteDelay(i){
-	if(!isNan(parseInt(i))){
-		this.config.messageDelay = parseInt(i);
-		return true;
+
+		for(var j=0; j<Math.ceil((q.length)/25); j++){
+			for(let i=j*25; i<(j*25)+25; i++){
+				if(!q[i])
+					break;
+
+				output += (i+1).toString()+". **"+q[i].getTitle()+"**\n";
+			}	
+			this.message(output);
+			output="";
+		}
 	}
-	return false;
-}
-login(token){
-	this.client.login(token);
-}
+	bump(songIndex){
+		if(!isNaN(parseInt(songIndex))){
+			let res = this.queue.bump(parseInt(songIndex));
+			if(typeof res == "object" && res[0]){
+				this.message("Bumped "+res[0].getTitle()+" to front of queue");
+			}else{
+				this.message("No song found at index `"+songIndex+"`");
+			}
+		}
+	}
+	removeFromQueue(songIndex){
+		if(!isNaN(parseInt(songIndex))){
+			let t = this.queue.removeFromQueue(parseInt(songIndex));
+			if(typeof t =="object" &&t[0]){
+				this.message("Removed "+t[0].getTitle()+" from queue");
+			}else{
+				this.message("No song found at index "+songIndex);
+			}
+		}
+	}
+	shuffle(){
+		this.queue.shuffle();
+	}
+	setPlaying(status){
+		this.client.user.setGame(status);
+	}
+	setStatus(status){
+		this.client.user.setStatus(status);
+	}
+	setVoiceChannel(chanID){
+		this.voice.channel = this.client.channels.get(chanID);
+	}
+	setTextChannel(chanID){
+		this.text.channel = this.client.channels.get(chanID);	
+	}
+	setPrefix(pfx){
+		this.config.prefix = pfx;
+	}
+	getPrefix(){
+		return this.config.prefix;
+	}
+	setMessageDeleteDelay(i){
+		if(!isNaN(parseInt(i))){
+			this.config.messageDelay = parseInt(i);
+			return true;
+		}
+		return false;
+	}
+	login(token){
+		this.client.login(token);
+	}
 }
 
 module.exports = Bot;
