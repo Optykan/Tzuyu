@@ -74,8 +74,8 @@ class YouTube {
 		};
 
 		_fetch("https://www.googleapis.com/youtube/v3/search", params, json=>{
-			var url =""; //the result url
-			var title = "song title";
+			var url =""+json.items[0].videoID; //the result url
+			var title = json.items[0].title;
 			//do stuff
 			callback(url, title);
 		});
