@@ -80,14 +80,15 @@ class YouTube {
 	search (term,callback){
 		var params = {
 			part: "snippet",
-			q: term
+			q: encodeURIComponent(term)
 		};
 
 		this._fetch("https://www.googleapis.com/youtube/v3/search", params, json=>{
-			var url =""+json.items[0].id.videoId; //the result url
-			var title = ""+json.items[0].snippet.title;
-			//do stuff
-			callback(url, title);
+			if(json.items[0]){
+				var url ="https://youtube.com/watch?v="+json.items[0].id.videoId; //the result url
+				var title = json.items[0].snippet.title;
+				callback(url, title);
+			}
 		});
 	}
 
