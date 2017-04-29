@@ -1,10 +1,10 @@
 [![CircleCI](https://circleci.com/gh/Optykan/Tzuyu.svg?style=svg)](https://circleci.com/gh/Optykan/Tzuyu)
 
-#Meet Tzuyu
+<h1>Meet Tzuyu</h1>
 
 ![](http://cdn.koreaboo.com/wp-content/uploads/2016/06/7-1-e1467067293149.jpeg "Basically Sam is going to jail")
 
-##Features:
+<h2>Features:</h2>
 
 - Plays music
 - Customizeable command prefix
@@ -12,7 +12,7 @@
 - Heroku-compatible
 - Tzuyu is qt bae
 
-##TODOs
+<h2>TODOs</h2>
 
 - [x] Skip
 - [x] Queue
