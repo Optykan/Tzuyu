@@ -110,7 +110,7 @@ class YouTube {
 				}
 			}
 			if(json.nextPageToken){
-				this._parsePlaylistThroughPages(json.nextPageToken, playlistId);
+				this._parsePlaylistThroughPages(json.nextPageToken, playlistId, callback);
 			}else{
 				callback(this.playlistStore);
 			}
