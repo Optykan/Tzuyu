@@ -10,7 +10,9 @@
     "opusscript": "^0.0.3",
     "ytdl-core": "^0.12.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "expect": "^1.20.2"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Optykan/Tzuyu.git"
@@ -22,6 +24,7 @@
     "url": "https://github.com/Optykan/Tzuyu/issues"
   },
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "node tests.js"
   }
 }
