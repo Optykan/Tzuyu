@@ -137,8 +137,15 @@ if (process.platform === "win32") {
 
 process.on("SIGINT", function () {
   //graceful shutdown
+  Tzuyu.message("SIGINT detected, shutting down...");
   Tzuyu.leave();
   process.exit();
+});
+
+process.on('SIGTERM', function () {
+	Tzuyu.message("Heroku cycling, rebooting...");
+	Tzuyu.leave();
+    process.exit();
 });
 
 Tzuyu.login(process.env.BOT_TOKEN);
