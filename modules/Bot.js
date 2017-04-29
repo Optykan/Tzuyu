@@ -134,8 +134,11 @@ class Bot {
 			this.leave();
 		}
 	}
-	message(m){
+	message(m, callback){
 		this.text.channel.send(m).then(message=>{
+			if(typeof callback == "function"){
+				callback();
+			}
 			message.delete(this.config.messageDelay);
 		}).catch(console.error);
 	}

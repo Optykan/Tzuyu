@@ -135,17 +135,22 @@ if (process.platform === "win32") {
 	});
 }
 
-process.on("SIGINT", function () {
+process.on('SIGINT', function () {
   //graceful shutdown
-  Tzuyu.message("SIGINT detected, shutting down...");
-  Tzuyu.leave();
-  process.exit();
+  // console.log('siginted');
+  Tzuyu.message("Received suicide order, leaving...", ()=>{
+	  Tzuyu.leave();
+	  process.exit();
+  });
+  
 });
 
 process.on('SIGTERM', function () {
-	Tzuyu.message("Heroku cycling, rebooting...");
-	Tzuyu.leave();
-    process.exit();
+	// console.log('sigtermed');
+	Tzuyu.message("Ending life...", ()=>{
+		Tzuyu.leave();	
+	    process.exit();
+	});
 });
 
 Tzuyu.login(process.env.BOT_TOKEN);
