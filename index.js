@@ -138,7 +138,7 @@ if (process.platform === "win32") {
 process.on('SIGINT', function () {
   //graceful shutdown
   // console.log('siginted');
-  Tzuyu.message("Received suicide order, leaving...", ()=>{
+  Tzuyu.message("Ending life, sponsored by Microsoft© Windows™", ()=>{
 	  Tzuyu.leave();
 	  process.exit();
   });
@@ -147,7 +147,7 @@ process.on('SIGINT', function () {
 
 process.on('SIGTERM', function () {
 	// console.log('sigtermed');
-	Tzuyu.message("Ending life...", ()=>{
+	Tzuyu.message("Received suicide order, leaving...", ()=>{
 		Tzuyu.leave();	
 	    process.exit();
 	});
