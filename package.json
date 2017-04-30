@@ -24,7 +24,7 @@
     "url": "https://github.com/Optykan/Tzuyu/issues"
   },
   "scripts": {
-    "start": "node index.js",
-    "test": "node tests.js"
+    "start": "node --use_strict index.js",
+    "test": "node --use_strict tests.js"
   }
 }
