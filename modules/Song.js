@@ -29,7 +29,7 @@ class Song{
 				if(!tries){
 					tries = 0;
 				}
-				that.resolveTitleFromMessage(message, tries+1);
+				that.resolveTitleFromMessage(message, callback, tries+1);
 			}, 500);
 		}else{
 			//maybe catch something here?
