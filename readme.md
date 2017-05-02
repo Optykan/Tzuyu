@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/Optykan/Tzuyu.svg?style=svg)](https://circleci.com/gh/Optykan/Tzuyu)
+[![CircleCI](https://circleci.com/gh/Optykan/Tzuyu/tree/deploy.svg?style=svg)](https://circleci.com/gh/Optykan/Tzuyu/tree/deploy)
 
 <h1>Meet Tzuyu</h1>
 
