@@ -58,9 +58,9 @@ Tzuyu.client.on('message', message => {
 					Tzuyu.playList(videos);
 				});
 			}else if(request.type=='search'){
-				YouTube.search(request.payload, (url, title)=>{
-					Tzuyu.playGivenTitle(url, title);
-				});
+				YouTube.search(request.payload).then((mediaResolvable)=>{
+					Tzuyu.play(mediaResolvable);
+				}).catch(console.error);
 			}else{
 				//direct request
 				Tzuyu.play(request.payload, message);
