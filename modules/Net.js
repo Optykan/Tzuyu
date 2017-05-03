@@ -1,16 +1,26 @@
 'use strict';
 
-class Net{
-	constructor(){
-		this.headers={
-			Accept: "application/json"
-		}
-	}
-	_fetch(method, url, params){
+const f = require('node-fetch');
 
-	}
-	get(url, params){
-		
+class Net{
+	static fetch(url, params){
+		var urlencoded = "";
+		for(var i in params){
+			urlencoded += "&"+i+"="+params[i]; //in the format &[key]=[value]
+		}
+
+		urlencoded = "?"+urlencoded.substring(1);
+
+		return f(url+urlencoded).then(result => {
+			return result.json(); //ensure a search isn't resulting no videos, making items[0] nil
+		}).then(json => {
+			return new Promise((resolve, reject)=>{
+				resolve(json);
+			});
+			callback(json);
+		}).catch(e=>{
+			console.error(e);
+		});
 	}
 }
 

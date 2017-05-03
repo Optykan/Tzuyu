@@ -1,9 +1,9 @@
 'use strict';
 
 class Song{
-	constructor(){
-		this.title = "undefined";
-		this.url = "undefined";
+	constructor(title, url){
+		this.title = title;
+		this.url = url;
 	}
 
 	setUrl(url){
