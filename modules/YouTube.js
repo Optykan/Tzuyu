@@ -1,6 +1,7 @@
 //youtube stuff
-const MediaResolvable = require('./types/MediaResolvable');
-const fetch = require('node-fetch');
+const MediaResolvable = require('./MediaResolvable');
+const Net = require('./Net');
+const Song = require('./Song');
 
 //we're looking for:
 //https://www.googleapis.com/youtube/v3/search?part=snippet&q=KEYWORD&key=YT_API_KEY
@@ -59,27 +60,42 @@ class YouTube {
 			console.error(e);
 		});
 	}
-	search (term,callback){
+	search (term){
 		var params = {
 			part: "snippet",
-			q: encodeURIComponent(term)
+			q: encodeURIComponent(term),
+			key: this.opts.key
 		};
 
-		this._fetch("https://www.googleapis.com/youtube/v3/search", params, json=>{
-			if(json.items[0]){
-				if(json.items[0].id.kind == "youtube#playlist"){
-					callback(new MediaResolvable('playlist', json.items[0].id.playlistId));
-				}else if(json.items[0].id.kind == "youtube#video"){
-					callback(return new MediaResolvable('playlist', json.items[0].id.videoId));
-				}
-				// var url ="https://youtube.com/watch?v="+json.items[0].id.videoId; //the result url
-				// var title = json.items[0].snippet.title;
-				// return new Promise((resolve, reject)=>{
-
-				// });
-				callback(url, title);
+		return Net.fetch("https://www.googleapis.com/youtube/v3/search", params).then(json=>{
+			if(json.pageInfo.totalResults > 0){
+				return new Promise((resolve, reject)=>{
+					if(json.items[0].id.kind == "youtube#playlist"){
+						resolve(new MediaResolvable(items[0].id.kind, items[0].id.playlistId));
+					}else if(json.items[0].id.kind == "youtube#video"){
+						resolve(new MediaResolvable(items[0].id.kind, items[0].id.videoId));
+					}else{
+						reject("No playable media found");
+					}
+				});
 			}
 		});
+
+		// this._fetch("https://www.googleapis.com/youtube/v3/search", params, json=>{
+		// 	if(json.items[0]){
+		// 		if(json.items[0].id.kind == "youtube#playlist"){
+		// 			callback(new MediaResolvable('playlist', json.items[0].id.playlistId));
+		// 		}else if(json.items[0].id.kind == "youtube#video"){
+		// 			callback(new MediaResolvable('playlist', json.items[0].id.videoId));
+		// 		}
+		// 		// var url ="https://youtube.com/watch?v="+json.items[0].id.videoId; //the result url
+		// 		// var title = json.items[0].snippet.title;
+		// 		// return new Promise((resolve, reject)=>{
+
+		// 		// });
+		// 		callback(url, title);
+		// 	}
+		// });
 	}
 
 	_parsePlaylistThroughPages(token, playlistId, callback){

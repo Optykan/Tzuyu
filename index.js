@@ -58,9 +58,15 @@ Tzuyu.client.on('message', message => {
 					Tzuyu.playList(videos);
 				});
 			}else if(request.type=='search'){
+<<<<<<< HEAD
 				YouTube.search(request.payload, (mediaResolvable)=>{
 					Tzuyu.playGivenTitle(url, title);
 				});
+=======
+				YouTube.search(request.payload).then((mediaResolvable)=>{
+					Tzuyu.play(mediaResolvable);
+				}).catch(console.error);
+>>>>>>> add-network-module
 			}else{
 				//direct request
 				Tzuyu.play(request.payload, message);
