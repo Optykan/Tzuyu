@@ -4,6 +4,7 @@ const ytdl = require('ytdl-core');
 const Queue = require('./Queue');
 const Discord = require("discord.js");
 const Song = require("./Song");
+const MediaResolvable = require("./MediaResolvable");
 // const MediaPlayer = require('./MediaPlayer');
 
 class Bot {
@@ -193,9 +194,18 @@ class Bot {
 		this._queue(song);
 	}
 
-	play(yturl, message, tries){
-		var song = new Song();
-		song.setUrl(yturl);
+	play(input){
+		if(input instanceof MediaResolvable){
+			if(input.isVideo()){
+				this._queue(mediaResolvable.resolve());
+			}
+		}
+		if(mediaResolvable.isVideo()){
+			this._queue(mediaResolvable.resolve());
+		}else if(mediaResolvable.isPlaylist()){
+
+		}
+		var song = mediaResolvable.resolve();
 		song.resolveTitleFromMessage(message, s=>{
 			this._queue(s);
 		});

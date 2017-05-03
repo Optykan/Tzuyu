@@ -71,9 +71,9 @@ class YouTube {
 			if(json.pageInfo.totalResults > 0){
 				return new Promise((resolve, reject)=>{
 					if(json.items[0].id.kind == "youtube#playlist"){
-						resolve(new MediaResolvable(items[0].id.kind, items[0].id.playlistId));
+						resolve(new MediaResolvable(items[0].id.kind, items[0].id.playlistId, items[0].snippet.title));
 					}else if(json.items[0].id.kind == "youtube#video"){
-						resolve(new MediaResolvable(items[0].id.kind, items[0].id.videoId));
+						resolve(new MediaResolvable(items[0].id.kind, items[0].id.videoId, items[0].snippet.title));
 					}else{
 						reject("No playable media found");
 					}
