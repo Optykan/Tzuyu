@@ -1,5 +1,5 @@
 //youtube stuff
-
+const MediaResolvable = require('./types/MediaResolvable');
 const fetch = require('node-fetch');
 
 //we're looking for:
@@ -17,42 +17,24 @@ class YouTube {
 			//its a youtube url
 			var playlist = /https?:\/\/(?:www\.)?youtube\.(?:.+?)\/watch(?:.*?)&list=(.*)/.exec(params);
 			if(playlist){
-				return {
-					type: 'playlist',
-					payload: playlist[1]
-				}
+				return new MediaResolvable('playlist', playlist[1]);
 			}else{
-				return {
-					type: 'direct',
-					payload: params
-				};
+				return new MediaResolvable('direct', params);
 			}
 		}else if(/https?:\/\/(?:www\.)?youtu\.be\//.exec(params)){
 			//its a youtu.be url
 			var playlist = /https?:\/\/(?:www\.)?youtu\.be\/(?:.*?)&list=(.*)/.exec(params);
 			if(playlist){
-				return {
-					type: 'playlist',
-					payload: playlist[1]
-				}
+				return new MediaResolvable('playlist', playlist[1]);
 			}else{
-				return {
-					type: 'direct',
-					payload: params
-				};
+				return new MediaResolvable('direct', params);
 			}
 		}else if(/https?:\/\/(?:www)?\.youtube\.com\/playlist\?list=(.*)/.exec(params)){
 			var playlist = /https?:\/\/(?:www)?\.youtube\.com\/playlist\?list=(.*)/.exec(params);
-			return {
-				type: 'playlist',
-				payload: playlist[1]
-			}
+			return new MediaResolvable('playlist', playlist[1]);
 		}
 		else{
-			return {
-				type: 'search',
-				payload: params
-			};
+			return new MediaResolvable('search', params);
 		}
 	}
 
