@@ -67,8 +67,16 @@ class YouTube {
 
 		this._fetch("https://www.googleapis.com/youtube/v3/search", params, json=>{
 			if(json.items[0]){
-				var url ="https://youtube.com/watch?v="+json.items[0].id.videoId; //the result url
-				var title = json.items[0].snippet.title;
+				if(json.items[0].id.kind == "youtube#playlist"){
+					callback(new MediaResolvable('playlist', json.items[0].id.playlistId));
+				}else if(json.items[0].id.kind == "youtube#video"){
+					callback(return new MediaResolvable('playlist', json.items[0].id.videoId));
+				}
+				// var url ="https://youtube.com/watch?v="+json.items[0].id.videoId; //the result url
+				// var title = json.items[0].snippet.title;
+				// return new Promise((resolve, reject)=>{
+
+				// });
 				callback(url, title);
 			}
 		});

@@ -1,9 +1,10 @@
 'use strict';
 
 class MediaResolvable{
-	constructor(type, payload){
+	constructor(type, payload, target){
 		this.type = type;
 		this.payload = payload;
+		this.target = "yt";
 	}
 }
 
