@@ -1,19 +1,20 @@
 'use strict';
 
-const Song = require("Song");
+const Song = require("./Song");
+const Playlist = require("./Playlist");
 
 class MediaResolvable{
-	constructor(type, payload, title, target){
+	constructor(type, id, title, target){
 		this.title = title;
 		this.type = type;
-		this.payload = payload;
+		this.id = id;
 		this.target = "yt";
 	}
 	resolve(){
 		if(this.isVideo()){
-			return new Song(this.title, this.payload);
+			return new Song(this.title, this.id);
 		}else if(this.isPlaylist()){
-			return new Playlist()
+			return new Playlist(this.id);
 		}
 	}
 	isVideo(){

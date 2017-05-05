@@ -18,21 +18,21 @@ class YouTube {
 			//its a youtube url
 			var playlist = /https?:\/\/(?:www\.)?youtube\.(?:.+?)\/watch(?:.*?)&list=(.*)/.exec(params);
 			if(playlist){
-				return new MediaResolvable('playlist', playlist[1]);
+				return new MediaResolvable('youtube#playlist', playlist[1]);
 			}else{
-				return new MediaResolvable('direct', params);
+				return new MediaResolvable('youtube#video', params);
 			}
 		}else if(/https?:\/\/(?:www\.)?youtu\.be\//.exec(params)){
 			//its a youtu.be url
 			var playlist = /https?:\/\/(?:www\.)?youtu\.be\/(?:.*?)&list=(.*)/.exec(params);
 			if(playlist){
-				return new MediaResolvable('playlist', playlist[1]);
+				return new MediaResolvable('youtube#playlist', playlist[1]);
 			}else{
-				return new MediaResolvable('direct', params);
+				return new MediaResolvable('youtube#video', params);
 			}
 		}else if(/https?:\/\/(?:www)?\.youtube\.com\/playlist\?list=(.*)/.exec(params)){
 			var playlist = /https?:\/\/(?:www)?\.youtube\.com\/playlist\?list=(.*)/.exec(params);
-			return new MediaResolvable('playlist', playlist[1]);
+			return new MediaResolvable('youtube#playlist', playlist[1]);
 		}
 		else{
 			return new MediaResolvable('search', params);
@@ -129,7 +129,7 @@ class YouTube {
 			playlistId: playlistId,
 			maxResults: 50
 		};
-		this._fetch("https://www.googleapis.com/youtube/v3/playlistItems", params, json=>{
+		return Net.fetch("https://www.googleapis.com/youtube/v3/playlistItems", params).then(json=>{
 			if(!json.errors && json.items && json.items[0]){
 				for(let i=0; i<json.items.length; i++){
 					this.playlistStore.push({
@@ -141,10 +141,14 @@ class YouTube {
 					console.log("searching through token:"+json.nextPageToken);
 					this._parsePlaylistThroughPages(json.nextPageToken, playlistId, callback);
 				}else{
-					callback(this.playlistStore);
+					return new Promise((resolve, reject)=>{
+						resolve(this.playlistStore);
+					});
 				}
 			}else{
-				callback([]);
+				return new Promise((resolve, reject)=>{
+					reject([]);
+				})
 			}
 		});
 	}

@@ -3,7 +3,7 @@
 class Song{
 	constructor(title, id){
 		this.title = title;
-		this.id = id;
+		this.url = id;
 	}
 
 	getUrl(){

@@ -17,7 +17,7 @@ class Net{
 			return new Promise((resolve, reject)=>{
 				resolve(json);
 			});
-			callback(json);
+			// callback(json);
 		}).catch(e=>{
 			console.error(e);
 		});

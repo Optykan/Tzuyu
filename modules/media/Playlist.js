@@ -1,7 +1,6 @@
 'use strict';
 
 class Playlist{
-
 	constructor(id){
 		this.id = id;
 	}

@@ -198,6 +198,8 @@ class Bot {
 		if(input instanceof MediaResolvable){
 			if(input.isVideo()){
 				this._queue(mediaResolvable.resolve());
+			}else if(input.isPlaylist()){
+
 			}
 		}
 		if(mediaResolvable.isVideo()){
