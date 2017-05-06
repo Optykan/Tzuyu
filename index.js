@@ -2,10 +2,11 @@ require('dotenv').config();
 
 const Bot = require('./modules/Bot');
 const Discord = require('discord.js');
-const YouTubeInterface = require('./modules/YouTube');
+const YouTube = require('./modules/YouTube');
+const MediaResolver = require('./modules/MediaResolver');
 
 var Tzuyu = new Bot();
-var YouTube = new YouTubeInterface(process.env.YT_API_KEY);
+// var YouTube = new YouTubeInterface(process.env.YT_API_KEY);
 
 Tzuyu.client.on('ready', () => {
 	console.log('Loaded!');
@@ -53,18 +54,9 @@ Tzuyu.client.on('message', message => {
 		case "play":
 			Tzuyu.setVoiceChannel(message.member.voiceChannelID);
 			var request = YouTube.parsePlayRequest(params);
-			if(request.type=='playlist'){
-				YouTube.parsePlaylist(request.payload, (videos)=>{
-					Tzuyu.playList(videos);
-				});
-			}else if(request.type=='search'){
-				YouTube.search(request.payload).then((mediaResolvable)=>{
-					Tzuyu.play(mediaResolvable);
-				}).catch(console.error);
-			}else{
-				//direct request
-				Tzuyu.play(request.payload, message);
-			}
+			MediaResolver.resolve(request).then(media=>{
+				Tzuyu.play(media);
+			}).catch(console.error);
 		break;
 		
 		case "playing":

@@ -41,6 +41,9 @@ class Queue{
 	dumpQ(){
 		this.q=[];
 	}
+	concat(playlist){
+		this.q.concat(playlist);
+	}
 	removeFromQueue(index){
 		if(index>0 && index<this.q.length+1){
 			return this.q.splice(index-1,1);

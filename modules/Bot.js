@@ -3,8 +3,9 @@
 const ytdl = require('ytdl-core');
 const Queue = require('./Queue');
 const Discord = require("discord.js");
-const Song = require("./Song");
-const MediaResolvable = require("./MediaResolvable");
+const Song = require("./media/Song");
+const Playlist = require("./media/Playlist");
+const MediaResolvable = require("./media/MediaResolvable");
 // const MediaPlayer = require('./MediaPlayer');
 
 class Bot {
@@ -169,24 +170,28 @@ class Bot {
 	}
 
 	//make sure you only send this boy a song object
-	_queue(song, isPlaylist){
-		this.queue.enqueue(song);
-		this._ensureConnectionAfterRequest(isPlaylist);
-	}
-	playList(listArray){
-		this.message("Adding playlist to queue");
-		if(listArray){
-			for(let i=0; i<listArray.length; i++){
-				let song = new Song();
-				song.setTitle(listArray[i].title);
-				song.setUrl(listArray[i].url);
-
-				this._queue(song, true);
-			}
+	_queue(item){
+		if(item instanceof Playlist){
+			this.queue.concat(item);
 		}else{
-			this.message("Something went wrong");
+			this.queue.enqueue(item);
 		}
+		this._ensureConnectionAfterRequest();
 	}
+	// playList(listArray){
+	// 	this.message("Adding playlist to queue");
+	// 	if(listArray){
+	// 		for(let i=0; i<listArray.length; i++){
+	// 			let song = new Song();
+	// 			song.setTitle(listArray[i].title);
+	// 			song.setUrl(listArray[i].url);
+
+	// 			this._queue(song, true);
+	// 		}
+	// 	}else{
+	// 		this.message("Something went wrong");
+	// 	}
+	// }
 	playGivenTitle(yturl, title){
 		var song = new Song();
 		song.setTitle(title);
@@ -195,22 +200,11 @@ class Bot {
 	}
 
 	play(input){
-		if(input instanceof MediaResolvable){
-			if(input.isVideo()){
-				this._queue(mediaResolvable.resolve());
-			}else if(input.isPlaylist()){
-
-			}
+		if(input instanceof Song || input instanceof Playlist){
+			this._queue(input);
+		}else{
+			throw new TypeError("Item passed to play was an instance of "+input.constructor.name);
 		}
-		if(mediaResolvable.isVideo()){
-			this._queue(mediaResolvable.resolve());
-		}else if(mediaResolvable.isPlaylist()){
-
-		}
-		var song = mediaResolvable.resolve();
-		song.resolveTitleFromMessage(message, s=>{
-			this._queue(s);
-		});
 	}
 	stop(){
 		if(this.dispatcher){

@@ -1,18 +1,17 @@
 //youtube stuff
-const MediaResolvable = require('./MediaResolvable');
+const MediaResolvable = require('./media/MediaResolvable');
 const Net = require('./Net');
-const Song = require('./Song');
+const Song = require('./media/Song');
+const Playlist = require('./media/Playlist');
 
 //we're looking for:
 //https://www.googleapis.com/youtube/v3/search?part=snippet&q=KEYWORD&key=YT_API_KEY
 class YouTube {
-	constructor(key){
-		this.opts={
-			key:key
-		};
-		this.playlistStore=[];
+	static get apikey(){
+		return process.env.YT_API_KEY;
 	}
-	parsePlayRequest(params){
+
+	static parsePlayRequest(params){
 		//accepts the part after the %play command
 		if(/https?:\/\/(?:www\.)?youtube\.(?:.+?)\/watch/.exec(params)){
 			//its a youtube url
@@ -35,36 +34,15 @@ class YouTube {
 			return new MediaResolvable('youtube#playlist', playlist[1]);
 		}
 		else{
-			return new MediaResolvable('search', params);
+			return new MediaResolvable('youtube#search', params);
 		}
 	}
 
-	_fetch(url, params, callback){
-		if (typeof callback !== 'function'){
-			return console.warn("no callback function defined for "+url);
-		}
-		var urlencoded = "";
-		
-		//urlencode the params
-		for(var i in params){
-			urlencoded += "&"+i+"="+params[i]; //in the format &[key]=[value]
-		}
-
-		urlencoded = "?"+urlencoded.substring(1);
-
-		fetch(url+urlencoded+'&key='+this.opts.key).then(result => {
-			return result.json(); //ensure a search isn't resulting no videos, making items[0] nil
-		}).then(json => {
-			callback(json);
-		}).catch(e=>{
-			console.error(e);
-		});
-	}
-	search (term){
+	static search (term){
 		var params = {
 			part: "snippet",
 			q: encodeURIComponent(term),
-			key: this.opts.key
+			key: YouTube.apikey;
 		};
 
 		return Net.fetch("https://www.googleapis.com/youtube/v3/search", params).then(json=>{
@@ -98,57 +76,56 @@ class YouTube {
 		// });
 	}
 
-	_parsePlaylistThroughPages(token, playlistId, callback){
-		var params = {
-			part: 'snippet',
-			playlistId: playlistId,
-			maxResults: 50,
-			pageToken: token
-		};
+	// static _parsePlaylistThroughPages(token, playlistId, callback){
+	// 	var params = {
+	// 		part: 'snippet',
+	// 		playlistId: playlistId,
+	// 		maxResults: 50,
+	// 		pageToken: token
+	// 	};
 
-		this._fetch("https://www.googleapis.com/youtube/v3/playlistItems", params, json=>{
-			if(!json.errors && json.items && json.items[0]){
-				for(let i=0; i<json.items.length; i++){
-					this.playlistStore.push({
-						title: json.items[i].snippet.title,
-						url: "https://www.youtube.com/watch?v="+json.items[i].snippet.resourceId.videoId
-					});
-				}
-			}
-			if(json.nextPageToken){
-				this._parsePlaylistThroughPages(json.nextPageToken, playlistId, callback);
-			}else{
-				callback(this.playlistStore);
-			}
-		});
-	}
-	parsePlaylist(playlistId, callback){
+	// 	Net.fetch("https://www.googleapis.com/youtube/v3/playlistItems", params).then(json=>{
+	// 		if(!json.errors && json.items && json.items[0]){
+	// 			for(let i=0; i<json.items.length; i++){
+	// 				this.playlistStore.push({
+	// 					title: json.items[i].snippet.title,
+	// 					url: "https://www.youtube.com/watch?v="+json.items[i].snippet.resourceId.videoId
+	// 				});
+	// 			}
+	// 		}
+	// 		if(json.nextPageToken){
+	// 			this._parsePlaylistThroughPages(json.nextPageToken, playlistId, callback);
+	// 		}else{
+	// 			callback(this.playlistStore);
+	// 		}
+	// 	});
+	// }
+	static parsePlaylist(playlistId, playlist, token){
 		this.playlistStore=[];
 		var params = {
 			part: 'snippet',
 			playlistId: playlistId,
-			maxResults: 50
+			maxResults: 50,
+			key: YouTube.apikey
 		};
 		return Net.fetch("https://www.googleapis.com/youtube/v3/playlistItems", params).then(json=>{
 			if(!json.errors && json.items && json.items[0]){
 				for(let i=0; i<json.items.length; i++){
-					this.playlistStore.push({
-						title: json.items[i].snippet.title,
-						url: "https://www.youtube.com/watch?v="+json.items[i].snippet.resourceId.videoId
-					});
+					playlist.push(new Song(json.items[i].snippet.title, json.items[i].snippet.resourceId.videoId));
 				}
 				if(json.nextPageToken){
-					console.log("searching through token:"+json.nextPageToken);
-					this._parsePlaylistThroughPages(json.nextPageToken, playlistId, callback);
+					console.log("searching through token: "+json.nextPageToken);
+					parsePlaylist(playlistId, playlist, json.nextPageToken);
 				}else{
 					return new Promise((resolve, reject)=>{
-						resolve(this.playlistStore);
+						//because js allegedly passes objects by pointers or something
+						resolve();
 					});
 				}
 			}else{
 				return new Promise((resolve, reject)=>{
 					reject([]);
-				})
+				});
 			}
 		});
 	}

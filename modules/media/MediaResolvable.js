@@ -4,17 +4,19 @@ const Song = require("./Song");
 const Playlist = require("./Playlist");
 
 class MediaResolvable{
-	constructor(type, id, title, target){
+	constructor(type, payload, title, target){
+		//type: youtube#<type>
+		//payload: either an id or a search
 		this.title = title;
 		this.type = type;
-		this.id = id;
+		this.payload = payload;
 		this.target = "yt";
 	}
 	resolve(){
-		if(this.isVideo()){
-			return new Song(this.title, this.id);
+		if(this.isVpayloadeo()){
+			return new Song(this.title, this.payload);
 		}else if(this.isPlaylist()){
-			return new Playlist(this.id);
+			return new Playlist(this.payload);
 		}
 	}
 	isVideo(){
@@ -22,6 +24,9 @@ class MediaResolvable{
 	}
 	isPlaylist(){
 		return this.type.search("playlist") != -1;
+	}
+	isSearch(){
+		return this.type.search("search") != -1;
 	}
 }
 
