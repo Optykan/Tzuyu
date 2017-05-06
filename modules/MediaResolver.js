@@ -10,8 +10,11 @@ class MediaResolver{
 		}
 
 		if(mediaResolvable.isVideo()){
-			return new Promise((resolve, reject)=>{
-				resolve(mediaResolvable.resolve());
+			return YouTube.getTitle(mediaResolvable.payload).then(title=>{
+				return new Promise((resolve, reject)=>{
+					mediaResolvable.title = title;
+					resolve(mediaResolvable.resolve());
+				});
 			});
 		}else if(mediaResolvable.isPlaylist()){
 			var pl = mediaResolvable.resolve();

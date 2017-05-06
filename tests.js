@@ -13,24 +13,33 @@ require('dotenv').config();
 
 const Bot = require('./modules/Bot');
 const Discord = require('discord.js');
-const YouTubeInterface = require('./modules/YouTube');
+const YouTube = require('./modules/YouTube');
+const MediaResolvable = require("./modules/media/MediaResolvable");
+const MediaResolver = require("./modules/MediaResolver");
+const Playlist = require("./modules/media/Playlist");
+const Song = require("./modules/media/Song");
 
 var Tzuyu = new Bot();
-var YouTube = new YouTubeInterface(process.env.YT_API_KEY);
 
 Tzuyu.login(process.env.BOT_TOKEN);
 
 var playRequest = YouTube.parsePlayRequest("https://www.youtube.com/watch?v=7hzIF8npWTc");
-expect(playRequest).toEqual({
-	type: 'direct',
-	payload: "https://www.youtube.com/watch?v=7hzIF8npWTc"
-});
+expect(playRequest instanceof MediaResolvable);
+expect(playRequest).toEqual(new MediaResolvable("youtube#video", "7hzIF8npWTc"));
+
+isMakingAsyncRequest = true;
+MediaResolver.resolve(playRequest).then(song=>{
+	expect(song instanceof Song);
+	expect(song).toEqual(new Song("Mada Mada song", "7hzIF8npWTc"));
+	isMakingAsyncRequest = false;
+});	
+
 
 playRequest = YouTube.parsePlayRequest("https://www.youtube.com/playlist?list=PLQI-1xShgqUKXYHOwjicC-zVOcKb_t9gs");
-expect(playRequest).toEqual({
-	type: 'playlist',
-	payload: "PLQI-1xShgqUKXYHOwjicC-zVOcKb_t9gs"
-});
+expect(playRequest).toEqual(new MediaResolvable("youtube#playlist", "PLQI-1xShgqUKXYHOwjicC-zVOcKb_t9gs"));
+MediaResolver.resolve(playRequest).then(playlist=>{
+	expect(playlist instanceof Playlist);
+})
 
 
 isMakingAsyncRequest = true;

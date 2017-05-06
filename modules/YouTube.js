@@ -15,19 +15,20 @@ class YouTube {
 		//accepts the part after the %play command
 		if(/https?:\/\/(?:www\.)?youtube\.(?:.+?)\/watch/.exec(params)){
 			//its a youtube url
-			var playlist = /https?:\/\/(?:www\.)?youtube\.(?:.+?)\/watch(?:.*?)&list=(.*)/.exec(params);
-			if(playlist){
-				return new MediaResolvable('youtube#playlist', playlist[1]);
+			var regex = /https?:\/\/(?:www\.)?youtube\.(?:.+?)\/watch\?v=(.*?)(?:&list=(.*))?$/.exec(params);
+			if(regex[2]){
+				return new MediaResolvable('youtube#playlist', regex[2]);
 			}else{
-				return new MediaResolvable('youtube#video', params);
+				return new MediaResolvable('youtube#video', regex[1]);
+				//shitty naming conventions right here      ^^^^^^^^^^^           
 			}
 		}else if(/https?:\/\/(?:www\.)?youtu\.be\//.exec(params)){
 			//its a youtu.be url
-			var playlist = /https?:\/\/(?:www\.)?youtu\.be\/(?:.*?)&list=(.*)/.exec(params);
-			if(playlist){
-				return new MediaResolvable('youtube#playlist', playlist[1]);
+			var regex = /https?:\/\/(?:www\.)?youtu\.be\/(.*?)(?:&list=(.*))?$/.exec(params);
+			if(regex[2]){
+				return new MediaResolvable('youtube#playlist', regex[2]);
 			}else{
-				return new MediaResolvable('youtube#video', params);
+				return new MediaResolvable('youtube#video', regex[1]);
 			}
 		}else if(/https?:\/\/(?:www)?\.youtube\.com\/playlist\?list=(.*)/.exec(params)){
 			var playlist = /https?:\/\/(?:www)?\.youtube\.com\/playlist\?list=(.*)/.exec(params);
@@ -38,6 +39,26 @@ class YouTube {
 		}
 	}
 
+	static getTitle(videoId){
+		var params = {
+			part: "snippet",
+			id: videoId,
+			key: YouTube.apikey
+		};
+		return Net.fetch("https://www.googleapis.com/youtube/v3/videos", params).then(json=>{
+			return new Promise((resolve, reject)=>{
+				if(!json.errors && json.pageInfo.totalResults > 0){
+					resolve(json.items[0].snippet.title);
+				}else{
+					reject("");
+				}
+				resolve()
+			});
+		});
+
+
+	}
+
 	static search (term){
 		var params = {
 			part: "snippet",
@@ -46,7 +67,7 @@ class YouTube {
 		};
 
 		return Net.fetch("https://www.googleapis.com/youtube/v3/search", params).then(json=>{
-			if(json.pageInfo.totalResults > 0){
+			if(!json.errors && json.pageInfo.totalResults > 0){
 				return new Promise((resolve, reject)=>{
 					if(json.items[0].id.kind == "youtube#playlist"){
 						resolve(new MediaResolvable(json.items[0].id.kind, json.items[0].id.playlistId, json.items[0].snippet.title));
@@ -58,48 +79,8 @@ class YouTube {
 				});
 			}
 		});
-
-		// this._fetch("https://www.googleapis.com/youtube/v3/search", params, json=>{
-		// 	if(json.items[0]){
-		// 		if(json.items[0].id.kind == "youtube#playlist"){
-		// 			callback(new MediaResolvable('playlist', json.items[0].id.playlistId));
-		// 		}else if(json.items[0].id.kind == "youtube#video"){
-		// 			callback(new MediaResolvable('playlist', json.items[0].id.videoId));
-		// 		}
-		// 		// var url ="https://youtube.com/watch?v="+json.items[0].id.videoId; //the result url
-		// 		// var title = json.items[0].snippet.title;
-		// 		// return new Promise((resolve, reject)=>{
-
-		// 		// });
-		// 		callback(url, title);
-		// 	}
-		// });
 	}
 
-	// static _parsePlaylistThroughPages(token, playlistId, callback){
-	// 	var params = {
-	// 		part: 'snippet',
-	// 		playlistId: playlistId,
-	// 		maxResults: 50,
-	// 		pageToken: token
-	// 	};
-
-	// 	Net.fetch("https://www.googleapis.com/youtube/v3/playlistItems", params).then(json=>{
-	// 		if(!json.errors && json.items && json.items[0]){
-	// 			for(let i=0; i<json.items.length; i++){
-	// 				this.playlistStore.push({
-	// 					title: json.items[i].snippet.title,
-	// 					url: "https://www.youtube.com/watch?v="+json.items[i].snippet.resourceId.videoId
-	// 				});
-	// 			}
-	// 		}
-	// 		if(json.nextPageToken){
-	// 			this._parsePlaylistThroughPages(json.nextPageToken, playlistId, callback);
-	// 		}else{
-	// 			callback(this.playlistStore);
-	// 		}
-	// 	});
-	// }
 	static parsePlaylist(playlistId, playlist, token){
 		this.playlistStore=[];
 		var params = {

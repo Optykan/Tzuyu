@@ -38,11 +38,14 @@ class Queue{
 	returnQ(){
 		return this.q;
 	}
+	getLength(){
+		return this.q.length;
+	}
 	dumpQ(){
 		this.q=[];
 	}
 	concat(playlist){
-		this.q.concat(playlist);
+		this.q = this.q.concat(playlist);
 	}
 	removeFromQueue(index){
 		if(index>0 && index<this.q.length+1){

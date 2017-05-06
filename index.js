@@ -55,7 +55,6 @@ Tzuyu.client.on('message', message => {
 			Tzuyu.setVoiceChannel(message.member.voiceChannelID);
 			var request = YouTube.parsePlayRequest(params);
 			MediaResolver.resolve(request).then(media=>{
-				console.log(media);
 				Tzuyu.play(media);
 			}).catch(console.error);
 		break;

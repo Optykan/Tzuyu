@@ -100,6 +100,7 @@ class Bot {
 		var stream = null;
 		//no url provided, just play from queue
 		if(this.queue.isEmpty()){
+			console.log(this.queue);
 			this.message("Queue is empty, leaving...");
 			return this.leave();
 		}
@@ -145,7 +146,7 @@ class Bot {
 		}).catch(console.error);
 	}
 
-	_ensureConnectionAfterRequest(isPlaylist){
+	_ensureConnectionAfterRequest(){
 		if(!this.connection && !this.isConnecting){
 			console.log("No connection, connecting...");
 
@@ -157,51 +158,28 @@ class Bot {
 				console.error(e);
 				this.leave();
 			});
-		}else if(!isPlaylist){
+		}else{
 			var latest=this.queue.peekLast();
-			if(latest && !isPlaylist){
-				let title=latest.getTitle();
-				let url = latest.getUrl();
-				this.message("Added **"+title+"** to the queue");
-			}else{
-				this.message("Something happened");
-			}
+			//do something...
 		}
 	}
 
 	//make sure you only send this boy a song object
 	_queue(item){
 		if(item instanceof Playlist){
-			this.queue.concat(item);
-		}else{
+			this.message("Adding playlist to queue...");
+			this.queue.concat(item.unwrap());
+			console.log(this.queue);
+		}else if(item instanceof Song){
+			console.log(escape(item.getTitle()));
+			this.message("Added "+item.getTitle()+" to queue at position "+parseInt(this.queue.getLength()+1));
 			this.queue.enqueue(item);
 		}
 		this._ensureConnectionAfterRequest();
 	}
-	// playList(listArray){
-	// 	this.message("Adding playlist to queue");
-	// 	if(listArray){
-	// 		for(let i=0; i<listArray.length; i++){
-	// 			let song = new Song();
-	// 			song.setTitle(listArray[i].title);
-	// 			song.setUrl(listArray[i].url);
-
-	// 			this._queue(song, true);
-	// 		}
-	// 	}else{
-	// 		this.message("Something went wrong");
-	// 	}
-	// }
-	playGivenTitle(yturl, title){
-		var song = new Song();
-		song.setTitle(title);
-		song.setUrl(yturl);
-		this._queue(song);
-	}
 
 	play(input){
 		if(input instanceof Song || input instanceof Playlist){
-			console.log(input);
 			this._queue(input);
 		}else{
 			throw new TypeError("Item passed to play was an instance of "+input.constructor.name);

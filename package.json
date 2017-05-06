@@ -1,6 +1,6 @@
 {
   "name": "Tzuyu",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "",
   "main": "index.js",
   "dependencies": {
@@ -24,7 +24,7 @@
     "url": "https://github.com/Optykan/Tzuyu/issues"
   },
   "scripts": {
-    "start": "node --use_strict index.js",
-    "test": "node --use_strict tests.js"
+    "start": "node index.js",
+    "test": "node tests.js"
   }
 }

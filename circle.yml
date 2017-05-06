@@ -10,3 +10,4 @@ general:
   branches:
     only:
       - deploy
+      - master
