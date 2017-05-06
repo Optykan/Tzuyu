@@ -1,17 +1,16 @@
-'use strict';
+'use strict'
 
-class Playlist{
-	constructor(id){
-		this.id = id;
-		this.contents = [];
-	}
-	push(song){
-		this.contents.push(song);
-	}
-	unwrap(){
-		return this.contents;
-	}
-
+class Playlist {
+  constructor (id) {
+    this.id = id
+    this.contents = []
+  }
+  push (song) {
+    this.contents.push(song)
+  }
+  unwrap () {
+    return this.contents
+  }
 }
 
-module.exports = Playlist;
+module.exports = Playlist
