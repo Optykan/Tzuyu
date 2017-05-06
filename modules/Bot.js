@@ -201,6 +201,7 @@ class Bot {
 
 	play(input){
 		if(input instanceof Song || input instanceof Playlist){
+			console.log(input);
 			this._queue(input);
 		}else{
 			throw new TypeError("Item passed to play was an instance of "+input.constructor.name);

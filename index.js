@@ -55,6 +55,7 @@ Tzuyu.client.on('message', message => {
 			Tzuyu.setVoiceChannel(message.member.voiceChannelID);
 			var request = YouTube.parsePlayRequest(params);
 			MediaResolver.resolve(request).then(media=>{
+				console.log(media);
 				Tzuyu.play(media);
 			}).catch(console.error);
 		break;
@@ -130,10 +131,10 @@ if (process.platform === "win32") {
 process.on('SIGINT', function () {
   //graceful shutdown
   // console.log('siginted');
-  Tzuyu.message("Ending life, sponsored by Microsoft© Windows™", ()=>{
-	  Tzuyu.leave();
+  // // Tzuyu.message("Ending life, sponsored by Microsoft© Windows™", ()=>{
+	 //  Tzuyu.leave();
+  // });
 	  process.exit();
-  });
   
 });
 

@@ -42,16 +42,16 @@ class YouTube {
 		var params = {
 			part: "snippet",
 			q: encodeURIComponent(term),
-			key: YouTube.apikey;
+			key: YouTube.apikey
 		};
 
 		return Net.fetch("https://www.googleapis.com/youtube/v3/search", params).then(json=>{
 			if(json.pageInfo.totalResults > 0){
 				return new Promise((resolve, reject)=>{
 					if(json.items[0].id.kind == "youtube#playlist"){
-						resolve(new MediaResolvable(items[0].id.kind, items[0].id.playlistId, items[0].snippet.title));
+						resolve(new MediaResolvable(json.items[0].id.kind, json.items[0].id.playlistId, json.items[0].snippet.title));
 					}else if(json.items[0].id.kind == "youtube#video"){
-						resolve(new MediaResolvable(items[0].id.kind, items[0].id.videoId, items[0].snippet.title));
+						resolve(new MediaResolvable(json.items[0].id.kind, json.items[0].id.videoId, json.items[0].snippet.title));
 					}else{
 						reject("No playable media found");
 					}
@@ -108,6 +108,9 @@ class YouTube {
 			maxResults: 50,
 			key: YouTube.apikey
 		};
+		if(token){
+			params.pageToken = token;
+		}
 		return Net.fetch("https://www.googleapis.com/youtube/v3/playlistItems", params).then(json=>{
 			if(!json.errors && json.items && json.items[0]){
 				for(let i=0; i<json.items.length; i++){
@@ -115,11 +118,11 @@ class YouTube {
 				}
 				if(json.nextPageToken){
 					console.log("searching through token: "+json.nextPageToken);
-					parsePlaylist(playlistId, playlist, json.nextPageToken);
+					return YouTube.parsePlaylist(playlistId, playlist, json.nextPageToken);
 				}else{
 					return new Promise((resolve, reject)=>{
-						//because js allegedly passes objects by pointers or something
-						resolve();
+						//because js allegedly passes objects by pointers or something but just in case
+						resolve(playlist);
 					});
 				}
 			}else{

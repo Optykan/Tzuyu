@@ -1,6 +1,7 @@
 'use strict';
 const Net = require('./Net');
 const YouTube = require('./YouTube');
+const MediaResolvable = require("./media/MediaResolvable");
 
 class MediaResolver{
 	static resolve(mediaResolvable){
@@ -8,21 +9,24 @@ class MediaResolver{
 			throw new TypeError("Passed an instance of "+mediaResolvable.constructor.name); 
 		}
 
-		if(this.media.isVideo()){
-			return mediaResolvable.resolve();
+		if(mediaResolvable.isVideo()){
+			return new Promise((resolve, reject)=>{
+				resolve(mediaResolvable.resolve());
+			});
 		}else if(mediaResolvable.isPlaylist()){
 			var pl = mediaResolvable.resolve();
-			return YouTube.parsePlaylist(pl.id, pl).then(()=>{
+			return YouTube.parsePlaylist(pl.id, pl).then((playlist)=>{
 				return new Promise((resolve, reject)=>{
-					resolve(pl);
+					resolve(playlist);
 				});
 			});
 		}else if(mediaResolvable.isSearch()){
-			return YouTube.search(mediaResolvable.payload).then(song=>{
-				return new Promise((resolve, reject)=>{
-					resolve(song);
+			return YouTube.search(mediaResolvable.payload).then(resolvable=>{
+				return new Promise((res, reject)=>{
+					//resolve the promise (then = res) with a call to resolve (static resolve) with the resolvable
+					res(MediaResolver.resolve(resolvable));
 				});
-			})
+			});
 		}
 
 	}

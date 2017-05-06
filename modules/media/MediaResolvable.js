@@ -13,7 +13,7 @@ class MediaResolvable{
 		this.target = "yt";
 	}
 	resolve(){
-		if(this.isVpayloadeo()){
+		if(this.isVideo()){
 			return new Song(this.title, this.payload);
 		}else if(this.isPlaylist()){
 			return new Playlist(this.payload);
