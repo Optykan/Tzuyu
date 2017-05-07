@@ -14,7 +14,7 @@ class MediaResolvable {
   }
   resolve () {
     if (this.isVideo()) {
-      return new Song(this.title, this.payload)
+      return new Song(this.payload, this.title)
     } else if (this.isPlaylist()) {
       return new Playlist(this.payload)
     }

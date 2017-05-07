@@ -104,8 +104,8 @@ class Bot {
     }
 
     let next = this.queue.dequeue()
-    let url = next.getUrl()
-    let title = next.getTitle()
+    let url = next.url
+    let title = next.title
     // console.log(next);
 
     this.currentSong = next

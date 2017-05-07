@@ -90,7 +90,7 @@ class YouTube {
     return Net.fetch('https://www.googleapis.com/youtube/v3/playlistItems', params).then(json => {
       if (!json.errors && json.items && json.items[0]) {
         for (let i = 0; i < json.items.length; i++) {
-          playlist.push(new Song(json.items[i].snippet.title, json.items[i].snippet.resourceId.videoId))
+          playlist.push(new Song(json.items[i].snippet.resourceId.videoId, json.items[i].snippet.title))
         }
         if (json.nextPageToken) {
           console.log('searching through token: ' + json.nextPageToken)

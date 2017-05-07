@@ -1,19 +1,12 @@
 'use strict'
 
 class Song {
-  constructor (title, id) {
+  constructor (id, title) {
     this.title = title
     this.id = id
   }
-
-  getUrl () {
+  get url () {
     return 'https://youtube.com/watch?v=' + this.id
-  }
-  setTitle (title) {
-    this.title = title
-  }
-  getTitle () {
-    return this.title
   }
 
   resolveTitleFromMessage (message, tries) {

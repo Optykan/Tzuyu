@@ -20,7 +20,7 @@ class MediaPlayer {
   }
   _playThroughConnection (song, connection) {
     this.nowPlaying = song
-    let stream = ytdl(song.getUrl(), {filter: 'audioonly', quality: 'lowest'})
+    let stream = ytdl(song.url, {filter: 'audioonly', quality: 'lowest'})
     this.dispatcher = connection.playStream(stream)
 
     this.dispatcher.on('end', () => {

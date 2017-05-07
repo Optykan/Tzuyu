@@ -1,10 +1,24 @@
+Error.stackTraceLimit = Infinity
 var expect = require('expect')
+
+function pass (m) {
+  console.log('\x1b[32m[PASS]\x1b[0m ' + m)
+}
+
+function log (m) {
+  console.log('\x1b[36m[LOG]\x1b[0m ' + m)
+}
+
+function error (m) {
+  console.log('\x1b[31m[ERR]\x1b[0m ' + m)
+  throw new Error(m)
+}
 // is this how you do tests?
 
 var timeout = 15000 // how to long to wait for async tests to complete
-var isMakingAsyncRequest = false
+var isTesting = []
 
-console.log('beginning tests')
+log('beginning tests')
 
 require('dotenv').config()
 
@@ -19,47 +33,54 @@ var Tzuyu = new Bot()
 
 Tzuyu.login(process.env.BOT_TOKEN)
 
+log('Resolving Mada Mada song...')
 var playRequest = YouTube.parsePlayRequest('https://www.youtube.com/watch?v=7hzIF8npWTc')
 expect(playRequest instanceof MediaResolvable)
 expect(playRequest).toEqual(new MediaResolvable('youtube#video', '7hzIF8npWTc'))
 
-isMakingAsyncRequest = true
+isTesting.push(true)
 MediaResolver.resolve(playRequest).then(song => {
   expect(song instanceof Song)
-  expect(song).toEqual(new Song('Mada Mada song', '7hzIF8npWTc'))
-  isMakingAsyncRequest = false
-})
+  expect(song).toEqual(new Song('7hzIF8npWTc', 'Mada Mada song'))
+  pass('Successfully resolved Mada Mada song')
+  isTesting.pop()
+}).catch(error)
 
+isTesting.push(true)
+log('Resolving kpop garbage...')
 playRequest = YouTube.parsePlayRequest('https://www.youtube.com/playlist?list=PLQI-1xShgqUKXYHOwjicC-zVOcKb_t9gs')
 expect(playRequest).toEqual(new MediaResolvable('youtube#playlist', 'PLQI-1xShgqUKXYHOwjicC-zVOcKb_t9gs'))
 MediaResolver.resolve(playRequest).then(playlist => {
   expect(playlist instanceof Playlist)
-})
+  pass('Successfully resolved kpop garbage...')
+  isTesting.pop()
+}).catch(error)
 
-isMakingAsyncRequest = true
-YouTube.search('ypM7qHf7zQw', (url, title) => {
-  expect(url).toEqual('https://youtube.com/watch?v=ypM7qHf7zQw')
-  expect(title).toEqual('Genji Circulation')
-  isMakingAsyncRequest = false
+isTesting.push(true)
+log('Resolving genji circulation...')
+YouTube.search('ypM7qHf7zQw').then(media => {
+  expect(media).toEqual(new MediaResolvable('youtube#video', 'ypM7qHf7zQw', 'Genji Circulation'))
+  pass('Successfully resolved genji circulation')
+  isTesting.pop()
   // i love testing
-})
+}).catch(error)
 
 // end tests...
-
+const retry = 500
 function waitForAsyncTests (times) {
-  if (isMakingAsyncRequest) {
-    console.log('waiting on async tests...')
-    if (times > timeout / 500) {
-      console.error('Async requests timed out...')
-      process.exit(0)
+  if (isTesting.length !== 0) {
+    log('waiting on ' + isTesting.length + ' tests...')
+    if (times > timeout / retry) {
+      error('Async requests timed out...')
+      process.exit(1)
     }
     setTimeout(() => {
       if (!times) { times = 0 }
 
       waitForAsyncTests(times + 1)
-    }, 500)
+    }, retry)
   } else {
-    console.log('all tests passed')
+    pass('All tests passed')
     process.exit(0)
   }
 }
