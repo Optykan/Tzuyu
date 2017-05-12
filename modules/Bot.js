@@ -168,7 +168,7 @@ class Bot {
       this.message('Adding playlist to queue...')
       this.queue.concat(item.unwrap())
     } else if (item instanceof Song) {
-      this.message('Added ' + item.getTitle() + ' to queue at position ' + parseInt(this.queue.getLength() + 1))
+      this.message('Added ' + item.title + ' to queue at position ' + parseInt(this.queue.getLength() + 1))
       this.queue.enqueue(item)
     }
     this._ensureConnectionAfterRequest()

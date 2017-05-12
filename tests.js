@@ -41,7 +41,7 @@ expect(playRequest).toEqual(new MediaResolvable('youtube#video', '7hzIF8npWTc'))
 isTesting.push(true)
 MediaResolver.resolve(playRequest).then(song => {
   expect(song instanceof Song)
-  expect(song).toEqual(new Song('7hzIF8npWTc', 'Mada Mada song'))
+  expect(song).toEqual(new Song('7hzIF8npWTc', 'Mada Mada song with Genji'))
   pass('Successfully resolved Mada Mada song')
   isTesting.pop()
 }).catch(error)
