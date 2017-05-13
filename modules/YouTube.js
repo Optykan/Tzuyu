@@ -93,7 +93,7 @@ class YouTube {
           playlist.push(new Song(json.items[i].snippet.resourceId.videoId, json.items[i].snippet.title))
         }
         if (json.nextPageToken) {
-          console.log('searching through token: ' + json.nextPageToken)
+          // console.log('searching through token: ' + json.nextPageToken)
           return YouTube.parsePlaylist(playlistId, playlist, json.nextPageToken)
         } else {
           return new Promise((resolve, reject) => {
