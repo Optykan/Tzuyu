@@ -1,8 +1,9 @@
 require('dotenv').config()
 
-const Bot = require('./modules/Bot')
-const YouTube = require('./modules/YouTube')
-const MediaResolver = require('./modules/MediaResolver')
+const Bot = require('./core/Bot')
+const YouTube = require('./core/YouTube')
+const MediaResolver = require('./core/media/MediaResolver')
+const CommandDelegator = require('./core/CommandDelegator')
 
 var Tzuyu = new Bot()
 // var YouTube = new YouTubeInterface(process.env.YT_API_KEY);
