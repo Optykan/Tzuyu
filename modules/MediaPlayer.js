@@ -3,6 +3,8 @@
 const ytdl = require('ytdl-core')
 const Queue = require('./Queue')
 const EventEmitter = require('events')
+const Playlist = require('./media/Playlist')
+// const Song = require('./media/Song')
 
 // should this class handle the queue?
 
@@ -10,36 +12,65 @@ class MediaPlayer {
   // this should handle incoming song objects and play them
   constructor () {
     this.dispatcher = null
+    this.connection = null
     this.streamOptions = {
       seek: 0,
-      volume: 0.05
+      volume: 0.2
     }
     this.nowPlaying = null
     this.queue = new Queue()
     this.eventEmitter = new EventEmitter()
   }
-  _playThroughConnection (song, connection) {
-    this.nowPlaying = song
-    let stream = ytdl(song.url, {filter: 'audioonly', quality: 'lowest'})
-    this.dispatcher = connection.playStream(stream)
+  play () {
+    if (!this.queue.isEmpty()) {
+      let current = this.queue.dequeue()
+      this.nowPlaying = current
+      this._emit('start', current)
 
-    this.dispatcher.on('end', () => {
-      this.dispatcher = null
-      this.nowPlaying = null
-      this._emit('end')
-    })
+      let stream = ytdl(current.url, {filter: 'audioonly', quality: 'lowest'})
+      this.dispatcher = this.connection.playStream(stream)
+
+      this.dispatcher.on('end', () => {
+        if (!this.queue.isEmpty()) {
+          this.play()
+        } else {
+          this.dispatcher = null
+          this.nowPlaying = null
+          this._emit('end')
+        }
+      })
+    }
   }
 
-  queue (song) {
-    this.queue.enqueue(song)
+  getQueueLength () {
+    return this.queue.getLength()
+  }
+
+  shuffle () {
+    this.queue.shuffle()
+  }
+
+  enqueue (input) {
+    if (input instanceof Playlist) {
+      this.queue.concat(input.unwrap())
+    } else {
+      this.queue.enqueue(input)
+    }
+  }
+
+  provideConnection (conn) {
+    this.connection = conn
   }
 
   bump (index) {
-    return this.enqueue.bump(index)
+    return this.queue.bump(index)
   }
 
   removeFromQueue (index) {
-    return this.enqueue.removeFromQueue(index)
+    return this.queue.removeFromQueue(index)
+  }
+  dumpQ () {
+    this.queue.dumpQ()
   }
 
   stop () {
@@ -52,16 +83,24 @@ class MediaPlayer {
   skip () {
     if (this.dispatcher) {
       this.dispatcher.end()
-      this._emit('end')
+      this._emit('skip')
     }
   }
 
-  _emit (event) {
-    this.eventEmitter.emit(event)
+  returnQueue () {
+    return this.queue.returnQ()
+  }
+
+  isQueueEmpty () {
+    return this.queue.isEmpty()
+  }
+
+  _emit (event, ...args) {
+    this.eventEmitter.emit(event, ...args)
   }
 
   on (event, callback) {
-    this.eventEmitter.on(event, callback.bind())
+    this.eventEmitter.on(event, callback)
   }
 }
 

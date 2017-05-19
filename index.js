@@ -75,7 +75,7 @@ Tzuyu.client.on('message', message => {
       break
 
     case 'queue':
-      Tzuyu.listQ()
+      Tzuyu.listQueue()
       break
 
     case 'shuffle':

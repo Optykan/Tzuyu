@@ -1,18 +1,12 @@
 'use strict'
 
-const ytdl = require('ytdl-core')
-const Queue = require('./Queue')
 const Discord = require('discord.js')
 const Song = require('./media/Song')
 const Playlist = require('./media/Playlist')
-// const MediaPlayer = require('./MediaPlayer');
+const MediaPlayer = require('./MediaPlayer')
 
 class Bot {
   constructor () {
-    this.streamOptions = {
-      seek: 0,
-      volume: 0.1
-    }
     this.voice = {
       channel: null
     }
@@ -20,11 +14,9 @@ class Bot {
       channel: null
     }
     this.connection = null
-    this.queue = new Queue()
-    this.dispatcher = null
     this.client = new Discord.Client()
     this.config = {
-      prefix: '%',
+      prefix: '$',
       messageDelay: 15000
     }
     this.isConnecting = false
@@ -34,11 +26,15 @@ class Bot {
       isActive: true,
       type: 'blacklist'
     }
-    this.currentSong = {
-      'title': '',
-      'url': ''
-    }
-    // this.mediaPlayer = new MediaPlayer();
+    this.mediaPlayer = new MediaPlayer()
+    this.mediaPlayer.on('start', song => {
+      this.message('Now playing: ' + song.title)
+      this.setPlaying(song.title)
+    })
+    this.mediaPlayer.on('end', () => {
+      this.message('Queue is empty, leaving...')
+      this.stop()
+    })
   }
 
   addToPermlist (id) {
@@ -73,7 +69,7 @@ class Bot {
   }
 
   leave () {
-    this.queue.dumpQ()
+    this.mediaPlayer.dumpQ()
     if (this.dispatcher) {
       this.dispatcher.end()
     }
@@ -92,49 +88,7 @@ class Bot {
     }
     this.setPlaying('Overwatch') // well...
   }
-  _playAfterLoad () {
-    // assumes we are connected to voice and plays the top of the queue or whatever is specified
-    // console.log(this.voice.channel.members);
 
-    var stream = null
-    // no url provided, just play from queue
-    if (this.queue.isEmpty()) {
-      this.message('Queue is empty, leaving...')
-      return this.leave()
-    }
-
-    let next = this.queue.dequeue()
-    let url = next.url
-    let title = next.title
-    // console.log(next);
-
-    this.currentSong = next
-    this.message('Now playing: **' + title + '**')
-    this.setPlaying(title)
-
-    stream = ytdl(url, {filter: 'audioonly', quality: 'lowest'})
-
-    console.log('playing' + url)
-
-    try {
-      this.dispatcher = this.connection.playStream(stream, this.streamOptions)
-
-      // bind a callback to do something when the song ends
-      this.dispatcher.on('end', () => {
-        this.dispatcher = null
-        if (this.queue.isEmpty()) {
-          this.message('Queue is empty, leaving...')
-          return this.leave()
-        } else {
-          this._playAfterLoad()
-        }
-      })
-    } catch (e) {
-      console.error(e)
-      this.message('Something happened')
-      this.leave()
-    }
-  }
   message (m, callback) {
     this.text.channel.send(m).then(message => {
       if (typeof callback === 'function') {
@@ -149,9 +103,10 @@ class Bot {
       console.log('No connection, connecting...')
 
       this.join().then(conn => {
-        this.isConnecting = false
         this.connection = conn
-        this._playAfterLoad()
+        this.isConnecting = false
+        this.mediaPlayer.provideConnection(conn)
+        this.mediaPlayer.play()
       }).catch(e => {
         console.error(e)
         this.leave()
@@ -162,76 +117,73 @@ class Bot {
     }
   }
 
-  // make sure you only send this boy a song object
-  _queue (item) {
-    if (item instanceof Playlist) {
-      this.message('Adding playlist to queue...')
-      this.queue.concat(item.unwrap())
-    } else if (item instanceof Song) {
-      this.message('Added ' + item.title + ' to queue at position ' + parseInt(this.queue.getLength() + 1))
-      this.queue.enqueue(item)
-    }
-    this._ensureConnectionAfterRequest()
-  }
-
   play (input) {
     if (input instanceof Song || input instanceof Playlist) {
-      this._queue(input)
+      if (input instanceof Song) {
+        this.message('Added ' + input.title + ' to queue at position ' + parseInt(this.mediaPlayer.getQueueLength() + 1))
+        this.mediaPlayer.enqueue(input)
+      } else if (input instanceof Playlist) {
+        this.message('Adding playlist to queue...')
+        this.mediaPlayer.enqueue(input)
+      }
+      this._ensureConnectionAfterRequest()
     } else {
       throw new TypeError('Item passed to play was an instance of ' + input.constructor.name)
     }
   }
   stop () {
-    if (this.dispatcher) {
-      this.dispatcher.end()
-    }
+    this.mediaPlayer.stop()
     this.leave()
   }
   skip () {
-    if (this.dispatcher) {
-      this.dispatcher.end()
-    }
+    this.mediaPlayer.skip()
   }
-  listQ () {
+  listQueue () {
     var output = ''
 
-    if (this.queue.isEmpty()) {
+    if (this.mediaPlayer.isQueueEmpty()) {
       return this.message('Queue is empty')
     }
-    var q = this.queue.returnQ()
+    var q = this.mediaPlayer.returnQueue()
 
     for (var j = 0; j < Math.ceil((q.length) / 25); j++) {
       for (let i = j * 25; i < (j * 25) + 25; i++) {
         if (!q[i]) { break }
 
-        output += (i + 1).toString() + '. **' + q[i].getTitle() + '**\n'
+        output += (i + 1).toString() + '. **' + q[i].title + '**\n'
       }
       this.message(output)
       output = ''
     }
   }
   bump (songIndex) {
-    if (!isNaN(parseInt(songIndex))) {
-      let res = this.queue.bump(parseInt(songIndex))
-      if (typeof res === 'object' && res[0]) {
-        this.message('Bumped ' + res[0].getTitle() + ' to front of queue')
+    let t = parseInt(songIndex)
+    if (!isNaN(t) && t > 0) {
+      let res = this.mediaPlayer.bump(t)
+      if (res !== false && res instanceof Song) {
+        this.message('Bumped ' + res.title + ' to front of queue')
       } else {
-        this.message('No song found at index `' + songIndex + '`')
+        this.message('No song found at index `' + t + '`')
       }
+    } else {
+      this.message('Invalid song index provided')
     }
   }
   removeFromQueue (songIndex) {
-    if (!isNaN(parseInt(songIndex))) {
-      let t = this.queue.removeFromQueue(parseInt(songIndex))
-      if (typeof t === 'object' && t[0]) {
-        this.message('Removed ' + t[0].getTitle() + ' from queue')
+    let t = parseInt(songIndex)
+    if (!isNaN(t) && t > 0) {
+      let res = this.mediaPlayer.removeFromQueue(t)
+      if (res !== false && res instanceof Song) {
+        this.message('Removed ***' + res.title + '*** from the queue')
       } else {
-        this.message('No song found at index ' + songIndex)
+        this.message('No song found at index `' + t + '`')
       }
+    } else {
+      this.message('Invalid song index provided')
     }
   }
   shuffle () {
-    this.queue.shuffle()
+    this.mediaPlayer.shuffle()
   }
   setPlaying (status) {
     this.client.user.setGame(status)

@@ -34,14 +34,14 @@ var Tzuyu = new Bot()
 Tzuyu.login(process.env.BOT_TOKEN)
 
 log('Resolving Mada Mada song...')
-var playRequest = YouTube.parsePlayRequest('https://www.youtube.com/watch?v=7hzIF8npWTc')
+var playRequest = YouTube.parsePlayRequest('https://www.youtube.com/watch?v=smecoorx1rA')
 expect(playRequest instanceof MediaResolvable)
-expect(playRequest).toEqual(new MediaResolvable('youtube#video', '7hzIF8npWTc'))
+expect(playRequest).toEqual(new MediaResolvable('youtube#video', 'smecoorx1rA'))
 
 isTesting.push(true)
 MediaResolver.resolve(playRequest).then(song => {
   expect(song instanceof Song)
-  expect(song).toEqual(new Song('7hzIF8npWTc', 'Mada Mada song with Genji'))
+  expect(song).toEqual(new Song('smecoorx1rA', 'Mada Mada song'))
   pass('Successfully resolved Mada Mada song')
   isTesting.pop()
 }).catch(error)

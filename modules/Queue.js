@@ -49,14 +49,14 @@ class Queue {
   }
   removeFromQueue (index) {
     if (index > 0 && index < this.q.length + 1) {
-      return this.q.splice(index - 1, 1)
+      return this.q.splice(index - 1, 1)[0]
     }
     return false
   }
   bump (index) {
     let t = this.removeFromQueue(index)
     if (t) {
-      this.q.unshift(t[0])
+      this.q.unshift(t)
       return t
     }
     return false
