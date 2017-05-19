@@ -16,7 +16,7 @@ class Bot {
     this.connection = null
     this.client = new Discord.Client()
     this.config = {
-      prefix: '&',
+      prefix: '$',
       messageDelay: 15000
     }
     this.isConnecting = false
@@ -159,7 +159,7 @@ class Bot {
   bump (songIndex) {
     let t = parseInt(songIndex)
     if (!isNaN(t) && t > 0) {
-      let res = this.queue.bump(t)
+      let res = this.mediaPlayer.bump(t)
       if (res !== false && res instanceof Song) {
         this.message('Bumped ' + res.title + ' to front of queue')
       } else {
@@ -183,7 +183,7 @@ class Bot {
     }
   }
   shuffle () {
-    this.queue.shuffle()
+    this.mediaPlayer.shuffle()
   }
   setPlaying (status) {
     this.client.user.setGame(status)
