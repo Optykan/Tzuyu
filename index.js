@@ -3,9 +3,13 @@ require('dotenv').config()
 const Bot = require('./core/Bot')
 const YouTube = require('./core/YouTube')
 const MediaResolver = require('./core/media/MediaResolver')
-const CommandDelegator = require('./core/CommandDelegator')
+const CommandDelegatorSkeleton = require('./core/CommandDelegator')
 
 var Tzuyu = new Bot()
+var CommandDelegator = new CommandDelegatorSkeleton()
+CommandDelegator.registerPluginHook('test', params => {
+  console.log('hi')
+})
 // var YouTube = new YouTubeInterface(process.env.YT_API_KEY);
 
 Tzuyu.client.on('ready', () => {

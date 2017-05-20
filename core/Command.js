@@ -1,12 +1,11 @@
-class Command{
-	constructor(trigger, callback){
-		this.trigger = trigger
+class Command {
+  constructor (trigger, callback) {
+    this.trigger = trigger
     this.callback = callback
-	}
-  execute(params){
+  }
+  execute (params) {
     this.callback(...params)
   }
-
 }
 
 module.exports = Command

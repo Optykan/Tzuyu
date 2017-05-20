@@ -1,5 +1,5 @@
 'use strict'
-const YouTube = require('./YouTube')
+const YouTube = require('./../YouTube')
 const MediaResolvable = require('./MediaResolvable')
 
 class MediaResolver {

@@ -22,12 +22,28 @@ log('beginning tests')
 
 require('dotenv').config()
 
-const Bot = require('./modules/Bot')
-const YouTube = require('./modules/YouTube')
-const MediaResolvable = require('./modules/media/MediaResolvable')
-const MediaResolver = require('./modules/MediaResolver')
-const Playlist = require('./modules/media/Playlist')
-const Song = require('./modules/media/Song')
+const Bot = require('./core/Bot')
+const YouTube = require('./core/YouTube')
+const MediaResolvable = require('./core/media/MediaResolvable')
+const MediaResolver = require('./core/media/MediaResolver')
+const Playlist = require('./core/media/Playlist')
+const Song = require('./core/media/Song')
+const CommandDelegatorSkeleton = require('./core/CommandDelegator')
+
+var CommandDelegator = new CommandDelegatorSkeleton()
+
+log('Testing command delegation')
+isTesting.push(true)
+
+CommandDelegator.registerPluginHook('test', params => {
+  isTesting.pop()
+  pass('Command delegation passed')
+})
+
+log('Ensuring unique command delegation')
+CommandDelegator.registerPluginHook('test', error)
+
+CommandDelegator.parseIncomingMessage({content: CommandDelegator.prefix + 'test here are some params'})
 
 var Tzuyu = new Bot()
 
