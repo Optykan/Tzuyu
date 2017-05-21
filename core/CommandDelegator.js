@@ -6,27 +6,39 @@ class CommandDelegator {
     this.injectables = injectables
   }
 
-  _registerTrigger (trigger, action, injects) {
+  addInjectable (key, value) {
+    this.injectables[key] = value
+  }
+
+  _registerTrigger (trigger, action, injects, help, context) {
     if (trigger.length < 1) {
       throw new TypeError('Plugin trigger cannot be empty')
     } else if (typeof trigger === 'string' && trigger.search(' ') !== -1) {
       throw new TypeError('Plugin trigger cannot contain spaces')
     } else if (!this.isTriggerRegistered(trigger)) {
-      this.commands.push(new Command(trigger, action, injects))
+      this.commands.push(new Command(trigger, action, injects, help, context))
     } else {
-      console.log(this.commands)
       throw new Error('Trigger ' + trigger + ' already registered')
     }
   }
 
-  registerPluginHook (trigger, action, injects) {
+  registerPluginHook (trigger, action, injects, help, context) {
+    // called by init.js in /plugins
     // where injects is of format thingToInject@paramName
     if (typeof trigger === 'object' && typeof action === 'object' && typeof injects === 'object' && trigger.length === action.length && action.length === injects.length) {
       for (let i = 0; i < trigger.length; i++) {
-        this._registerTrigger(trigger[i], action[i], injects[i])
+        if (typeof help === 'string') {
+          this._registerTrigger(trigger[i], action[i], injects[i], help, context)
+        } else if (typeof help === 'object' && help[0]) {
+          this._registerTrigger(trigger[i], action[i], injects[i], help[i], context)
+        } else if (typeof help === 'object' && help[trigger[i]]) {
+          this._registerTrigger(trigger[i], action[i], injects[i], help[trigger[i]], context)
+        } else {
+          throw new Error('Something went wrong in your plugin definition. Check your register method and try again')
+        }
       }
     } else {
-      this._registerTrigger(trigger, action, injects)
+      this._registerTrigger(trigger, action, injects, help, context)
     }
   }
 
@@ -65,6 +77,15 @@ class CommandDelegator {
     for (let c in this.commands) {
       if (this.commands[c].trigger.toLowerCase() === trigger.toLowerCase()) {
         return true
+      }
+    }
+    return false
+  }
+
+  findCommand (trigger) {
+    for (let i = 0; i < this.commands.length; i++) {
+      if (this.commands[i].trigger.toLowerCase() === trigger.toLowerCase()) {
+        return this.commands[i]
       }
     }
     return false

@@ -11,7 +11,8 @@ class Configure extends Plugin {
     return {
       trigger: 'config',
       action: this.handle,
-      injects: 'Tzuyu@tzuyu'
+      injects: 'Tzuyu@tzuyu',
+      help: this.help
     }
   }
   handle (tzuyu, setting, value) {

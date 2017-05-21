@@ -88,12 +88,15 @@ class Bot {
     this.setPlaying('Overwatch') // well...
   }
 
-  message (m, callback) {
+  message (m, options, callback) {
     this.text.channel.send(m).then(message => {
       if (typeof callback === 'function') {
-        callback()
+        callback(message)
       }
-      message.delete(this.config.messageDelay)
+      let delay = (options ? (options.messageDelay || this.config.messageDelay) : this.config.messageDelay)
+      if (delay > 0) {
+        message.delete(delay)
+      }
     }).catch(console.error)
   }
 

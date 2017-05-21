@@ -1,8 +1,10 @@
 class Command {
-  constructor (trigger, callback, injects) {
+  constructor (trigger, callback, injects, help, context) {
     // remember injects: thingToInject@paramName,more@things
     this.trigger = trigger
     this.callback = callback
+    this.help = help
+    this.context = context
     this.injects = injects.split(',').map(element => {
       let s = element.split('@')
       return {
@@ -54,7 +56,7 @@ class Command {
     //   throw new RangeError('Parameters to send must equal the number of bound parameters')
     // }
 
-    this.callback(...send, ...params)
+    this.callback.call(this.context, ...send, ...params)
   }
 }
 

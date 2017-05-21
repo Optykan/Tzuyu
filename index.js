@@ -16,6 +16,8 @@ let injectables = {
 
 var CommandDelegator = new Delegator(injectables)
 require('./plugins/init')(CommandDelegator)
+// yes, we're adding itself as a delegator
+CommandDelegator.addInjectable('CommandDelegator', CommandDelegator)
 
 Tzuyu.client.on('ready', () => {
   console.log('Loaded!')
@@ -26,10 +28,6 @@ Tzuyu.client.on('ready', () => {
 
 // handle message events (really the only thing we need to do)
 Tzuyu.client.on('message', message => {
-  var input = message.content.split(/\s(.+)/)
-  var command = input[0].toLowerCase()
-  const params = input[1]
-
   if (message.channel.type === 'dm') {
     // do something for dm's
     // Tzuyu.text.channel = Tzuyu.client.channels.get(message.channel.id);
@@ -43,10 +41,6 @@ Tzuyu.client.on('message', message => {
   //   return false
   // }
 
-  if (!command.startsWith(CommandDelegator.prefix)) {
-    return false
-  }
-
   if (!Tzuyu.isPermitted(message.author.id)) {
     return false
   }
@@ -54,55 +48,6 @@ Tzuyu.client.on('message', message => {
   Tzuyu.setTextChannel(message.channel.id)
   Tzuyu.setVoiceChannel(message.member.voiceChannelID)
   CommandDelegator.parseIncomingMessage(message)
-  // console.log(message);
-
-  command = command.substring(1)
-  // play command
-  switch (command) {
-    case 'play':
-      Tzuyu.setVoiceChannel(message.member.voiceChannelID)
-      var request = YouTube.parsePlayRequest(params)
-      MediaResolver.resolve(request).then(media => {
-        Tzuyu.play(media)
-      }).catch(console.error)
-      break
-
-    case 'playing':
-    // Remind me to collect the ID of user who added the playlist as well (later tho)
-      // Tzuyu.currentSong();
-      // does this overlap with listQ?
-      break
-
-    case 'kill':
-      Tzuyu.leave()
-      break
-
-    case 'leave':
-      Tzuyu.leave()
-      break
-
-    case 'skip':
-      Tzuyu.message('Skipped song')
-      Tzuyu.skip()
-      break
-
-    case 'queue':
-      Tzuyu.listQueue()
-      break
-
-    case 'shuffle':
-      Tzuyu.shuffle()
-      Tzuyu.message('Shuffled queue')
-      break
-
-    case 'bump':
-      Tzuyu.bump(params)
-      break
-
-    case 'remove':
-      Tzuyu.removeFromQueue(params)
-      break
-  }
 })
 
 // handle some dirty windows things
@@ -128,7 +73,7 @@ process.on('SIGINT', function () {
 
 process.on('SIGTERM', function () {
   // console.log('sigtermed');
-  Tzuyu.message('Received suicide order, leaving...', () => {
+  Tzuyu.message('Received suicide order, leaving...', {messageDelay: -1}, () => {
     Tzuyu.leave()
     process.exit()
   })

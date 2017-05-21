@@ -9,9 +9,9 @@ function registerPlugins (delegator) {
     let Plugin = require('./' + dir[i] + '/' + (string => { return string.charAt(0).toUpperCase() + string.slice(1) })(dir[i]))
     let pluginInstance = new Plugin()
     let register = pluginInstance.register()
-    delegator.registerPluginHook(register.trigger, register.action, register.injects)
+    let help = register.help || pluginInstance.help
+    delegator.registerPluginHook(register.trigger, register.action, register.injects, help, pluginInstance)
   }
-  return delegator
 }
 
 module.exports = registerPlugins

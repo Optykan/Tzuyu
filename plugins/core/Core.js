@@ -11,7 +11,17 @@ class Core extends Plugin {
     return {
       trigger: ['play', 'kill', 'leave', 'skip', 'queue', 'shuffle', 'bump', 'remove'],
       action: [this.play, this.kill, this.kill, this.skip, this.queue, this.shuffle, this.bump, this.remove],
-      injects: ['Tzuyu@tzuyu,YouTube@yt,MediaResolver@media', 'Tzuyu@tzuyu', 'Tzuyu@tzuyu', 'Tzuyu@tzuyu', 'Tzuyu@tzuyu', 'Tzuyu@tzuyu', 'Tzuyu@tzuyu', 'Tzuyu@tzuyu']
+      injects: ['Tzuyu@tzuyu,YouTube@yt,MediaResolver@media', 'Tzuyu@tzuyu', 'Tzuyu@tzuyu', 'Tzuyu@tzuyu', 'Tzuyu@tzuyu', 'Tzuyu@tzuyu', 'Tzuyu@tzuyu', 'Tzuyu@tzuyu'],
+      help: {
+        play: 'Accepts a string to search for, or a full youtube URL',
+        kill: 'Clears the queue and leaves the channel',
+        leave: 'Clears the queue and leaves the channel',
+        skip: 'Skips the currently playing song',
+        queue: 'Lists the queue',
+        shuffle: 'Shuffles the queue',
+        bump: 'Format: `bump n` where `n` is any valid number. Bumps said song to the front of the queue',
+        remove: 'Format: `remove n` where `n` is any valid number. Removes said song from the queue'
+      }
     }
   }
 
