@@ -3,19 +3,19 @@ require('dotenv').config()
 const Bot = require('./core/Bot')
 const YouTube = require('./core/YouTube')
 const MediaResolver = require('./core/media/MediaResolver')
-// const Delegator = require('./core/CommandDelegator')
+const Delegator = require('./core/CommandDelegator')
 
 var Tzuyu = new Bot()
 
 // we can add things here because things pass by reference here in JS land
-// let injectables = {
-//   'Tzuyu': Tzuyu,
-//   'YouTube': YouTube,
-//   'MediaResolver': MediaResolver
-// }
-// var CommandDelegator = new Delegator(injectables)
+let injectables = {
+  'Tzuyu': Tzuyu,
+  'YouTube': YouTube,
+  'MediaResolver': MediaResolver
+}
 
-// var YouTube = new YouTubeInterface(process.env.YT_API_KEY);
+var CommandDelegator = new Delegator(injectables)
+require('./plugins/init')(CommandDelegator)
 
 Tzuyu.client.on('ready', () => {
   console.log('Loaded!')
@@ -38,12 +38,12 @@ Tzuyu.client.on('message', message => {
     return false
   }
 
-  if (!message.member || !message.member.voiceChannelID) {
-    // if the user is not in a voice channel
-    return false
-  }
+  // if (!message.member || !message.member.voiceChannelID) {
+  //   // if the user is not in a voice channel
+  //   return false
+  // }
 
-  if (!command.startsWith(Tzuyu.getPrefix())) {
+  if (!command.startsWith(CommandDelegator.prefix)) {
     return false
   }
 
@@ -52,6 +52,8 @@ Tzuyu.client.on('message', message => {
   }
 
   Tzuyu.setTextChannel(message.channel.id)
+  Tzuyu.setVoiceChannel(message.member.voiceChannelID)
+  CommandDelegator.parseIncomingMessage(message)
   // console.log(message);
 
   command = command.substring(1)
@@ -93,29 +95,12 @@ Tzuyu.client.on('message', message => {
       Tzuyu.message('Shuffled queue')
       break
 
-    case 'config_prefix':
-      Tzuyu.setPrefix(params)
-      Tzuyu.message('Changed prefix to `' + params + '`')
-      break
-
-    case 'help':
-      Tzuyu.message('Available commands: \n\n play, kill, leave, skip, queue, bump, remove, config_prefix, config_delete_delay \n\n Current prefix: `' + Tzuyu.getPrefix() + '`')
-      break
-
     case 'bump':
       Tzuyu.bump(params)
       break
 
     case 'remove':
       Tzuyu.removeFromQueue(params)
-      break
-
-    case 'config_delete_delay':
-      if (Tzuyu.setMessageDeleteDelay(params)) {
-        Tzuyu.message('Changed delay to `' + params + '`ms')
-      } else {
-        Tzuyu.message('Sorry! Something went wrong')
-      }
       break
   }
 })

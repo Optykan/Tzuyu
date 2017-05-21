@@ -37,23 +37,19 @@ let injectables = {
   'YouTube': YouTube,
   'MediaResolver': MediaResolver
 }
+
 var CommandDelegator = new Delegator(injectables)
+require('./plugins/init')(CommandDelegator)
 
 log('Testing command delegation')
 isTesting.push(true)
 
-//ensure that this works if even if we reverse the param names
-CommandDelegator.registerPluginHook('test', (tzuyu, yt) => {
+CommandDelegator.registerPluginHook('test', (yt, tzuyu) => {
   isTesting.pop()
-  console.log(yt.name)
   expect(tzuyu.constructor.name).toEqual('Bot')
   expect(yt.name).toEqual('YouTube')
   pass('Command delegation passed')
 }, 'Tzuyu@tzuyu,YouTube@yt')
-
-log('Ensuring unique command delegation')
-CommandDelegator.registerPluginHook('test', error)
-
 CommandDelegator.parseIncomingMessage({content: CommandDelegator.prefix + 'test here are some params'})
 
 Tzuyu.login(process.env.BOT_TOKEN)
@@ -94,7 +90,7 @@ YouTube.search('ypM7qHf7zQw').then(media => {
 const retry = 500
 function waitForAsyncTests (times) {
   if (isTesting.length !== 0) {
-    log('waiting on ' + isTesting.length + ' tests...')
+    // log('waiting on ' + isTesting.length + ' tests...')
     if (times > timeout / retry) {
       error('Async requests timed out...')
       process.exit(1)

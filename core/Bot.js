@@ -16,7 +16,6 @@ class Bot {
     this.connection = null
     this.client = new Discord.Client()
     this.config = {
-      prefix: '$',
       messageDelay: 15000
     }
     this.isConnecting = false
@@ -196,12 +195,6 @@ class Bot {
   }
   setTextChannel (chanID) {
     this.text.channel = this.client.channels.get(chanID)
-  }
-  setPrefix (pfx) {
-    this.config.prefix = pfx
-  }
-  getPrefix () {
-    return this.config.prefix
   }
   setMessageDeleteDelay (i) {
     if (!isNaN(parseInt(i))) {

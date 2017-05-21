@@ -58,7 +58,8 @@ class YouTube {
     var params = {
       part: 'snippet',
       q: encodeURIComponent(term),
-      key: YouTube.apikey
+      key: YouTube.apikey,
+      type: 'video,playlist'
     }
 
     return Net.fetch('https://www.googleapis.com/youtube/v3/search', params).then(json => {

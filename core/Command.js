@@ -15,7 +15,7 @@ class Command {
   _getArgSpecs (fncDef) {
     // theres no way this can go wrong
     let signature = fncDef.toString().split('\n')[0]
-    let params = /(?:.*?)\(([\S\s]+)\)\s(?:.*)|(\S+)\s=>\s{$/m.exec(signature)
+    let params = /(?:.*?)\(([\S\s]+)\)\s(?:.*)|(\S+)\s=>\s{\s?}?$/m.exec(signature)
     if (params[1]) {
       return params[1].split(',').map(elem => {
         return elem.trim()
@@ -33,34 +33,26 @@ class Command {
     let accepts = this._getArgSpecs(this.callback) // ['tzuyu']
     let send = []
 
-    console.log('Injects: ')
-    console.log(this.injects)
-    console.log('Injectables: ')
-    console.log(injectables)
-    console.log('Accepts: ')
-    console.log(accepts)
+    if (this.injects.length !== 0) {
+      // iterate through our bound parameters, see if we can find the thing that we're injecting
+      for (let i = 0; i < accepts.length; i++) {
+        // iterate through what our callback accepts, see if we can find where we're injecting it to
+        for (let j = 0; j < this.injects.length; j++) {
+          // if the accept parameter is named the same as the inject target
 
-    // iterate through our bound parameters, see if we can find the thing that we're injecting
-    for (let i = 0; i < this.injects.length; i++) {
-      // iterate through what our callback accepts, see if we can find where we're injecting it to
-      for (let j = 0; j < accepts.length; j++) {
-        // if the accept parameter is named the same as the inject target
-        console.log(this.injects[i].target + '=' + accepts[j])
-
-        if (this.injects[i].target === accepts[j]) {
-          if (!injectables[this.injects[i].inject]) {
-            throw new Error('Injectable ' + this.injects[i].inject + 'not found')
+          if (this.injects[j].target === accepts[i]) {
+            if (!injectables[this.injects[j].inject]) {
+              throw new TypeError('Injectable ' + this.injects[j].inject + 'not found')
+            }
+            send.push(injectables[this.injects[j].inject])
           }
-          send.push(injectables[this.injects[i].inject])
         }
       }
     }
 
-    console.log(send)
-
-    if (send.length !== accepts.length) {
-      throw new Error('Parameters to send must equal the number of bound parameters')
-    }
+    // if (send.length !== accepts.length) {
+    //   throw new RangeError('Parameters to send must equal the number of bound parameters')
+    // }
 
     this.callback(...send, ...params)
   }
