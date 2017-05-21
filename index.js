@@ -3,13 +3,18 @@ require('dotenv').config()
 const Bot = require('./core/Bot')
 const YouTube = require('./core/YouTube')
 const MediaResolver = require('./core/media/MediaResolver')
-const CommandDelegatorSkeleton = require('./core/CommandDelegator')
+// const Delegator = require('./core/CommandDelegator')
 
 var Tzuyu = new Bot()
-var CommandDelegator = new CommandDelegatorSkeleton()
-CommandDelegator.registerPluginHook('test', params => {
-  console.log('hi')
-})
+
+// we can add things here because things pass by reference here in JS land
+// let injectables = {
+//   'Tzuyu': Tzuyu,
+//   'YouTube': YouTube,
+//   'MediaResolver': MediaResolver
+// }
+// var CommandDelegator = new Delegator(injectables)
+
 // var YouTube = new YouTubeInterface(process.env.YT_API_KEY);
 
 Tzuyu.client.on('ready', () => {

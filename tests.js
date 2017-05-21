@@ -28,24 +28,33 @@ const MediaResolvable = require('./core/media/MediaResolvable')
 const MediaResolver = require('./core/media/MediaResolver')
 const Playlist = require('./core/media/Playlist')
 const Song = require('./core/media/Song')
-const CommandDelegatorSkeleton = require('./core/CommandDelegator')
+const Delegator = require('./core/CommandDelegator')
 
-var CommandDelegator = new CommandDelegatorSkeleton()
+var Tzuyu = new Bot()
+
+let injectables = {
+  'Tzuyu': Tzuyu,
+  'YouTube': YouTube,
+  'MediaResolver': MediaResolver
+}
+var CommandDelegator = new Delegator(injectables)
 
 log('Testing command delegation')
 isTesting.push(true)
 
-CommandDelegator.registerPluginHook('test', params => {
+//ensure that this works if even if we reverse the param names
+CommandDelegator.registerPluginHook('test', (tzuyu, yt) => {
   isTesting.pop()
+  console.log(yt.name)
+  expect(tzuyu.constructor.name).toEqual('Bot')
+  expect(yt.name).toEqual('YouTube')
   pass('Command delegation passed')
-})
+}, 'Tzuyu@tzuyu,YouTube@yt')
 
 log('Ensuring unique command delegation')
 CommandDelegator.registerPluginHook('test', error)
 
 CommandDelegator.parseIncomingMessage({content: CommandDelegator.prefix + 'test here are some params'})
-
-var Tzuyu = new Bot()
 
 Tzuyu.login(process.env.BOT_TOKEN)
 

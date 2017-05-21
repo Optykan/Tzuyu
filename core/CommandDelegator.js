@@ -1,13 +1,15 @@
 const Command = require('./Command')
 class CommandDelegator {
-  constructor () {
+  constructor (injectables) {
     this.prefix = '$'
     this.commands = []
+    this.injectables = injectables
   }
 
-  registerPluginHook (trigger, action) {
+  registerPluginHook (trigger, action, injects) {
+    // where injects is of format thingToInject@paramName
     if (!this.isTriggerRegistered(trigger)) {
-      this.commands.push(new Command(trigger, action))
+      this.commands.push(new Command(trigger, action, injects))
     }
   }
 
@@ -23,7 +25,7 @@ class CommandDelegator {
   delegateCommand (command, params) {
     for (let c in this.commands) {
       if (this.commands[c].trigger.toLowerCase() === command.toLowerCase()) {
-        this.commands[c].execute(params)
+        this.commands[c].execute(this.injectables, params)
       }
     }
   }
