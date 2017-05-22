@@ -1,11 +1,12 @@
 const Plugin = require('./../Plugin')
 
-class Core extends Plugin {
+class MediaCore extends Plugin {
   constructor () {
     super()
     this.title = 'Core plugin support'
     this.desc = 'Provides default module support'
     this.help = 'lord help us all'
+    this.enabled = true
   }
   register () {
     return {
@@ -52,4 +53,4 @@ class Core extends Plugin {
   }
 }
 
-module.exports = Core
+module.exports = MediaCore

@@ -6,6 +6,7 @@ class Configure extends Plugin {
     this.title = 'Configure Tzuyu plugin package'
     this.desc = 'Provides configure support'
     this.help = 'Configure stuff'
+    this.enabled = true
   }
   register () {
     return {
@@ -15,6 +16,7 @@ class Configure extends Plugin {
       help: this.help
     }
   }
+
   handle (tzuyu, setting, value) {
     if (setting && value) {
       if (tzuyu.config[setting]) {
