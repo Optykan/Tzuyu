@@ -45,7 +45,7 @@ class Help extends Plugin {
             .setTitle('Help: ' + trigger)
             .setColor(0x3498db)
             .setDescription(command.help)
-            .setFooter('-'+tzuyu.client.user.username, 'http://i.imgur.com/paHhYtW.jpg')
+            .setFooter('-' + tzuyu.client.user.username, 'http://i.imgur.com/paHhYtW.jpg')
         } else {
           tzuyu.message('Command ' + command + ' not found')
         }
@@ -59,7 +59,7 @@ class Help extends Plugin {
         .setTitle('Help: All Commands')
         .setColor(0x3498db)
         .setDescription(description)
-        .setFooter('-'+tzuyu.client.user.username,'http://i.imgur.com/paHhYtW.jpg')
+        .setFooter('-' + tzuyu.client.user.username, 'http://i.imgur.com/paHhYtW.jpg')
     }
     // console.log(tzuyu.client.user)
     // console.log(tzuyu.client.user.avatarURL)

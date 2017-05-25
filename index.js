@@ -28,55 +28,19 @@ Tzuyu.client.on('ready', () => {
 
 // handle message events (really the only thing we need to do)
 Tzuyu.client.on('message', message => {
+  CommandDelegator.addInjectable('Message', message)
+
   if (message.channel.type === 'dm') {
-    // do something for dm's
-    // Tzuyu.text.channel = Tzuyu.client.channels.get(message.channel.id);
-    // //go away...
     // Tzuyu.message("zzz...");
     return false
   }
-
-  // if (!message.member || !message.member.voiceChannelID) {
-  //   // if the user is not in a voice channel
-  //   return false
-  // }
 
   if (!Tzuyu.isPermitted(message.author.id)) {
     return false
   }
 
   Tzuyu.setTextChannel(message.channel.id)
-  Tzuyu.setVoiceChannel(message.member.voiceChannelID)
   CommandDelegator.parseIncomingMessage(message)
-})
-
-// handle some dirty windows things
-if (process.platform === 'win32') {
-  var rl = require('readline').createInterface({
-    input: process.stdin,
-    output: process.stdout
-  })
-
-  rl.on('SIGINT', function () {
-    process.emit('SIGINT')
-  })
-}
-
-process.on('SIGINT', function () {
-  // graceful shutdown
-  // console.log('siginted');
-  // // Tzuyu.message("Ending life, sponsored by Microsoft© Windows™", ()=>{
-   //  Tzuyu.leave();
-  // });
-  process.exit()
-})
-
-process.on('SIGTERM', function () {
-  // console.log('sigtermed');
-  Tzuyu.message('Received suicide order, leaving...', {messageDelay: -1}, () => {
-    Tzuyu.leave()
-    process.exit()
-  })
 })
 
 Tzuyu.login(process.env.BOT_TOKEN)

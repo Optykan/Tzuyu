@@ -12,7 +12,7 @@ class MediaCore extends Plugin {
     return {
       trigger: ['play', 'kill', 'leave', 'skip', 'queue', 'shuffle', 'bump', 'remove'],
       action: [this.play, this.kill, this.kill, this.skip, this.queue, this.shuffle, this.bump, this.remove],
-      injects: ['Tzuyu@tzuyu,YouTube@yt,MediaResolver@media', 'Tzuyu@tzuyu', 'Tzuyu@tzuyu', 'Tzuyu@tzuyu', 'Tzuyu@tzuyu', 'Tzuyu@tzuyu', 'Tzuyu@tzuyu', 'Tzuyu@tzuyu'],
+      injects: ['Tzuyu@tzuyu,YouTube@yt,MediaResolver@media,Message@message', 'Tzuyu@tzuyu', 'Tzuyu@tzuyu', 'Tzuyu@tzuyu', 'Tzuyu@tzuyu', 'Tzuyu@tzuyu', 'Tzuyu@tzuyu', 'Tzuyu@tzuyu'],
       help: {
         play: 'Accepts a string to search for, or a full youtube URL',
         kill: 'Clears the queue and leaves the channel',
@@ -26,8 +26,12 @@ class MediaCore extends Plugin {
     }
   }
 
-  play (tzuyu, yt, media, ...params) {
-    var request = yt.parsePlayRequest(params.join(' '))
+  play (tzuyu, yt, media, message, ...params) {
+    if (!message.member || !message.member.voiceChannelID) {
+      return false
+    }
+    tzuyu.setVoiceChannel(message.member.voiceChannelID)
+    let request = yt.parsePlayRequest(params.join(' '))
     media.resolve(request).then(media => {
       tzuyu.play(media)
     }).catch(console.error)

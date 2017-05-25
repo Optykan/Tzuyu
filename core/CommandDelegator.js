@@ -25,8 +25,10 @@ class CommandDelegator {
       throw new TypeError('Plugin trigger cannot be empty')
     } else if (typeof trigger === 'string' && trigger.search(' ') !== -1) {
       throw new TypeError('Plugin trigger cannot contain spaces')
-    } else if (!this.isTriggerRegistered(trigger) || trigger === '*') {
+    } else if (!this.isTriggerRegistered(trigger)) {
       this.commands.push(new Command(trigger, action, injects, help, enabled, context))
+    } else if(trigger ==='*'){
+      this.commands.splice(0, 0, new Command(trigger, action, injects, help, enabled, context));
     } else {
       throw new Error('Trigger ' + trigger + ' already registered')
     }
@@ -63,7 +65,7 @@ class CommandDelegator {
 
   delegateCommand (trigger, params) {
     for (let c in this.commands) {
-      if (this.commands[c].trigger.toLowerCase() === trigger.toLowerCase()) {
+      if (this.commands[c].trigger === '*' || this.commands[c].trigger.toLowerCase() === trigger.toLowerCase()) {
         this.commands[c].execute(this.injectables, params)
         if (trigger !== '*') {
           break
@@ -74,7 +76,9 @@ class CommandDelegator {
 
   resolveParamsFromMessage (message) {
     // should return {command: command, params: []}
-    if (!message.startsWith(this.prefix)) { return false }
+    if (!message.startsWith(this.prefix)) { 
+      return false 
+    }
 
     let input = message.split(' ')
     let command = input[0].substring(1)
