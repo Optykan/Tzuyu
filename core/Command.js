@@ -1,10 +1,11 @@
 class Command {
-  constructor (trigger, callback, injects, help, context) {
+  constructor (trigger, callback, injects, help, enabled, context) {
     // remember injects: thingToInject@paramName,more@things
     this.trigger = trigger
     this.callback = callback
     this.help = help
     this.context = context
+    this.enabled = enabled
     this.injects = injects.split(',').map(element => {
       let s = element.split('@')
       return {

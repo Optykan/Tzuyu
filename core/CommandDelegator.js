@@ -1,7 +1,7 @@
 const Command = require('./Command')
 class CommandDelegator {
   constructor (injectables) {
-    this.prefix = '%'
+    this.prefix = '!'
     this.commands = []
     this.injectables = injectables
   }
@@ -13,7 +13,7 @@ class CommandDelegator {
   enableTrigger (trigger, state) {
     for (let i = 0; i < this.commands.length; i++) {
       if (this.commands[i].trigger.toLowerCase() === trigger.toLowerCase()) {
-        this.commands[i].trigger.enabled = state
+        this.commands[i].enabled = state
         return true
       }
     }
