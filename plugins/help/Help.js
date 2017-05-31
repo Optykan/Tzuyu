@@ -37,7 +37,7 @@ class Help extends Plugin {
         .setTitle('Help: ' + trigger)
         .setColor(0xe74c3c)
         .setDescription('Only the Lord may offer salvation.')
-        .setFooter('Matthew 19:25-26')
+        .setFooter('Matthew 19:25-26', 'http://i.imgur.com/paHhYtW.jpg')
       } else {
         let command = delegator.findCommand(trigger)
         if (command) {
@@ -45,6 +45,7 @@ class Help extends Plugin {
             .setTitle('Help: ' + trigger)
             .setColor(0x3498db)
             .setDescription(command.help)
+            .setFooter('-' + tzuyu.client.user.username, 'http://i.imgur.com/paHhYtW.jpg')
         } else {
           tzuyu.message('Command ' + command + ' not found')
         }
@@ -58,9 +59,11 @@ class Help extends Plugin {
         .setTitle('Help: All Commands')
         .setColor(0x3498db)
         .setDescription(description)
+        .setFooter('-' + tzuyu.client.user.username, 'http://i.imgur.com/paHhYtW.jpg')
     }
     // console.log(tzuyu.client.user)
-    embed.setThumbnail(tzuyu.client.user.avatarUrl)
+    // console.log(tzuyu.client.user.avatarURL)
+    // embed.setThumbnail(tzuyu.client.user.avatarURL)
     tzuyu.message({embed}, {messageDelay: -1}, message => {
       // this.rainbow(start, embed, message)
     })
