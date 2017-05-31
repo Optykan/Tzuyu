@@ -32,8 +32,8 @@ class MediaPlayer {
 
       this.dispatcher.on('end', () => {
         if (!this.queue.isEmpty()) {
-          this.play()
           this._emit('end')
+          this.play()
         } else {
           this.dispatcher = null
           this.nowPlaying = null
