@@ -38,10 +38,17 @@ In the `constructor()` method, first call `super()` then:
 
 - `MediaResolver`: the MediaResolver instance to resolve MediaResolvable objects into playable songs
 
-- `CommandDelegator`: the CommandDelegator instance containing all the reigstered plugins and associated commands. Use this with care.
+- `CommandDelegator`: the CommandDelegator instance containing all the registered plugins and associated commands. Use this with care.
 
 ### Handling Triggers
 
 Say you have a function with signature `foo(tzuyu, youtube, param1, ...otherParams)`. In your register method, you set it to be triggered by `foo`, the `action` to be `foo` and injected `Tzuyu@tzuyu,YouTube@youtube` into the parameters. When someone types `<CommandPrefix>foo` into chat, the CommandDelegator will run the `foo` method, inject the `Tzuyu` instance into the `tzuyu` parameter, and the `YouTube` instance into the `youtube` parameter.
 
 `param1` will hold the first word after the trigger. For example, with `<CommandPrefix>foo 1 2 3 4`, `param1` would hold `'1'`. `...otherParams` would hold whatever's left in an array, e.g. `['2','3','4']`.
+
+### Event support
+
+You can make things react to events if you want to. Instead of responding to commands, they respond to events emitted by various classes. The syntax is: `event@<Injectable>:<event>` where `Injectable` is one of the supported injectables, and `<event>` is one of the events that the injectable emits. You can find a list of these below:
+
+Just kidding nothing is supported yet.
+
