@@ -68,7 +68,11 @@ class CommandDelegator {
   delegateCommand (trigger, params) {
     for (let c in this.commands) {
       if (this.commands[c].trigger === '*' || this.commands[c].trigger.toLowerCase() === trigger.toLowerCase()) {
-        this.commands[c].execute(this.injectables, params)
+        try {
+          this.commands[c].execute(this.injectables, params)
+        } catch (e) {
+          console.error(e)
+        }
         if (trigger !== '*') {
           break
         }
