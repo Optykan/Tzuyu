@@ -6,6 +6,7 @@ class CommandDelegator {
     this.prefix = '%'
     this.commands = new PriorityQueue()
     this.injectables = injectables
+    this.verbose = true
   }
 
   addInjectable (key, value) {
@@ -23,6 +24,14 @@ class CommandDelegator {
   // }
 
   _registerTrigger (trigger, action, injects, help, enabled, context, priority) {
+    if (this.verbose) {
+      console.log('Debug info for: ' + trigger)
+      console.log('    Action   : ' + action.name)
+      console.log('    Injects  : ' + injects)
+      console.log('    Help     : ' + help)
+      console.log('    Context  : ' + context)
+      console.log('    Priority : ' + priority)
+    }
     if (trigger.length < 1) {
       throw new TypeError('Plugin trigger cannot be empty')
     } else if (typeof trigger === 'string' && trigger.search(' ') !== -1) {
@@ -44,7 +53,7 @@ class CommandDelegator {
     if (typeof trigger === 'object' && typeof action === 'object' && typeof injects === 'object' && trigger.length === action.length && action.length === injects.length) {
       for (let i = 0; i < trigger.length; i++) {
         var commandPriority = 10
-        if(Array.isArray(priority) && typeof priority[i] !== 'undefined'){
+        if (Array.isArray(priority) && typeof priority[i] !== 'undefined') {
           commandPriority = priority[i]
         }
         if (typeof help === 'string') {
@@ -73,10 +82,10 @@ class CommandDelegator {
 
   delegateCommand (trigger, params) {
     var injectedParams = params
-    for (let c in this.commands) {
-      if (this.commands[c].trigger === '*' || this.commands[c].trigger.toLowerCase() === trigger.toLowerCase()) {
+    for (let c of this.commands) {
+      if (c.command.trigger === '*' || c.command.trigger.toLowerCase() === trigger.toLowerCase()) {
         try {
-          var result = this.commands[c].execute(this.injectables, injectedParams)
+          var result = c.command.execute(this.injectables, injectedParams)
           if (typeof result !== 'undefined' && Array.isArray(result)) {
             // if we get a result then chain it further
             injectedParams = result
@@ -109,8 +118,8 @@ class CommandDelegator {
   }
 
   isTriggerRegistered (trigger) {
-    for (let c in this.commands) {
-      if (this.commands[c].trigger.toLowerCase() === trigger.toLowerCase()) {
+    for (let c of this.commands) {
+      if (c.command.trigger.toLowerCase() === trigger.toLowerCase()) {
         return true
       }
     }
@@ -118,9 +127,9 @@ class CommandDelegator {
   }
 
   findCommand (trigger) {
-    for (let i = 0; i < this.commands.length; i++) {
-      if (this.commands[i].trigger.toLowerCase() === trigger.toLowerCase()) {
-        return this.commands[i]
+    for (let c of this.commands) {
+      if (c.command.trigger.toLowerCase() === trigger.toLowerCase()) {
+        return c.command
       }
     }
     return false

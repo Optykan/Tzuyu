@@ -2,9 +2,9 @@
 class PriorityQueue {
   constructor () {
     this.queue = []
-    this[Symbol.iterator] = function* (){
+    this[Symbol.iterator] = function * () {
       let index = 0
-      while(index < queue.length){
+      while (index < this.queue.length) {
         yield this.queue[index++]
       }
     }
@@ -25,16 +25,16 @@ class PriorityQueue {
     }
     this.queue.push(toPush)
   }
-  get(index){
+  get (index) {
     return this.queue[index]
   }
-  pop(){
-    if(this.queue[0]){
+  pop () {
+    if (this.queue[0]) {
       return this.queue.splice(0, 1)
     }
   }
-  peek(){
-    if(this.queue[0]){
+  peek () {
+    if (this.queue[0]) {
       return this.queue[0]
     }
   }
