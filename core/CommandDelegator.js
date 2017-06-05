@@ -1,8 +1,10 @@
 const Command = require('./Command')
+const PriorityQueue = require('./PriorityQueue')
+
 class CommandDelegator {
   constructor (injectables) {
     this.prefix = '%'
-    this.commands = []
+    this.commands = new PriorityQueue()
     this.injectables = injectables
   }
 
@@ -10,17 +12,17 @@ class CommandDelegator {
     this.injectables[key] = value
   }
 
-  enableTrigger (trigger, state) {
-    for (let i = 0; i < this.commands.length; i++) {
-      if (this.commands[i].trigger.toLowerCase() === trigger.toLowerCase()) {
-        this.commands[i].enabled = state
-        return true
-      }
-    }
-    return false
-  }
+  // enableTrigger (trigger, state) {
+  //   for (let i = 0; i < this.commands.length; i++) {
+  //     if (this.commands[i].trigger.toLowerCase() === trigger.toLowerCase()) {
+  //       this.commands[i].enabled = state
+  //       return true
+  //     }
+  //   }
+  //   return false
+  // }
 
-  _registerTrigger (trigger, action, injects, help, enabled, context) {
+  _registerTrigger (trigger, action, injects, help, enabled, context, priority) {
     if (trigger.length < 1) {
       throw new TypeError('Plugin trigger cannot be empty')
     } else if (typeof trigger === 'string' && trigger.search(' ') !== -1) {
@@ -28,31 +30,35 @@ class CommandDelegator {
     } else if (typeof action !== 'function') {
       throw new TypeError('Trigger action must be a function, ' + typeof action + ' given')
     } else if (!this.isTriggerRegistered(trigger)) {
-      this.commands.push(new Command(trigger, action, injects, help, enabled, context))
+      this.commands.push(new Command(trigger, action, injects, help, enabled, context), priority)
     } else if (trigger === '*') {
-      this.commands.splice(0, 0, new Command(trigger, action, injects, help, enabled, context))
+      this.commands.push(new Command(trigger, action, injects, help, enabled, context), priority)
     } else {
       throw new Error('Trigger ' + trigger + ' already registered')
     }
   }
 
-  registerPluginHook (trigger, action, injects, help, enabled, context) {
+  registerPluginHook (trigger, action, injects, help, enabled, context, priority) {
     // called by init.js in /plugins
     // where injects is of format thingToInject@paramName
     if (typeof trigger === 'object' && typeof action === 'object' && typeof injects === 'object' && trigger.length === action.length && action.length === injects.length) {
       for (let i = 0; i < trigger.length; i++) {
+        var commandPriority = 10
+        if(Array.isArray(priority) && typeof priority[i] !== 'undefined'){
+          commandPriority = priority[i]
+        }
         if (typeof help === 'string') {
-          this._registerTrigger(trigger[i], action[i], injects[i], help, enabled, context)
-        } else if (typeof help === 'object' && help[0]) {
-          this._registerTrigger(trigger[i], action[i], injects[i], help[i], enabled, context)
+          this._registerTrigger(trigger[i], action[i], injects[i], help, enabled, context, commandPriority)
+        } else if (Array.isArray(help)) {
+          this._registerTrigger(trigger[i], action[i], injects[i], help[i], enabled, context, commandPriority)
         } else if (typeof help === 'object' && help[trigger[i]]) {
-          this._registerTrigger(trigger[i], action[i], injects[i], help[trigger[i]], enabled, context)
+          this._registerTrigger(trigger[i], action[i], injects[i], help[trigger[i]], enabled, context, commandPriority)
         } else {
           throw new Error('Something went wrong in your plugin definition. Check your register method and try again')
         }
       }
     } else {
-      this._registerTrigger(trigger, action, injects, help, enabled, context)
+      this._registerTrigger(trigger, action, injects, help, enabled, context, priority)
     }
   }
 
@@ -71,17 +77,16 @@ class CommandDelegator {
       if (this.commands[c].trigger === '*' || this.commands[c].trigger.toLowerCase() === trigger.toLowerCase()) {
         try {
           var result = this.commands[c].execute(this.injectables, injectedParams)
-          if(typeof result[0] !== 'undefined'){
+          if (typeof result !== 'undefined' && Array.isArray(result)) {
+            // if we get a result then chain it further
             injectedParams = result
-          }else{
+          } else {
+            // if we dont get a result then set it back to the passed values
             injectedParams = params
           }
         } catch (e) {
           console.error(e)
           result = []
-        }
-        if (trigger !== '*') {
-          break
         }
       }
     }
