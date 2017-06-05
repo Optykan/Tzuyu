@@ -66,12 +66,19 @@ class CommandDelegator {
   }
 
   delegateCommand (trigger, params) {
+    var injectedParams = params
     for (let c in this.commands) {
       if (this.commands[c].trigger === '*' || this.commands[c].trigger.toLowerCase() === trigger.toLowerCase()) {
         try {
-          this.commands[c].execute(this.injectables, params)
+          var result = this.commands[c].execute(this.injectables, injectedParams)
+          if(typeof result[0] !== 'undefined'){
+            injectedParams = result
+          }else{
+            injectedParams = params
+          }
         } catch (e) {
           console.error(e)
+          result = []
         }
         if (trigger !== '*') {
           break
