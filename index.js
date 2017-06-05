@@ -1,5 +1,6 @@
 require('dotenv').config()
 
+const Net = require('./core/Net')
 const Bot = require('./core/Bot')
 const YouTube = require('./core/YouTube')
 const MediaResolver = require('./core/media/MediaResolver')
@@ -11,7 +12,8 @@ var Tzuyu = new Bot()
 let injectables = {
   'Tzuyu': Tzuyu,
   'YouTube': YouTube,
-  'MediaResolver': MediaResolver
+  'MediaResolver': MediaResolver,
+  'Net': Net
 }
 
 var CommandDelegator = new Delegator(injectables)
