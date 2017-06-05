@@ -1,8 +1,7 @@
 const Command = require('./Command')
 class CommandDelegator {
   constructor (injectables) {
-
-    this.prefix = '$'
+    this.prefix = '%'
     this.commands = []
     this.injectables = injectables
   }
