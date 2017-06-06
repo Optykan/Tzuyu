@@ -81,7 +81,9 @@ class Bot {
       // console.log(conns);
       if (conns.length > 0) {
         for (var i = conns.length - 1; i >= 0; i--) {
-          conns[i].leave()
+          if (conns[i]) {
+            conns[i].leave()
+          }
         };
       }
     }
@@ -140,23 +142,11 @@ class Bot {
   skip () {
     this.mediaPlayer.skip()
   }
-  listQueue () {
-    var output = ''
-
+  returnQueue () {
     if (this.mediaPlayer.isQueueEmpty()) {
-      return this.message('Queue is empty')
+      return null
     }
-    var q = this.mediaPlayer.returnQueue()
-
-    for (var j = 0; j < Math.ceil((q.length) / 25); j++) {
-      for (let i = j * 25; i < (j * 25) + 25; i++) {
-        if (!q[i]) { break }
-
-        output += (i + 1).toString() + '. **' + q[i].title + '**\n'
-      }
-      this.message(output)
-      output = ''
-    }
+    return this.mediaPlayer.returnQueue()
   }
   bump (songIndex) {
     let t = parseInt(songIndex)
