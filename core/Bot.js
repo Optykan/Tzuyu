@@ -30,7 +30,7 @@ class Bot {
       this.message('Now playing: ' + song.title)
       this.setPlaying(song.title)
     })
-    this.mediaPlayer.on('end', () => {
+    this.mediaPlayer.on('finished', () => {
       this.message('Queue is empty, leaving...')
       this.stop()
     })
