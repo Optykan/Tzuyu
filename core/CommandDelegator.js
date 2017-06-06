@@ -6,7 +6,7 @@ class CommandDelegator {
     this.prefix = '%'
     this.commands = new PriorityQueue()
     this.injectables = injectables
-    this.verbose = true
+    this.verbose = false
   }
 
   addInjectable (key, value) {
@@ -26,10 +26,10 @@ class CommandDelegator {
   _registerTrigger (trigger, action, injects, help, enabled, context, priority) {
     if (this.verbose) {
       console.log('Debug info for: ' + trigger)
-      console.log('    Action   : ' + action.name)
+      console.log('    Action   : ' + (context ? context.constructor.name : 'window') + '@' + action.name)
       console.log('    Injects  : ' + injects)
       console.log('    Help     : ' + help)
-      console.log('    Context  : ' + context)
+      console.log('    Context  : ' + (context ? context.constructor.name : 'window'))
       console.log('    Priority : ' + priority)
     }
     if (trigger.length < 1) {
@@ -50,9 +50,9 @@ class CommandDelegator {
   registerPluginHook (trigger, action, injects, help, enabled, context, priority) {
     // called by init.js in /plugins
     // where injects is of format thingToInject@paramName
+    var commandPriority = 10
     if (typeof trigger === 'object' && typeof action === 'object' && typeof injects === 'object' && trigger.length === action.length && action.length === injects.length) {
       for (let i = 0; i < trigger.length; i++) {
-        var commandPriority = 10
         if (Array.isArray(priority) && typeof priority[i] !== 'undefined') {
           commandPriority = priority[i]
         }
@@ -67,7 +67,7 @@ class CommandDelegator {
         }
       }
     } else {
-      this._registerTrigger(trigger, action, injects, help, enabled, context, priority)
+      this._registerTrigger(trigger, action, injects, help, enabled, context, commandPriority)
     }
   }
 

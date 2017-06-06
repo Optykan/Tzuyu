@@ -11,7 +11,7 @@ function registerPlugins (delegator) {
     console.log('Loading: ' + dir[i])
     let register = pluginInstance.register()
     let help = register.help || pluginInstance.help
-    delegator.registerPluginHook(register.trigger, register.action, register.injects, help, register.enabled, pluginInstance)
+    delegator.registerPluginHook(register.trigger, register.action, register.injects, help, register.enabled, pluginInstance, register.priority)
   }
 }
 
