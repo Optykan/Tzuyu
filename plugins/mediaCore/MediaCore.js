@@ -1,4 +1,5 @@
 const Plugin = require('./../Plugin')
+const Discord = require('discord.js')
 
 class MediaCore extends Plugin {
   constructor () {
@@ -43,7 +44,28 @@ class MediaCore extends Plugin {
     tzuyu.skip()
   }
   queue (tzuyu) {
-    tzuyu.listQueue()
+    let q = tzuyu.returnQueue()
+    if (!q) {
+      return tzuyu.message('Queue is empty')
+    }
+
+    let embed = new Discord.RichEmbed()
+      .setTitle('Queue: ')
+      .setColor(0x2ecc71)
+    var description = ''
+
+    let upperPages = Math.ceil((q.length) / 25)
+    for (var j = 0; j < upperPages; j++) {
+      for (let i = j * 25; i < (j * 25) + 25; i++) {
+        if (!q[i]) { break }
+
+        description += (i + 1).toString() + '. **' + q[i].title + '**\n'
+      }
+      embed.setDescription(description)
+      embed.setFooter('Page: ' + (j + 1) + ' of ' + upperPages + ' - Total: ' + q.length)
+      tzuyu.message({embed})
+      description = ''
+    }
   }
   shuffle (tzuyu) {
     tzuyu.shuffle()

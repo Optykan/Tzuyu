@@ -15,7 +15,7 @@ class MediaPlayer {
     this.connection = null
     this.streamOptions = {
       seek: 0,
-      volume: 0.2
+      volume: 0.1
     }
     this.nowPlaying = null
     this.queue = new Queue()
@@ -70,6 +70,7 @@ class MediaPlayer {
   removeFromQueue (index) {
     return this.queue.removeFromQueue(index)
   }
+
   dumpQ () {
     this.queue.dumpQ()
   }
