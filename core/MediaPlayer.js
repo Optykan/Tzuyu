@@ -32,11 +32,12 @@ class MediaPlayer {
 
       this.dispatcher.on('end', () => {
         if (!this.queue.isEmpty()) {
+          this._emit('end')
           this.play()
         } else {
           this.dispatcher = null
           this.nowPlaying = null
-          this._emit('end')
+          this._emit('finished')
         }
       })
     }
@@ -76,7 +77,6 @@ class MediaPlayer {
   stop () {
     if (this.dispatcher) {
       this.dispatcher.end()
-      this._emit('end')
     }
   }
 

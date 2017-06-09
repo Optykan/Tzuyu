@@ -1,10 +1,11 @@
 class Command {
-  constructor (trigger, callback, injects, help, context) {
+  constructor (trigger, callback, injects, help, enabled, context) {
     // remember injects: thingToInject@paramName,more@things
     this.trigger = trigger
     this.callback = callback
     this.help = help
     this.context = context
+    this.enabled = enabled
     this.injects = injects.split(',').map(element => {
       let s = element.split('@')
       return {
@@ -32,7 +33,7 @@ class Command {
     // accepts is an array of parameters of what the callback accepts
     // injectables is the stuff we CAN inject
     // this.injects is mapping thingToInject@accepts
-    let accepts = this._getArgSpecs(this.callback) // ['tzuyu']
+    let accepts = this._getArgSpecs(this.callback) // ['tzuyu', 'param1']
     let send = []
 
     if (this.injects.length !== 0) {
@@ -52,9 +53,24 @@ class Command {
       }
     }
 
-    // if (send.length !== accepts.length) {
-    //   throw new RangeError('Parameters to send must equal the number of bound parameters')
-    // }
+    if (send.length !== this.injects.length) {
+      throw new RangeError('Could not inject specified parameters, found: ' +
+        (function (found) {
+          var res = ''
+          for (let i in found) {
+            res += (typeof found[i]) + ','
+          }
+          return res
+        })(send) + ' but specified ' +
+        (function (specified) {
+          var res = ''
+          for (let i in this.injects) {
+            res += this.injects[i].inject + ','
+          }
+          return res
+        })(this.injects)
+        )
+    }
 
     this.callback.call(this.context, ...send, ...params)
   }

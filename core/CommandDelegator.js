@@ -13,7 +13,7 @@ class CommandDelegator {
   enableTrigger (trigger, state) {
     for (let i = 0; i < this.commands.length; i++) {
       if (this.commands[i].trigger.toLowerCase() === trigger.toLowerCase()) {
-        this.commands[i].trigger.enabled = state
+        this.commands[i].enabled = state
         return true
       }
     }
@@ -25,10 +25,12 @@ class CommandDelegator {
       throw new TypeError('Plugin trigger cannot be empty')
     } else if (typeof trigger === 'string' && trigger.search(' ') !== -1) {
       throw new TypeError('Plugin trigger cannot contain spaces')
+    } else if (typeof action !== 'function') {
+      throw new TypeError('Trigger action must be a function, ' + typeof action + ' given')
     } else if (!this.isTriggerRegistered(trigger)) {
       this.commands.push(new Command(trigger, action, injects, help, enabled, context))
-    } else if(trigger ==='*'){
-      this.commands.splice(0, 0, new Command(trigger, action, injects, help, enabled, context));
+    } else if (trigger === '*') {
+      this.commands.splice(0, 0, new Command(trigger, action, injects, help, enabled, context))
     } else {
       throw new Error('Trigger ' + trigger + ' already registered')
     }
@@ -66,7 +68,11 @@ class CommandDelegator {
   delegateCommand (trigger, params) {
     for (let c in this.commands) {
       if (this.commands[c].trigger === '*' || this.commands[c].trigger.toLowerCase() === trigger.toLowerCase()) {
-        this.commands[c].execute(this.injectables, params)
+        try {
+          this.commands[c].execute(this.injectables, params)
+        } catch (e) {
+          console.error(e)
+        }
         if (trigger !== '*') {
           break
         }
@@ -76,8 +82,8 @@ class CommandDelegator {
 
   resolveParamsFromMessage (message) {
     // should return {command: command, params: []}
-    if (!message.startsWith(this.prefix)) { 
-      return false 
+    if (!message.startsWith(this.prefix)) {
+      return false
     }
 
     let input = message.split(' ')

@@ -16,17 +16,6 @@ class Help extends Plugin {
       injects: 'Tzuyu@tzuyu,CommandDelegator@delegator'
     }
   }
-  rainbow (start, embed, message) {
-    // const colors = [0xe74c3c, 0xe67e22, 0xf1c40f, 0x2ecc71, 0x1abc9c, 0x3498db, 0x9b59b6]
-    // console.log(start)
-    // console.log('edit: ' + colors[start % colors.length])
-    // embed.setColor(colors[start % colors.length])
-    // message.edit({embed}).then(m => {
-    //   setTimeout(() => {
-    //     this.rainbow(start + 1, embed, m)
-    //   }, 1000)
-    // })
-  }
   handle (tzuyu, delegator, trigger) {
     // const colors = [0xe74c3c, 0xe67e22, 0xf1c40f, 0x2ecc71, 0x1abc9c, 0x3498db, 0x9b59b6]
     // var start = ((max, min) => { return Math.floor(Math.random() * (max - min)) + min })(0, colors.length)
@@ -42,10 +31,10 @@ class Help extends Plugin {
         let command = delegator.findCommand(trigger)
         if (command) {
           embed = new Discord.RichEmbed()
-            .setTitle('Help: ' + trigger)
-            .setColor(0x3498db)
-            .setDescription(command.help)
-            .setFooter('-' + tzuyu.client.user.username, 'http://i.imgur.com/paHhYtW.jpg')
+          .setTitle('Help: ' + trigger)
+          .setColor(0x3498db)
+          .setDescription(command.help)
+          .setFooter('-' + tzuyu.client.user.username, 'http://i.imgur.com/paHhYtW.jpg')
         } else {
           tzuyu.message('Command ' + command + ' not found')
         }
@@ -56,10 +45,10 @@ class Help extends Plugin {
         description += '-' + delegator.commands[i].trigger + '\n'
       }
       embed = new Discord.RichEmbed()
-        .setTitle('Help: All Commands')
-        .setColor(0x3498db)
-        .setDescription(description)
-        .setFooter('-' + tzuyu.client.user.username, 'http://i.imgur.com/paHhYtW.jpg')
+      .setTitle('Help: All Commands')
+      .setColor(0x3498db)
+      .setDescription(description)
+      .setFooter('-' + tzuyu.client.user.username, 'http://i.imgur.com/paHhYtW.jpg')
     }
     // console.log(tzuyu.client.user)
     // console.log(tzuyu.client.user.avatarURL)
