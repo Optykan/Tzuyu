@@ -5,21 +5,32 @@ const Bot = require('./core/Bot')
 const YouTube = require('./core/YouTube')
 const MediaResolver = require('./core/media/MediaResolver')
 const Delegator = require('./core/CommandDelegator')
+const { Client } = require('pg')
 
+var Postgres = new Client()
 var Tzuyu = new Bot()
+
+Postgres.connect()
 
 // we can add things here because things pass by reference here in JS land
 let injectables = {
   'Tzuyu': Tzuyu,
   'YouTube': YouTube,
   'MediaResolver': MediaResolver,
-  'Net': Net
+  'Net': Net,
 }
 
 var CommandDelegator = new Delegator(injectables)
 require('./plugins/init')(CommandDelegator)
-// yes, we're adding itself as a delegator
+// yes, we're adding itself as an injectable
 CommandDelegator.addInjectable('CommandDelegator', CommandDelegator)
+
+Postgres.query('SELECT table_schema,table_name FROM information_schema.tables;', (err, res)=>{
+  if(err){
+    throw err
+  }
+  console.log(res)
+})
 
 Tzuyu.client.on('ready', () => {
   console.log('Loaded!')
