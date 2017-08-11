@@ -9,6 +9,10 @@ class PriorityQueue {
       }
     }
   }
+  get length () {
+    return this.queue.length
+  }
+
   push (item, priority) {
     // a priority of 0 is the greatest priority (or negative numbers i guess)
     let toPush = {

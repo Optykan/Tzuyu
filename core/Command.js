@@ -18,6 +18,7 @@ class Command {
   _getArgSpecs (fncDef) {
     // theres no way this can go wrong
     let signature = fncDef.toString().split('\n')[0]
+    // console.log('signature: ' + signature)
     let params = /(?:.*?)\(([\S\s]+)\)\s(?:.*)|(\S+)\s=>\s{\s?}?$/m.exec(signature)
     if (params[1]) {
       return params[1].split(',').map(elem => {

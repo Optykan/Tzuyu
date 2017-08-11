@@ -21,7 +21,7 @@ class Bot {
     this.isConnecting = false
 
     this.permlist = {
-      users: [116399321661833218, 304780284077801472],
+      users: [],
       isActive: true,
       type: 'blacklist'
     }

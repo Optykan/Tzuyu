@@ -88,9 +88,9 @@ class CommandDelegator {
         try {
           var result = c.command.execute(this.injectables, injectedParams)
         } catch (e) {
-          console.warn(e.message)
-          if(e instanceof PermissionError) {
-            //if we have a permission error then we should stop looking for any other commands (mainly for moderator stuff but other plugins could probably use this)
+          console.error(e)
+          if (e instanceof PermissionError) {
+            // if we have a permission error then we should stop looking for any other commands (mainly for moderator stuff but other plugins could probably use this)
             break
           }
         }
