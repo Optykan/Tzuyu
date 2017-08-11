@@ -1,5 +1,6 @@
 const Command = require('./Command')
 const PriorityQueue = require('./PriorityQueue')
+const PermissionError = require('./ext/PermissionError')
 
 class CommandDelegator {
   constructor (injectables) {
@@ -86,16 +87,19 @@ class CommandDelegator {
       if (c.command.trigger === '*' || c.command.trigger.toLowerCase() === trigger.toLowerCase()) {
         try {
           var result = c.command.execute(this.injectables, injectedParams)
-          if (typeof result !== 'undefined' && Array.isArray(result)) {
-            // if we get a result then chain it further
-            injectedParams = result
-          } else {
-            // if we dont get a result then set it back to the passed values
-            injectedParams = params
-          }
         } catch (e) {
-          console.error(e)
-          result = []
+          console.warn(e.message)
+          if(e instanceof PermissionError) {
+            //if we have a permission error then we should stop looking for any other commands (mainly for moderator stuff but other plugins could probably use this)
+            break
+          }
+        }
+        if (typeof result !== 'undefined' && Array.isArray(result)) {
+          // if we get a result then chain it further
+          injectedParams = result
+        } else {
+          // if we dont get a result then set it back to the passed values
+          injectedParams = params
         }
       }
     }
