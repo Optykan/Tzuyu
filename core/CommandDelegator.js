@@ -64,7 +64,7 @@ class CommandDelegator {
         } else if (typeof help === 'object' && help[trigger[i]]) {
           this._registerTrigger(trigger[i], action[i], injects[i], help[trigger[i]], enabled, context, commandPriority)
         } else {
-          throw new Error('Something went wrong in your plugin definition. Check your register method and try again')
+          throw new Error('Something went wrong in your plugin definition. Check your register method and try again. Maybe your help text doesn\'t match its trigger?')
         }
       }
     } else {
