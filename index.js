@@ -39,6 +39,7 @@ rl.on('line', (line) => {
 var Postgres = new Client()
 var Tzuyu = new Bot()
 
+console.log('Establishing database connection...')
 Postgres.connect()
 
 // we can add things here because things pass by reference here in JS land
