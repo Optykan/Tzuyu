@@ -1,4 +1,5 @@
 const Database = require('./Database')
+const PermissionError = require('./../../core/ext/PermissionError')
 
 const PERM_ADMIN = 3
 const PERM_MOD = 2
@@ -22,12 +23,20 @@ class PermissionManager{
   //     })
   //   }
   // }
-  _canPerformAction(database, requester, action, target){
+  _canPerformAction(database, requester, action){
     if(!this.db.hasConnection()){
       this.db.provideConnection(database)
     }
     return new Promise((resolve, reject)=>{
-      this.db.query('SELECT permission FROM users WHERE user_id')
+      //see if we have the ability to perform this action
+      this.db.query('SELECT users.permission FROM users INNER JOIN commands ON (users.permission>=commands.permission) WHERE users.user_id=$1 AND commands.trigger=$2', [requester, action]).then(res=>{
+        if(res.rowCount > 0){
+          resolve(true)
+        }else{
+          reject(new PermissionError('Insufficient priveleges to perform this command'))
+        }
+
+      })
     })
   }
 

@@ -23,7 +23,7 @@ class Database{
   }
   getAllTables(){
     var result = {
-      users: {}
+      users: {},
       commands: {}
     }
     return new Promise((resolve, reject)=>{
@@ -47,7 +47,7 @@ class Database{
           resolve(true)
         } else {
           // table doesnt exist... start creating them
-          this.db.query('CREATE TABLE users (user_id VARCHAR(18) PRIMARY KEY, permission SMALLINT)', (err, res) => {
+          this.db.query('CREATE TABLE users (user_id VARCHAR(18) PRIMARY KEY, permission SMALLINT)').then(res => {
             console.log('Created users table...')
             this.db.query('INSERT INTO users (user_id, permission) VALUES ($1, $2)', [message.channel.guild.ownerID, PERM_ADMIN]).then(res => {
               console.log('Added superadmin...')
