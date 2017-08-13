@@ -47,20 +47,20 @@ class Database{
     let user = (new User).fromParams(id, permission, server)
 
     return new Promise((resolve, reject)=>{
-      this.update(user).then(res=>{
+      this.save(user).then(res=>{
         resolve(user)
       })
     })
   }
-  _checkIfExists(dbResult){
-
+  _ensureUserExists(dbResult, id, server){
     return new Promise((resolve, reject)=>{
       if(dbResult.rowCount===0){
-        this._createNewUser(id, PERM_USER, server).then(user=>{
+        return this._createNewUser(id, PERM_USER, server).then(user=>{
           resolve(user)
         })
+      }else{
+        resolve((new User).fromDatabase(dbResult.rows[0]))
       }
-      resolve((new User).fromDatabase(res[0]))
     })
   }
   getUser(id, server){
@@ -68,17 +68,15 @@ class Database{
     return new Promise((resolve, reject)=>{
       if(server){
         this.query('SELECT * FROM users WHERE user_id=$1 AND server_id=$2', [id, server]).then(res=>{
-
-          
+          this._ensureUserExists(res, id, server).then(user=>{
+            resolve(user)
+          })
         })
       }else{
         this.query('SELECT * FROM users WHERE user_id=$1', id).then(res=>{
-          if(res.rowCount===0){
-            this._createNewUser(id, PERM_USER, server).then(user=>{
-              resolve(user)
-            })
-          }
-          resolve((new User).fromDatabase(res[0]))
+          this._ensureUserExists(res, id, server).then(user=>{
+            resolve(user)
+          })
         })
       }
     })
@@ -107,17 +105,17 @@ class Database{
       })
     })
   }
-  update(object){
+  save(object){
+    if(!(object instanceof User || object instanceof Command)){
+      throw new TypeError('User or Command object exapected, '+typeof object +' given')
+    }
     return new Promise((resolve, reject)=>{
-      if(!(object instanceof User || object instanceof Command)){
-        throw new TypeError('User or Command object exapected, '+typeof object +' given')
-      }
       if(object instanceof User){
-        this.query('REPLACE INTO users(user_id, permission, server_id) VALUES ($1, $2, $3)', [object.id, object.permission, object.serverId]).then(res=>{
+        this.query('INSERT INTO users(user_id, permission, server_id) VALUES ($1, $2, $3) ON DUPLICATE KEY UPDATE permission=$2', [object.id, object.permission, object.serverId]).then(res=>{
           resolve()
         })
       }else{
-        this.query('REPLACE INTO commands(trigger, permission, role_id, server_id) VALUES($1, $2, $3, $4)', [object.trigger, object.permission, object.roleId, object.serverId]).then(res=>{
+        this.query('INSERT INTO commands(trigger, permission, role_id, server_id) VALUES($1, $2, $3, $4) ON DUPLICATE KEY UPDATE permission=$2', [object.trigger, object.permission, object.roleId, object.serverId]).then(res=>{
           resolve()
         })
       }

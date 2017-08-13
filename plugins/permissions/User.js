@@ -8,11 +8,13 @@ class User{
     this.id = db.user_id
     this.serverId = db.server_id
     this.permission = db.permission
+    return this
   }
   fromParams(id, permission, server){
     this.id = id
-    this.serverId = permission
-    this.permission = server
+    this.permission = permission
+    this.serverId = server
+    return this
   }
 }
 
