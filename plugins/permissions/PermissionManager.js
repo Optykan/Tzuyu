@@ -1,5 +1,6 @@
 const Database = require('./Database')
 const PermissionError = require('./../../core/ext/PermissionError')
+const Command = require('./Command')
 
 const PERM_ADMIN = 3
 const PERM_MOD = 2
@@ -23,6 +24,19 @@ class PermissionManager{
   //     })
   //   }
   // }
+  initialize(database, message){
+    if(!this.db.hasConnection()){
+      this.db.provideConnection(database)
+    }
+    return new Promise((resolve, reject)=>{
+      this.db.initializeTables(message).then(res=>{
+        resolve(true)
+      })
+    })
+  }
+  _getUserFromId(){
+
+  }
   _canPerformAction(database, requester, action){
     if(!this.db.hasConnection()){
       this.db.provideConnection(database)
@@ -40,7 +54,7 @@ class PermissionManager{
     })
   }
 
-  _changePermissionLevel(user, perm){
+  _updateUser(user){
     return new Promise((resolve, reject)=>{
       this.db.query('SELECT 1 FROM users WHERE user_id=$1', user).then(res => {
         if(res.rowCount === 1){
@@ -56,9 +70,9 @@ class PermissionManager{
     })
   }
 
-  _restrictCommandLevel(trigger, newLevel, role){
-    if(role){
-      newLevel = PERM_USER
+  _restrictCommandLevel(command){
+    if(!(command instanceof Command)){
+      throw new TypeError('Command object expected, '+ typeof command+' given')
     }
     return new Promise((resolve, reject)=>{
       this.db.query('SELECT 1 FROM commands WHERE trigger=$1', trigger).then(res => {

@@ -22,6 +22,7 @@ rl.prompt()
 rl.on('line', (line) => {
   var start = new Date().getTime()
   line = line.trim()
+  //select * from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME='<Table Name>'
   Postgres.query(line).then(res => {
     var time = new Date().getTime() - start
     if (res.rowCount === 0) {
@@ -33,6 +34,9 @@ rl.on('line', (line) => {
       console.log(res.rows)
     }
     rl.prompt()
+  }).catch(err=>{
+    var time = new Date().getTime() - start
+    console.log('\x1b[31m[POSTGRES]\x1b[0m ('+time+'ms) Query failed: '+err.message)
   })
 }).on('close', () => {
   console.log('Exiting...')

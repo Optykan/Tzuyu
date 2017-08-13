@@ -8,6 +8,7 @@ class Permissions extends Plugin {
     this.desc = 'Does things for moderation'
     // this.help = undefined
     this.enabled = true
+    this.permissionManager = new PermissionManager()
   }
   register () {
     return {
@@ -24,7 +25,11 @@ class Permissions extends Plugin {
   initialize (database, tzuyu, message) {
     // welcome to callback hell
     tzuyu.message('Creating tables...')
-    this.db.initializeTables(database, message)
+    this.permissionManager.initialize(database, message).then(res=>{
+      tzuyu.message('Done')
+    }).catch(err=>{
+      tzuyu.message('An error occured: '+err.message)
+    })
   }
 
   _getIdFromMessage(message){
@@ -41,9 +46,9 @@ class Permissions extends Plugin {
       console.error(e)
       return tzuyu.message(e.message)
     }
-    if(this.users.permission >= PERM_MOD){
-      return this._changePermissionLevel(target)
-    }
+    // if(this.users.permission >= PERM_MOD){
+    //   return this._changePermissionLevel(target)
+    // }
   }
 
   mod (tzuyu, message, database, target) {
