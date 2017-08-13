@@ -52,21 +52,15 @@ class Permissions extends Plugin {
   }
 
   mod (tzuyu, message, database, target) {
-    if(!this.db.hasConnection()){
-      this.db.provideConnection(database)
-    }
+    let author = message.author.id
+    let server = message.member.guild.id
     // console.log(message)
-    if (!this.users) {
-      this.db.query('SELECT * FROM users').then(res => {
-        this.users = res.rows
-        this.db.query('SELECT * FROM commands').then(res => {
-          this.commands = res
-          this._modAfterSearch(tzuyu, message.author.id, target)
-        })
-      })
-    } else {
-      this._modAfterSearch(tzuyu, message.author.id, target)
-    }
+    // console.log('retrieving user..')
+    this.permissionManager.getUser(database, author, server).then(user=>{
+      console.log(user)
+    }).catch(err=>{
+      console.error(e)
+    })
   }
   restrict (message, level) {
     console.log('body')

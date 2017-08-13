@@ -43,12 +43,52 @@ class Database{
       })
     })
   }
+  _createNewUser(id, permission, server){
+    let user = (new User).fromParams(id, permission, server)
+
+    return new Promise((resolve, reject)=>{
+      this.update(user).then(res=>{
+        resolve(user)
+      })
+    })
+  }
+  _checkIfExists(dbResult){
+
+    return new Promise((resolve, reject)=>{
+      if(dbResult.rowCount===0){
+        this._createNewUser(id, PERM_USER, server).then(user=>{
+          resolve(user)
+        })
+      }
+      resolve((new User).fromDatabase(res[0]))
+    })
+  }
+  getUser(id, server){
+    // console.log('querying user...')
+    return new Promise((resolve, reject)=>{
+      if(server){
+        this.query('SELECT * FROM users WHERE user_id=$1 AND server_id=$2', [id, server]).then(res=>{
+
+          
+        })
+      }else{
+        this.query('SELECT * FROM users WHERE user_id=$1', id).then(res=>{
+          if(res.rowCount===0){
+            this._createNewUser(id, PERM_USER, server).then(user=>{
+              resolve(user)
+            })
+          }
+          resolve((new User).fromDatabase(res[0]))
+        })
+      }
+    })
+  }
   initializeTables(message){
     //callback hell
     return new Promise((resolve, reject)=>{
       this.query('SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = \'public\' AND table_name = \'users\')').then(res => {
         if (res.rows[0].exists === true) {
-          resolve(true)
+          resolve()
         } else {
           // table doesnt exist... start creating them
           this.query('CREATE TABLE users (user_id VARCHAR(18) NOT NULL, permission SMALLINT NOT NULL, server_id VARCHAR(18));'
@@ -59,7 +99,7 @@ class Database{
               this.query('CREATE TABLE commands (trigger VARCHAR(25) NOT NULL, permission SMALLINT NOT NULL, role_id VARCHAR(18), server_id VARCHAR(18));'
                             + 'CREATE UNIQUE INDEX UniqueCommandIndex ON commands(trigger, server_id);').then(res => {
                 console.log('Created commands table...')
-                resolve(true)
+                resolve()
               })
             })
           })
@@ -74,11 +114,11 @@ class Database{
       }
       if(object instanceof User){
         this.query('REPLACE INTO users(user_id, permission, server_id) VALUES ($1, $2, $3)', [object.id, object.permission, object.serverId]).then(res=>{
-          resolve(true)
+          resolve()
         })
       }else{
         this.query('REPLACE INTO commands(trigger, permission, role_id, server_id) VALUES($1, $2, $3, $4)', [object.trigger, object.permission, object.roleId, object.serverId]).then(res=>{
-          resolve(true)
+          resolve()
         })
       }
     })
