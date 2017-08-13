@@ -34,8 +34,16 @@ class PermissionManager{
       })
     })
   }
-  _getUserFromId(){
-
+  getUser(database, id, server){
+    if(!this.db.hasConnection()){
+      this.db.provideConnection(database)
+    }
+    // console.log('passing through to db...')
+    return new Promise((resolve, reject)=>{
+      this.db.getUser(id, server).then(user=>{
+        resolve(user)
+      })
+    })
   }
   _canPerformAction(database, requester, action){
     if(!this.db.hasConnection()){
