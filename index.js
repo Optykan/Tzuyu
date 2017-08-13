@@ -13,31 +13,32 @@ const rl = readline.createInterface({
   output: process.stdout
 })
 
+var Postgres = new Client()
+var Tzuyu = new Bot()
+
 rl.prompt()
 
 // open a CLI to postgres
 rl.on('line', (line) => {
+  var start = new Date().getTime()
   line = line.trim()
-  Postgres.query(line, (err, res) => {
-    if (err) {
-      console.error(err.error)
-    } else if (res.rowCount === 0) {
-      console.log('Query returned 0 items')
+  Postgres.query(line).then(res => {
+    var time = new Date().getTime() - start
+    if (res.rowCount === 0) {
+      console.log('\x1b[36m[POSTGRES]\x1b[0m ('+time+'ms) Query returned 0 items ')
     } else if (res.command !== 'SELECT') {
-      console.log(res)
+      console.log('\x1b[36m[POSTGRES]\x1b[0m ('+time+'ms) ' + res.command + ' command completed successfully, updated ' + res.rowCount + ' row(s)')
     } else {
+      console.log('\x1b[36m[POSTGRES]\x1b[0m ('+time+'ms) Query result:')
       console.log(res.rows)
     }
+    rl.prompt()
   })
-
-  rl.prompt()
 }).on('close', () => {
   console.log('Exiting...')
   process.exit(0)
 })
 
-var Postgres = new Client()
-var Tzuyu = new Bot()
 
 console.log('Establishing database connection...')
 Postgres.connect()
