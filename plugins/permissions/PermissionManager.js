@@ -6,107 +6,89 @@ const PERM_ADMIN = 3
 const PERM_MOD = 2
 const PERM_USER = 1
 
-class PermissionManager{
-  constructor(){
+class PermissionManager {
+  constructor () {
     // cache the permissions and users list
     this.db = new Database()
     // this.commands = undefined
     // this.users = undefined
   }
-  // _loadCache(){
-  //   if (!this.users) {
-  //     return new Promise((resolve, reject)=>{
-  //       this.db.getAllTables().then(res=>{
-  //         this.commands = res.commands
-  //         this.users = res.users
-  //         resolve()
-  //       })
-  //     })
-  //   }
-  // }
-  initialize(database, message){
-    if(!this.db.hasConnection()){
+
+  //this is a fun javascript generator
+  forceAsync(fn){
+    let iterator = fn()
+
+    let loop = result =>{
+      console.log('LOOOOP')
+      //so long as we are not done then the second part will not execute (thanks short circuit operators)
+      !result.done && result.value.then(
+          res=>loop(iterator.next(res)),
+          err=>loop(iterator.throw(err))
+        )
+      }
+    loop(iterator.next())
+  }
+  
+  initialize (database, message) {
+    if (!this.db.hasConnection()) {
       this.db.provideConnection(database)
     }
-    return new Promise((resolve, reject)=>{
-      this.db.initializeTables(message).then(res=>{
+    return new Promise((resolve, reject) => {
+      this.db.initializeTables(message).then(res => {
         resolve(true)
       })
     })
   }
-  getUser(database, id, server){
-    if(!this.db.hasConnection()){
+  _ensureDBConnection(database){
+    if (!this.db.hasConnection()) {
       this.db.provideConnection(database)
     }
-    // console.log('passing through to db...')
+  }
+
+  //returns a command object built with data from the database
+  getCommand (database, id, server){
+    this._ensureDBConnection(database)
     return new Promise((resolve, reject)=>{
-      this.db.getUser(id, server).then(user=>{
+      this.db.getCommand(id, server).then(command=>{
+        resolve(command)
+      })
+    })
+  }
+  getUser (database, id, server) {
+    this._ensureDBConnection(database)
+    return new Promise((resolve, reject) => {
+      this.db.getUser(id, server).then(user => {
         resolve(user)
       })
     })
   }
-  _canPerformAction(database, requester, action){
-    if(!this.db.hasConnection()){
-      this.db.provideConnection(database)
-    }
-    return new Promise((resolve, reject)=>{
-      //see if we have the ability to perform this action
-      this.db.query('SELECT users.permission FROM users INNER JOIN commands ON (users.permission>=commands.permission) WHERE users.user_id=$1 AND commands.trigger=$2', [requester, action]).then(res=>{
-        if(res.rowCount > 0){
+  _canPerformAction (database, requester, action) {
+    this._ensureDBConnection(database)
+    return new Promise((resolve, reject) => {
+      // see if we have the ability to perform this action
+      this.db.query('SELECT users.permission FROM users INNER JOIN commands ON (users.permission>=commands.permission) WHERE users.user_id=$1 AND commands.trigger=$2', [requester, action]).then(res => {
+        if (res.rowCount > 0) {
           resolve(true)
-        }else{
-          reject(new PermissionError('Insufficient priveleges to perform this command'))
+        } else {
+          throw new PermissionError('Insufficient priveleges to perform this command')
         }
-
       })
     })
   }
 
-  _updateUser(user){
-    return new Promise((resolve, reject)=>{
+  _updateUser (user) {
+    return new Promise((resolve, reject) => {
       this.db.query('SELECT 1 FROM users WHERE user_id=$1', user).then(res => {
-        if(res.rowCount === 1){
-          this.db.query('UPDATE users SET permission=$1 WHERE user_id=$2', [perm, user]).then(res=>{
+        if (res.rowCount === 1) {
+          this.db.query('UPDATE users SET permission=$1 WHERE user_id=$2', [user.permission, user.id]).then(res => {
             resolve(true)
           })
-        }else{
-          this.db.query('INSERT INTO users(user_id, permission) VALUES($1, $2)', [user, perm]).then(res=>{
+        } else {
+          this.db.query('INSERT INTO users(user_id, permission) VALUES($1, $2)', [user.id, user.perm]).then(res => {
             resolve(true)
           })
         }
-      })      
-    })
-  }
-
-  _restrictCommandLevel(command){
-    if(!(command instanceof Command)){
-      throw new TypeError('Command object expected, '+ typeof command+' given')
-    }
-    return new Promise((resolve, reject)=>{
-      this.db.query('SELECT 1 FROM commands WHERE trigger=$1', trigger).then(res => {
-        //if the command exists then 
-        if(res.rowCount === 1){
-          if(role){
-            this.db.query('UPDATE commands SET permission=$1,role_id=$2 WHERE trigger=$3', [newLevel, role, trigger]).then(res=>{
-              resolve(true)
-            })
-          }else{
-            this.db.query('UPDATE commands SET permission=$1,role_id=-1 WHERE trigger=$2', [newLevel, trigger]).then(res=>{
-              resolve(true)
-            })
-          }
-        }else{
-          if(role){
-            this.db.query('INSERT INTO commands(trigger, permission, role_id) VALUES($1, $2, $3)', [user, newLevel, role]).then(res=>{
-              resolve(true)
-            })
-          }else{
-            this.db.query('INSERT INTO commands(trigger, permission, role_id) VALUES($1, $2, -1)', [user, newLevel]).then(res=>{
-              resolve(true)
-            })
-          }
-        }
-      })      
+      })
     })
   }
 }

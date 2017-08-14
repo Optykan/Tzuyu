@@ -22,27 +22,26 @@ rl.prompt()
 rl.on('line', (line) => {
   var start = new Date().getTime()
   line = line.trim()
-  //select * from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME='<Table Name>'
+  // select * from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME='<Table Name>'
   Postgres.query(line).then(res => {
     var time = new Date().getTime() - start
     if (res.rowCount === 0) {
-      console.log('\x1b[36m[POSTGRES]\x1b[0m ('+time+'ms) Query returned 0 items ')
+      console.log('\x1b[36m[POSTGRES]\x1b[0m (' + time + 'ms) Query returned 0 items ')
     } else if (res.command !== 'SELECT') {
-      console.log('\x1b[36m[POSTGRES]\x1b[0m ('+time+'ms) ' + res.command + ' command completed successfully, updated ' + res.rowCount + ' row(s)')
+      console.log('\x1b[36m[POSTGRES]\x1b[0m (' + time + 'ms) ' + res.command + ' command completed successfully, updated ' + res.rowCount + ' row(s)')
     } else {
-      console.log('\x1b[36m[POSTGRES]\x1b[0m ('+time+'ms) Query result:')
+      console.log('\x1b[36m[POSTGRES]\x1b[0m (' + time + 'ms) Query result:')
       console.log(res.rows)
     }
     rl.prompt()
-  }).catch(err=>{
+  }).catch(err => {
     var time = new Date().getTime() - start
-    console.log('\x1b[31m[POSTGRES]\x1b[0m ('+time+'ms) Query failed: '+err.message)
+    console.log('\x1b[31m[POSTGRES]\x1b[0m (' + time + 'ms) Query failed: ' + err.message)
   })
 }).on('close', () => {
   console.log('Exiting...')
   process.exit(0)
 })
-
 
 console.log('Establishing database connection...')
 Postgres.connect()

@@ -1,3 +1,5 @@
+'use strict'
+
 const Plugin = require('../Plugin')
 const PermissionManager = require('./PermissionManager')
 
@@ -23,44 +25,51 @@ class Permissions extends Plugin {
     }
   }
   initialize (database, tzuyu, message) {
-    // welcome to callback hell
     tzuyu.message('Creating tables...')
-    this.permissionManager.initialize(database, message).then(res=>{
+    this.permissionManager.initialize(database, message).then(res => {
       tzuyu.message('Done')
-    }).catch(err=>{
-      tzuyu.message('An error occured: '+err.message)
+    }).catch(err => {
+      tzuyu.message('An error occured: ' + err.message)
     })
   }
 
-  _getIdFromMessage(message){
+  _getIdFromMessage (message) {
     let res = /<@([0-9]{18})>/.exec(message)
-    if(res){
+    if (res) {
       return res[1]
     }
     throw new Error('Could not resolve ID of user')
   }
   _modAfterSearch (tzuyu, source, msgTarget) {
-    try{
+    try {
       var target = this._getIdFromMessage(msgTarget)
-    } catch(e){
+    } catch (e) {
       console.error(e)
       return tzuyu.message(e.message)
     }
-    // if(this.users.permission >= PERM_MOD){
-    //   return this._changePermissionLevel(target)
-    // }
   }
 
   mod (tzuyu, message, database, target) {
     let author = message.author.id
     let server = message.member.guild.id
-    // console.log(message)
-    // console.log('retrieving user..')
-    this.permissionManager.getUser(database, author, server).then(user=>{
-      console.log(user)
-    }).catch(err=>{
-      console.error(e)
+
+    let user = {}
+    let command = {}
+
+    var that = this
+
+    this.permissionManager.forceAsync(function* (){
+      let user = yield that.permissionManager.getUser(database, author, server)
+      console.log('yielded user')
     })
+
+    this.permissionManager.forceAsync(function* (){
+      let command = yield that.permissionManager.getCommand(database, 'mod', server)
+      console.log('yielded command')
+    })
+
+    console.log('async\'d')
+
   }
   restrict (message, level) {
     console.log('body')
