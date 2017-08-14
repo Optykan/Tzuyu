@@ -53,23 +53,19 @@ class Permissions extends Plugin {
     let author = message.author.id
     let server = message.member.guild.id
 
-    let user = {}
-    let command = {}
+    var user = {}
+    var command = {}
 
     var that = this
 
-    this.permissionManager.forceAsync(function* (){
-      let user = yield that.permissionManager.getUser(database, author, server)
-      console.log('yielded user')
+    this.permissionManager.forceAsync(function * () {
+      user = yield that.permissionManager.getUser(database, author, server)
+      console.log(user)
     })
-
-    this.permissionManager.forceAsync(function* (){
-      let command = yield that.permissionManager.getCommand(database, 'mod', server)
-      console.log('yielded command')
+    this.permissionManager.forceAsync(function * () {
+      command = yield that.permissionManager.getCommand(database, 'mod', server)
+      console.log(command)
     })
-
-    console.log('async\'d')
-
   }
   restrict (message, level) {
     console.log('body')

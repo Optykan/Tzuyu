@@ -1,7 +1,7 @@
 const Command = require('./Command')
 
 class User {
-  constructor(){
+  constructor () {
     return this
   }
   can (command) {
