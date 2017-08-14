@@ -8,27 +8,22 @@ const PERM_USER = 1
 
 class PermissionManager {
   constructor () {
-    // cache the permissions and users list
     this.db = new Database()
-    // this.commands = undefined
-    // this.users = undefined
   }
 
-  //this is a fun javascript generator
-  forceAsync(fn){
+  forceAsync (fn) {
     let iterator = fn()
 
-    let loop = result =>{
-      console.log('LOOOOP')
-      //so long as we are not done then the second part will not execute (thanks short circuit operators)
+    let loop = result => {
+      // so long as we are not done then the second part will not execute (thanks short circuit operators)
       !result.done && result.value.then(
-          res=>loop(iterator.next(res)),
-          err=>loop(iterator.throw(err))
+        res => loop(iterator.next(res)),
+        err => loop(iterator.throw(err))
         )
-      }
+    }
     loop(iterator.next())
   }
-  
+
   initialize (database, message) {
     if (!this.db.hasConnection()) {
       this.db.provideConnection(database)
@@ -39,25 +34,27 @@ class PermissionManager {
       })
     })
   }
-  _ensureDBConnection(database){
+  _ensureDBConnection (database) {
     if (!this.db.hasConnection()) {
       this.db.provideConnection(database)
     }
   }
 
-  //returns a command object built with data from the database
-  getCommand (database, id, server){
+  // returns a command object built with data from the database
+  getCommand (database, trigger, server, role) {
     this._ensureDBConnection(database)
-    return new Promise((resolve, reject)=>{
-      this.db.getCommand(id, server).then(command=>{
+    return new Promise((resolve, reject) => {
+      this.db.getCommand(trigger, server, role).then(command => {
         resolve(command)
       })
     })
   }
   getUser (database, id, server) {
+    console.log('getting user')
     this._ensureDBConnection(database)
     return new Promise((resolve, reject) => {
       this.db.getUser(id, server).then(user => {
+        console.log('resolving...')
         resolve(user)
       })
     })

@@ -17,12 +17,12 @@ class Database {
       if (params) {
         this.connection.query(query, params, (err, res) => {
           if (err) { throw err }
-          resolve(res)
+            resolve(res)
         })
       } else {
         this.connection.query(query, (err, res) => {
           if (err) { throw err }
-          resolve(res)
+            resolve(res)
         })
       }
     })
@@ -84,13 +84,13 @@ class Database {
   }
   getUser (id, server) {
     // console.log('querying user...')
-      let query = 'SELECT * FROM users WHERE user_id=$1'
-      let params = [id]
+    let query = 'SELECT * FROM users WHERE user_id=$1'
+    let params = [id]
 
-      if(server){
-        query += ' AND server_id=$2'
-        params.push(server)
-      }
+    if (server) {
+      query += ' AND server_id=$2'
+      params.push(server)
+    }
 
     return new Promise((resolve, reject) => {
       this.query(query, params).then(res => {
@@ -100,23 +100,26 @@ class Database {
       })
     })
   }
-  getCommand (trigger, role, server){
+  getCommand (trigger, server, role) {
+    let index = 2
     let query = 'SELECT * FROM commands WHERE trigger=$1'
     let params = [trigger]
-    if(role){
-      query += ' AND role_id=$2'
+    if (role) {
+      query += ' AND role_id=$'+index
       params.push(role)
+      index++
     }
-    if(server){
-      query += ' AND server_id=$3'
+    if (server) {
+      query += ' AND server_id=$'+index
       params.push(server)
+      index++
     }
-    return new Promise((resolve, reject)=>{
-      if(server){
-        this.query(query, params).then(res=>{
-
+    return new Promise((resolve, reject) => {
+      this.query(query, params).then(res=>{
+        this._ensureCommandExists(res, trigger, PERM_USER, role, server).then(command=>{
+          resolve(command)
         })
-      }
+      })
     })
   }
   initializeTables (message) {
@@ -128,10 +131,10 @@ class Database {
         } else {
           // table doesnt exist... start creating them
           this.query('CREATE TABLE users (user_id VARCHAR(18) NOT NULL, permission BYTE NOT NULL, server_id VARCHAR(18), UNIQUE(user_id, server_id))').then(res => {
-             console.log('Created users table...')
-             this.query('INSERT INTO users (user_id, permission, server_id) VALUES ($1, $2, $3)', [message.channel.guild.ownerID, PERM_ADMIN, message.channel.guild.id]).then(res => {
-               console.log('Added superadmin...')
-               this.query('CREATE TABLE commands (trigger VARCHAR(25) NOT NULL, permission BYTE NOT NULL, role_id VARCHAR(18), server_id VARCHAR(18), UNIQUE(trigger, server_id))').then(res => {
+            console.log('Created users table...')
+            this.query('INSERT INTO users (user_id, permission, server_id) VALUES ($1, $2, $3)', [message.channel.guild.ownerID, PERM_ADMIN, message.channel.guild.id]).then(res => {
+              console.log('Added superadmin...')
+              this.query('CREATE TABLE commands (trigger VARCHAR(25) NOT NULL, permission BYTE NOT NULL, role_id VARCHAR(18), server_id VARCHAR(18), UNIQUE(trigger, server_id))').then(res => {
                 console.log('Created commands table...')
                 resolve()
               })
