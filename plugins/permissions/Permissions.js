@@ -78,7 +78,8 @@ class Permissions extends Plugin {
           if(this.current.user.can(this.current.command)){
             resolve()
           }else{
-            throw new PermissionError('User has insufficient privileges to perform '+trigger)
+            tzuyu.message('You do not have permission to perform this command', {messageDelay: -1})
+            reject(new PermissionError('User has insufficient privileges to perform '+trigger))
           }
         })
       })
@@ -108,7 +109,7 @@ class Permissions extends Plugin {
     this.permissionManager.getUser(database, id, this.current.user.serverId).then(user=>{
       user.permission = PERM_MOD
       this.permissionManager.save(user).then(res=>{
-        tzuyu.message('Request successful...')
+        tzuyu.message('Promoted user to moderator', {messageDelay: -1})
       })
     }).catch(e=>{
       console.error(e)
