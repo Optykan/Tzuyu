@@ -2,6 +2,7 @@
 
 const Plugin = require('../Plugin')
 const PermissionManager = require('./PermissionManager')
+const PermissionError = require('./../../core/ext/PermissionError')
 
 const PERM_ADMIN = 3
 const PERM_MOD = 2
@@ -26,7 +27,7 @@ class Permissions extends Plugin {
       trigger: ['*', 'mod', 'perms_generateTables', 'restrict'],
       action: [this.checkPermission, this.mod, this.initialize, this.restrict],
       injects: ['Trigger@trigger,Tzuyu@tzuyu,Message@message,Database@database', 'Tzuyu@tzuyu,Database@database', 'Database@database,Tzuyu@tzuyu,Message@message', 'Message@message'],
-      priority: [0, 10, 10, 10],
+      priority: [99, 10, 10, 10],
       help: {
         '*': ' - ',
         mod: 'Format: `mod @user`. Gives a user elevated privileges, granting them the ability to access restricted commands (restricted: mod)',
@@ -66,37 +67,41 @@ class Permissions extends Plugin {
     let server = message.member.guild.id
 
     console.log('SERVER: '+server)
-    
-
-    var waiting = true
 
     var that = this
-    this.permissionManager.forceAsync(function * () {
-      console.log('SERVER (generator): '+server)
-      let user = yield that.permissionManager.getUser(database, author, server)
-      let command = yield that.permissionManager.getCommand(database, trigger, server)
 
-      if(user.can(command)){
-        waiting = false
-        that.current.user = user
-        that.current.command = command
-      }else{
-        throw new PermissionError('User has insufficient privileges')
-      }
+    return new Promise((resolve, reject)=>{
+      this.permissionManager.getUser(database, author, server).then(user=>{
+        this.current.user = user
+        this.permissionManager.getCommand(database, trigger, server).then(command=>{
+          this.current.command = command
+          if(this.current.user.can(this.current.command)){
+            resolve()
+          }else{
+            throw new PermissionError('User has insufficient privileges to perform '+trigger)
+          }
+        })
+      })
     })
+    // this.permissionManager.forceAsync(function * () {
+    //   console.log('SERVER (generator): '+server)
+    //   let user = yield that.permissionManager.getUser(database, author, server)
+    //   let command = yield that.permissionManager.getCommand(database, trigger, server)
 
-    let waitLoop = () => {
-      if(waiting){
-        console.log('waiting...')
-        setTimeout(waitLoop, 100)
-      }
-    }
-
-    waitLoop()
-    console.log('done')
+    //   if(user.can(command)){
+    //     that.current.user = user
+    //     that.current.command = command
+    //     console.log('SAVED ID '+that.current.user.id)
+    //     waiting = false
+    //   }else{
+    //     allowed = false
+    //     waiting = false
+    //   }
+    // })
   }
 
   mod (tzuyu, database, target) {
+    console.log('RUNNING MOD')
     let id = this._getIdFromMessage(target)
     console.log(this.current)
     console.log('SERVER (mod): '+this.current.user.serverId)

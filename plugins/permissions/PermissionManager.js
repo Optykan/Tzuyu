@@ -58,7 +58,6 @@ class PermissionManager {
     this._ensureDBConnection(database)
     return new Promise((resolve, reject) => {
       this.db.getUser(id, server).then(user => {
-        console.log('resolving...')
         resolve(user)
       }).catch(e=>{
         console.error(e)
