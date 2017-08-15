@@ -31,6 +31,8 @@ class PermissionManager {
     return new Promise((resolve, reject) => {
       this.db.initializeTables(message).then(res => {
         resolve(true)
+      }).catch(e=>{
+        console.error(e)
       })
     })
   }
@@ -46,6 +48,8 @@ class PermissionManager {
     return new Promise((resolve, reject) => {
       this.db.getCommand(trigger, server, role).then(command => {
         resolve(command)
+      }).catch(e=>{
+        console.error(e)
       })
     })
   }
@@ -56,6 +60,8 @@ class PermissionManager {
       this.db.getUser(id, server).then(user => {
         console.log('resolving...')
         resolve(user)
+      }).catch(e=>{
+        console.error(e)
       })
     })
   }
@@ -73,20 +79,8 @@ class PermissionManager {
     })
   }
 
-  _updateUser (user) {
-    return new Promise((resolve, reject) => {
-      this.db.query('SELECT 1 FROM users WHERE user_id=$1', user).then(res => {
-        if (res.rowCount === 1) {
-          this.db.query('UPDATE users SET permission=$1 WHERE user_id=$2', [user.permission, user.id]).then(res => {
-            resolve(true)
-          })
-        } else {
-          this.db.query('INSERT INTO users(user_id, permission) VALUES($1, $2)', [user.id, user.perm]).then(res => {
-            resolve(true)
-          })
-        }
-      })
-    })
+  save (obj) {
+    return this.db.save(obj)
   }
 }
 
