@@ -14,9 +14,9 @@ class Permissions extends Plugin {
   }
   register () {
     return {
-      trigger: ['mod', 'perms_generateTables', 'restrict'],
-      action: [this.mod, this.initialize, this.restrict],
-      injects: ['Tzuyu@tzuyu,Message@message,Database@database', 'Database@database,Tzuyu@tzuyu,Message@message', 'Message@message'],
+      trigger: ['*', 'mod', 'perms_generateTables', 'restrict'],
+      action: [this.checkPermission, this.mod, this.initialize, this.restrict],
+      injects: ['Trigger@trigger,Tzuyu@tzuyu,Message@message,Database@database', 'Tzuyu@tzuyu,Message@message,Database@database', 'Database@database,Tzuyu@tzuyu,Message@message', 'Message@message'],
       help: {
         mod: 'Format: `mod @user`. Gives a user elevated privileges, granting them the ability to access restricted commands (restricted: mod)',
         perms_generateTables: 'Generates the tables required for the Permissions plugin to work. Run this once (restricted: server owner)',
@@ -49,7 +49,7 @@ class Permissions extends Plugin {
     }
   }
 
-  mod (tzuyu, message, database, target) {
+  checkPermission(trigger, tzuyu, message, database, target){
     let author = message.author.id
     let server = message.member.guild.id
 
@@ -58,14 +58,22 @@ class Permissions extends Plugin {
 
     var that = this
 
-    this.permissionManager.forceAsync(function * () {
-      user = yield that.permissionManager.getUser(database, author, server)
-      console.log(user)
+    return new Promise((resolve, reject)=>{
+      this.permissionManager.forceAsync(function * () {
+        user = yield that.permissionManager.getUser(database, author, server)
+        command = yield that.permissionManager.getCommand(database, trigger, server)
+
+        if(user.can(command)){
+          resolve(true)
+        }else{
+          throw new PermissionError('User has insufficient privileges')
+        }
+      })
     })
-    this.permissionManager.forceAsync(function * () {
-      command = yield that.permissionManager.getCommand(database, 'mod', server)
-      console.log(command)
-    })
+  }
+
+  mod (tzuyu, message, database, target) {
+
   }
   restrict (message, level) {
     console.log('body')
