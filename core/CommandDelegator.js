@@ -72,9 +72,10 @@ class CommandDelegator {
     }
   }
 
-  parseIncomingMessage (message) {
+  parseIncomingMessage (tzuyu, message) {
     let request = this.resolveParamsFromMessage(message.content)
     if (request !== false) {
+      tzuyu.setTextChannel(message.channel.id)
       this.delegateCommand(request.command, request.params)
     } else {
       // do nothing because its not a command
@@ -86,6 +87,8 @@ class CommandDelegator {
     let command = this.commands.next()
     if(command){
       callback(command)
+    }else{
+      this.commands.done()
     }
   }
 
