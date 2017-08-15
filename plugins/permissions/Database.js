@@ -171,6 +171,7 @@ class Database {
     })
   }
   save (object) {
+    console.log('SERVER (save): '+object.serverId)
     if (!(object instanceof User || object instanceof Command)) {
       throw new TypeError('User or Command object exapected, ' + typeof object + ' given')
     }
