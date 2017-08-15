@@ -20,7 +20,7 @@ In the `register()` method, return an object with the following key-value pairs:
 
 - `help` (optional): a string or an array of strings representing the help text for each trigger
 
-- `priority` (optional): an integer or an array of integers representing the load priority of the plugin trigger. A lower priority value will cause the mapped action to run before other commands. The default value is 10. 
+- `priority` (optional): an integer or an array of integers representing the load priority of the plugin trigger. A higher priority value will cause the mapped action to run before other commands. The default value is 10. 
 
 In the `constructor()` method, first call `super()` then:
 

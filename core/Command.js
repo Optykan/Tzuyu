@@ -73,7 +73,7 @@ class Command {
         )
     }
 
-    this.callback.call(this.context, ...send, ...params)
+    return this.callback.call(this.context, ...send, ...params)
   }
 }
 

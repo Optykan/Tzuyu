@@ -81,29 +81,42 @@ class CommandDelegator {
     }
   }
 
+  _nextCommand(callback){
+    console.log('next')
+    let command = this.commands.next()
+    if(command){
+      callback(command)
+    }
+  }
+
   delegateCommand (trigger, params) {
+    console.log('delegating')
     var injectedParams = params
-    for (let c of this.commands) {
+
+    let commandIteration = c => {
+      console.log(c.command.trigger)
       if (c.command.trigger === '*' || c.command.trigger.toLowerCase() === trigger.toLowerCase()) {
         this.addInjectable('Trigger', trigger)
-        try {
-          var result = c.command.execute(this.injectables, injectedParams)
-        } catch (e) {
+        console.log('testing '+c.command.trigger)
+        Promise.resolve(c.command.execute(this.injectables, injectedParams)).then(result=>{
+        this._nextCommand(commandIteration)
+        }).catch(e=>{
           console.error(e)
-          if (e instanceof PermissionError) {
-            // if we have a permission error then we should stop looking for any other commands (mainly for moderator stuff but other plugins could probably use this)
-            break
-          }
-        }
+        })
+      }else{
+        this._nextCommand(commandIteration)
+      }
+        /* temp(?) disable chaining
         if (typeof result !== 'undefined' && Array.isArray(result)) {
           // if we get a result then chain it further
           injectedParams = result
         } else {
           // if we dont get a result then set it back to the passed values
           injectedParams = params
-        }
-      }
+        }*/
     }
+
+    this._nextCommand(commandIteration)
   }
 
   resolveParamsFromMessage (message) {

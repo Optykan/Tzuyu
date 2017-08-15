@@ -2,6 +2,7 @@
 class PriorityQueue {
   constructor () {
     this.queue = []
+    this.index = 0
     this[Symbol.iterator] = function * () {
       let index = 0
       while (index < this.queue.length) {
@@ -9,22 +10,37 @@ class PriorityQueue {
       }
     }
   }
+
+  next(){
+    if(this.index >= this.length){
+      this.index = 0
+      return null
+    }
+    let res = this.get(this.index)
+    
+    this.index++
+
+    return res
+  }
+
   get length () {
     return this.queue.length
   }
 
   push (item, priority) {
-    // a priority of 0 is the greatest priority (or negative numbers i guess)
+    // a larger priority means it will be run first
     let toPush = {
       command: item,
       priority: priority
     }
-    if (this.queue.length === 0 || this.queue[this.queue.length - 1].priority < priority) {
+    if (this.queue.length === 0 || this.queue[this.queue.length - 1].priority > priority) {
       this.queue.push(toPush)
+    }else if(priority > this.queue[0].priority){
+      this.queue.splice(0, 0, toPush)
     }
-    for (let i = 0; i < this.queue.length; i++) {
-      if (this.queue[i].priority < priority) {
-        return this.queue.splice(i, 0, toPush)
+    for (let i = 0; i < this.queue.length-1; i++) {
+      if (this.queue[i+1].priority < priority) {
+        return this.queue.splice(i+1, 0, toPush)
       }
     }
     this.queue.push(toPush)
