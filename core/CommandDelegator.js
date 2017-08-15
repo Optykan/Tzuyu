@@ -85,6 +85,7 @@ class CommandDelegator {
     var injectedParams = params
     for (let c of this.commands) {
       if (c.command.trigger === '*' || c.command.trigger.toLowerCase() === trigger.toLowerCase()) {
+        this.addInjectable('Trigger', trigger)
         try {
           var result = c.command.execute(this.injectables, injectedParams)
         } catch (e) {
