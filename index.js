@@ -82,9 +82,7 @@ Tzuyu.client.on('message', message => {
   if (!Tzuyu.isPermitted(message.author.id)) {
     return false
   }
-
-  Tzuyu.setTextChannel(message.channel.id)
-  CommandDelegator.parseIncomingMessage(message)
+  CommandDelegator.parseIncomingMessage(Tzuyu, message)
 })
 
 Tzuyu.login(process.env.BOT_TOKEN)

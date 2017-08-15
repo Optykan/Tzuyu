@@ -10,10 +10,9 @@ class PriorityQueue {
       }
     }
   }
-
+  
   next(){
     if(this.index >= this.length){
-      this.index = 0
       return null
     }
     let res = this.get(this.index)
@@ -21,6 +20,10 @@ class PriorityQueue {
     this.index++
 
     return res
+  }
+
+  done(){
+    this.index=0
   }
 
   get length () {
