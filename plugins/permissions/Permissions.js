@@ -65,15 +65,21 @@ class Permissions extends Plugin {
     let author = message.author.id
     let server = message.member.guild.id
 
+    console.log('SERVER: '+server)
+    
+
     var waiting = true
 
     var that = this
     this.permissionManager.forceAsync(function * () {
-      that.current.user = yield that.permissionManager.getUser(database, author, server)
-      that.current.command = yield that.permissionManager.getCommand(database, trigger, server)
+      console.log('SERVER (generator): '+server)
+      let user = yield that.permissionManager.getUser(database, author, server)
+      let command = yield that.permissionManager.getCommand(database, trigger, server)
 
-      if(that.current.user.can(that.current.command)){
+      if(user.can(command)){
         waiting = false
+        that.current.user = user
+        that.current.command = command
       }else{
         throw new PermissionError('User has insufficient privileges')
       }
@@ -92,6 +98,8 @@ class Permissions extends Plugin {
 
   mod (tzuyu, database, target) {
     let id = this._getIdFromMessage(target)
+    console.log(this.current)
+    console.log('SERVER (mod): '+this.current.user.serverId)
     this.permissionManager.getUser(database, id, this.current.user.serverId).then(user=>{
       user.permission = PERM_MOD
       this.permissionManager.save(user).then(res=>{
