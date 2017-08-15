@@ -10,18 +10,24 @@ class Database {
     this.connection = connection
   }
   hasConnection () {
-    return this.connection !== undefined
+    return !!this.connection
   }
   query (query, params) {
     return new Promise((resolve, reject) => {
       if (params) {
         this.connection.query(query, params, (err, res) => {
-          if (err) { throw err }
+          if (err) { 
+            console.error(err)
+            throw err
+           }
             resolve(res)
         })
       } else {
         this.connection.query(query, (err, res) => {
-          if (err) { throw err }
+          if (err) { 
+            console.error(err)
+            throw err
+          }
             resolve(res)
         })
       }
@@ -38,7 +44,11 @@ class Database {
         this.query('SELECT * FROM commands').then(res => {
           result.commands = res.rows
           resolve(result)
+        }).catch(e=>{
+          console.error(e)
         })
+      }).catch(e=>{
+        console.error(e)
       })
     })
   }
@@ -48,6 +58,8 @@ class Database {
     return new Promise((resolve, reject) => {
       this.save(user).then(res => {
         resolve(user)
+      }).catch(e=>{
+        console.error(e)
       })
     })
   }
@@ -57,6 +69,8 @@ class Database {
     return new Promise((resolve, reject) => {
       this.save(command).then(res => {
         resolve(command)
+      }).catch(e=>{
+        console.error(e)
       })
     })
   }
@@ -65,7 +79,9 @@ class Database {
       if (dbResult.rowCount === 0) {
         return this._createNewUser(id, PERM_USER, server).then(user => {
           resolve(user)
-        })
+        }).catch(e=>{
+        console.error(e)
+      })
       } else {
         resolve((new User()).fromDatabase(dbResult.rows[0]))
       }
@@ -76,6 +92,8 @@ class Database {
       if (dbResult.rowCount === 0) {
         return this._createNewCommand(trigger, permission, roleId, server).then(command => {
           resolve(command)
+        }).catch(e=>{
+          console.error(e)
         })
       } else {
         resolve((new Command()).fromDatabase(dbResult.rows[0]))
@@ -96,7 +114,11 @@ class Database {
       this.query(query, params).then(res => {
         this._ensureUserExists(res, id, server).then(user => {
           resolve(user)
+        }).catch(e=>{
+          console.error(e)
         })
+      }).catch(e=>{
+        console.error(e)
       })
     })
   }
@@ -118,7 +140,11 @@ class Database {
       this.query(query, params).then(res=>{
         this._ensureCommandExists(res, trigger, PERM_USER, role, server).then(command=>{
           resolve(command)
+        }).catch(e=>{
+          console.error(e)
         })
+      }).catch(e=>{
+        console.error(e)
       })
     })
   }

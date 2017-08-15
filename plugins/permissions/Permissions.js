@@ -3,6 +3,10 @@
 const Plugin = require('../Plugin')
 const PermissionManager = require('./PermissionManager')
 
+const PERM_ADMIN = 3
+const PERM_MOD = 2
+const PERM_USER = 1
+
 class Permissions extends Plugin {
   constructor () {
     super()
@@ -11,13 +15,20 @@ class Permissions extends Plugin {
     // this.help = undefined
     this.enabled = true
     this.permissionManager = new PermissionManager()
+
+    this.current = {
+      user: {},
+      command: {}
+    }
   }
   register () {
     return {
       trigger: ['*', 'mod', 'perms_generateTables', 'restrict'],
       action: [this.checkPermission, this.mod, this.initialize, this.restrict],
-      injects: ['Trigger@trigger,Tzuyu@tzuyu,Message@message,Database@database', 'Tzuyu@tzuyu,Message@message,Database@database', 'Database@database,Tzuyu@tzuyu,Message@message', 'Message@message'],
+      injects: ['Trigger@trigger,Tzuyu@tzuyu,Message@message,Database@database', 'Tzuyu@tzuyu,Database@database', 'Database@database,Tzuyu@tzuyu,Message@message', 'Message@message'],
+      priority: [0, 10, 10, 10],
       help: {
+        '*': ' - ',
         mod: 'Format: `mod @user`. Gives a user elevated privileges, granting them the ability to access restricted commands (restricted: mod)',
         perms_generateTables: 'Generates the tables required for the Permissions plugin to work. Run this once (restricted: server owner)',
         restrict: 'Format: `restrict <command>`, where <command> does not include the prefix (!, &, whatever is set). Only allows moderators to use these commands (restricted: mod)'
@@ -49,31 +60,46 @@ class Permissions extends Plugin {
     }
   }
 
-  checkPermission(trigger, tzuyu, message, database, target){
+  checkPermission (trigger, tzuyu, message, database, target) {
+    //always implicity called through the * command trigger
     let author = message.author.id
     let server = message.member.guild.id
 
-    var user = {}
-    var command = {}
+    var waiting = true
 
     var that = this
+    this.permissionManager.forceAsync(function * () {
+      that.current.user = yield that.permissionManager.getUser(database, author, server)
+      that.current.command = yield that.permissionManager.getCommand(database, trigger, server)
 
-    return new Promise((resolve, reject)=>{
-      this.permissionManager.forceAsync(function * () {
-        user = yield that.permissionManager.getUser(database, author, server)
-        command = yield that.permissionManager.getCommand(database, trigger, server)
-
-        if(user.can(command)){
-          resolve(true)
-        }else{
-          throw new PermissionError('User has insufficient privileges')
-        }
-      })
+      if(that.current.user.can(that.current.command)){
+        waiting = false
+      }else{
+        throw new PermissionError('User has insufficient privileges')
+      }
     })
+
+    let waitLoop = () => {
+      if(waiting){
+        console.log('waiting...')
+        setTimeout(waitLoop, 100)
+      }
+    }
+
+    waitLoop()
+    console.log('done')
   }
 
-  mod (tzuyu, message, database, target) {
-
+  mod (tzuyu, database, target) {
+    let id = this._getIdFromMessage(target)
+    this.permissionManager.getUser(database, id, this.current.user.serverId).then(user=>{
+      user.permission = PERM_MOD
+      this.permissionManager.save(user).then(res=>{
+        tzuyu.message('Request successful...')
+      })
+    }).catch(e=>{
+      console.error(e)
+    })
   }
   restrict (message, level) {
     console.log('body')
