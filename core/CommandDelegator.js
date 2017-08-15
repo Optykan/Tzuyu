@@ -102,7 +102,7 @@ class CommandDelegator {
         this.addInjectable('Trigger', trigger)
         console.log('testing '+c.command.trigger)
         Promise.resolve(c.command.execute(this.injectables, injectedParams)).then(result=>{
-        this._nextCommand(commandIteration)
+          this._nextCommand(commandIteration)
         }).catch(e=>{
           console.error(e)
         })
