@@ -84,21 +84,6 @@ class Permissions extends Plugin {
         })
       })
     })
-    // this.permissionManager.forceAsync(function * () {
-    //   console.log('SERVER (generator): '+server)
-    //   let user = yield that.permissionManager.getUser(database, author, server)
-    //   let command = yield that.permissionManager.getCommand(database, trigger, server)
-
-    //   if(user.can(command)){
-    //     that.current.user = user
-    //     that.current.command = command
-    //     console.log('SAVED ID '+that.current.user.id)
-    //     waiting = false
-    //   }else{
-    //     allowed = false
-    //     waiting = false
-    //   }
-    // })
   }
 
   mod (tzuyu, database, target) {
@@ -115,7 +100,7 @@ class Permissions extends Plugin {
       console.error(e)
     })
   }
-  restrict (message, level) {
+  restrict (tzuyu, database, level) {
     console.log('body')
   }
 }
