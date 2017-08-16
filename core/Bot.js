@@ -178,7 +178,15 @@ class Bot {
     this.mediaPlayer.shuffle()
   }
   setPlaying (status) {
-    this.client.user.setGame(status)
+    this.client.user.setPresence({
+      status: 'idle',
+      afk: false,
+      game: {
+        name: status,
+        type: 1,
+        url: 'https://www.twitch.tv/'
+      }
+    })
   }
   setStatus (status) {
     this.client.user.setStatus(status)
