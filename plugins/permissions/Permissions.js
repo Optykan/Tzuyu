@@ -73,7 +73,7 @@ class Permissions extends Plugin {
           if(this.current.user.can(this.current.command)){
             resolve()
           }else{
-            tzuyu.message('You do not have permission to perform this command', {messageDelay: -1})
+            // tzuyu.message('You do not have permission to perform this command', {messageDelay: -1})
             reject(new PermissionError('User has insufficient privileges to perform '+trigger))
           }
         })
@@ -97,7 +97,7 @@ class Permissions extends Plugin {
   restrict (tzuyu, database, trigger, level) {
     let newLevel = parseInt(level)
     if(isNaN(newLevel) || newLevel < 1 || newLevel > 2){
-      tzuyu.message('Provided level was not an integer or out of range')
+      // tzuyu.message('Provided level was not an integer or out of range')
       throw new TypeError('Provided level was not an integer or out of range')
     }
     return new Promise((resolve, reject)=>{

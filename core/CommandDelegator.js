@@ -14,6 +14,10 @@ class CommandDelegator {
     this.injectables[key] = value
   }
 
+  getInjectable (key) {
+    return this.injectables[key]
+  }
+
   // enableTrigger (trigger, state) {
   //   for (let i = 0; i < this.commands.length; i++) {
   //     if (this.commands[i].trigger.toLowerCase() === trigger.toLowerCase()) {
@@ -104,6 +108,8 @@ class CommandDelegator {
         Promise.resolve(c.command.execute(this.injectables, injectedParams)).then(result=>{
           this._nextCommand(commandIteration)
         }).catch(e=>{
+          let tzuyu = this.getInjectable('Tzuyu')
+          tzuyu.message(e.message)
           console.error(e)
         })
       }else{
