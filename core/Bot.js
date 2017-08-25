@@ -178,18 +178,18 @@ class Bot {
     this.mediaPlayer.shuffle()
   }
   setPlaying (status) {
+    this.setStatus(status)
+  }
+  setStatus (status) {
     this.client.user.setPresence({
-      status: 'idle',
+      status: 'online',
       afk: false,
       game: {
         name: status,
-        type: 1,
-        url: 'https://www.twitch.tv/'
+        // url: 'http://www.twitch.tv/.',
+        // type: 1
       }
     })
-  }
-  setStatus (status) {
-    this.client.user.setStatus(status)
   }
   setVoiceChannel (chanID) {
     this.voice.channel = this.client.channels.get(chanID)

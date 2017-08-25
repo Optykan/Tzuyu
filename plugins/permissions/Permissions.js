@@ -17,16 +17,18 @@ class Permissions extends Plugin {
     this.enabled = true
     this.permissionManager = new PermissionManager()
 
+    //the current running command
     this.current = {
       user: {},
       command: {}
     }
   }
+  
   register () {
     return {
       trigger: ['*', 'mod', 'perms_generateTables', 'restrict'],
       action: [this.checkPermission, this.mod, this.initialize, this.restrict],
-      injects: ['Trigger@trigger,Tzuyu@tzuyu,Message@message,Database@database', 'Tzuyu@tzuyu,Database@database', 'Database@database,Tzuyu@tzuyu,Message@message', 'Message@message'],
+      injects: ['Trigger@trigger,Tzuyu@tzuyu,Message@message,Database@database', 'Tzuyu@tzuyu,Database@database', 'Database@database,Tzuyu@tzuyu,Message@message', 'Tzuyu@tzuyu,Database@database'],
       priority: [99, 10, 10, 10],
       help: {
         '*': ' - ',
@@ -36,6 +38,7 @@ class Permissions extends Plugin {
       }
     }
   }
+
   initialize (database, tzuyu, message) {
     tzuyu.message('Creating tables...')
     this.permissionManager.initialize(database, message).then(res => {
@@ -51,14 +54,6 @@ class Permissions extends Plugin {
       return res[1]
     }
     throw new Error('Could not resolve ID of user')
-  }
-  _modAfterSearch (tzuyu, source, msgTarget) {
-    try {
-      var target = this._getIdFromMessage(msgTarget)
-    } catch (e) {
-      console.error(e)
-      return tzuyu.message(e.message)
-    }
   }
 
   checkPermission (trigger, tzuyu, message, database, target) {
@@ -89,20 +84,33 @@ class Permissions extends Plugin {
   mod (tzuyu, database, target) {
     console.log('RUNNING MOD')
     let id = this._getIdFromMessage(target)
-    console.log(this.current)
-    console.log('SERVER (mod): '+this.current.user.serverId)
-    this.permissionManager.getUser(database, id, this.current.user.serverId).then(user=>{
-      user.permission = PERM_MOD
-      this.permissionManager.save(user).then(res=>{
-        tzuyu.message('Promoted user to moderator', {messageDelay: -1})
+    return new Promise((resolve, reject)=>{
+      this.permissionManager.getUser(database, id, this.current.user.serverId).then(user=>{
+        user.permission = PERM_MOD
+        this.permissionManager.save(user).then(res=>{
+          tzuyu.message('Promoted user to moderator', {messageDelay: -1})
+          resolve()
+        })
       })
-    }).catch(e=>{
-      console.error(e)
     })
   }
-  restrict (tzuyu, database, level) {
-    console.log('body')
+  restrict (tzuyu, database, trigger, level) {
+    let newLevel = parseInt(level)
+    if(isNaN(newLevel) || newLevel < 1 || newLevel > 2){
+      tzuyu.message('Provided level was not an integer or out of range')
+      throw new TypeError('Provided level was not an integer or out of range')
+    }
+    return new Promise((resolve, reject)=>{
+      this.permissionManager.getCommand(database, trigger, this.current.user.serverId).then(command=>{
+        command.permission = level
+        this.permissionManager.save(command).then(res=>{
+          tzuyu.message('Restricted command level', {messageDelay: -1})
+          resolve()
+        })
+      })
+    })
   }
 }
 
 module.exports = Permissions
+ 
