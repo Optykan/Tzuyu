@@ -1,13 +1,22 @@
 //its like an enum but i didnt want to import enums
 
-const levels = {
-	
-}
+var levels = {
+	PERM_USER: 1,
+	PERM_MOD: 2,
+	PERM_ADMIN: 3,
 
-class PermissionLevel {
-	get PERM_MOD(){
-		return 1
+	get(){
+
 	}
 }
+
+var PermissionLevel = new Proxy(levels, {
+	get: function (target, name){
+		return target[name]
+	},
+	set: function (target, name, value){
+		target[name] = value
+	}
+})
 
 module.exports = PermissionLevel
