@@ -1,5 +1,5 @@
 const Database = require('./Database')
-const PermissionError = require('./../../core/ext/PermissionError')
+const PermissionError = require('./PermissionError')
 const Command = require('./Command')
 
 const PERM_ADMIN = 3
@@ -9,19 +9,6 @@ const PERM_USER = 1
 class PermissionManager {
   constructor () {
     this.db = new Database()
-  }
-
-  forceAsync (fn) {
-    let iterator = fn()
-
-    let loop = result => {
-      // so long as we are not done then the second part will not execute (thanks short circuit operators)
-      !result.done && result.value.then(
-        res => loop(iterator.next(res)),
-        err => loop(iterator.throw(err))
-        )
-    }
-    loop(iterator.next())
   }
 
   initialize (database, message) {
@@ -53,6 +40,7 @@ class PermissionManager {
       })
     })
   }
+
   getUser (database, id, server) {
     console.log('SERVER (get): '+server)
     this._ensureDBConnection(database)
@@ -64,6 +52,7 @@ class PermissionManager {
       })
     })
   }
+  
   _canPerformAction (database, requester, action) {
     this._ensureDBConnection(database)
     return new Promise((resolve, reject) => {

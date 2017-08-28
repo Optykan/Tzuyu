@@ -2,7 +2,7 @@
 
 const Plugin = require('../Plugin')
 const PermissionManager = require('./PermissionManager')
-const PermissionError = require('./../../core/ext/PermissionError')
+const PermissionError = require('./PermissionError')
 
 const PERM_ADMIN = 3
 const PERM_MOD = 2
@@ -113,4 +113,3 @@ class Permissions extends Plugin {
 }
 
 module.exports = Permissions
- 
