@@ -1,6 +1,6 @@
 const Command = require('./Command')
 const PriorityQueue = require('./PriorityQueue')
-const PermissionError = require('./ext/PermissionError')
+const PermissionError = require('./ext/FatalError')
 
 class CommandDelegator {
   constructor (injectables) {
@@ -123,12 +123,12 @@ class CommandDelegator {
           // if we dont get a result then set it back to the passed values
           injectedParams = params
         }*/
+      }
+
+      this._nextCommand(commandIteration)
     }
 
-    this._nextCommand(commandIteration)
-  }
-
-  resolveParamsFromMessage (message) {
+    resolveParamsFromMessage (message) {
     // should return {command: command, params: []}
     if (!message.startsWith(this.prefix)) {
       return false
