@@ -5,6 +5,9 @@ class User {
     return this
   }
   can (command) {
+    if (!(command instanceof Command)) {
+      throw new TypeError('Expected an instance of Command, got ' + typeof command)
+    }
     return this.permission >= command.permission && this.serverId === command.serverId
   }
   fromDatabase (db) {

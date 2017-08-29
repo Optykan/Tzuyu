@@ -87,7 +87,6 @@ class CommandDelegator {
   }
 
   _nextCommand (callback) {
-    console.log('next')
     let command = this.commands.next()
     if (command) {
       callback(command)
@@ -97,11 +96,9 @@ class CommandDelegator {
   }
 
   delegateCommand (trigger, params) {
-    console.log('delegating')
     var injectedParams = params
 
     let commandIteration = c => {
-      console.log(c.command.trigger)
       if (c.command.trigger === '*' || c.command.trigger.toLowerCase() === trigger.toLowerCase()) {
         this.addInjectable('Trigger', trigger)
         Promise.resolve(c.command.execute(this.injectables, injectedParams)).then(result => {

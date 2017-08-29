@@ -1,10 +1,5 @@
 const Database = require('./Database')
 const PermissionError = require('./PermissionError')
-const Command = require('./Command')
-
-const PERM_ADMIN = 3
-const PERM_MOD = 2
-const PERM_USER = 1
 
 class PermissionManager {
   constructor () {

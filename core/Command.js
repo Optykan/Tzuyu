@@ -34,6 +34,7 @@ class Command {
     // accepts is an array of parameters of what the callback accepts
     // injectables is the stuff we CAN inject
     // this.injects is mapping thingToInject@accepts
+    // console.log(injectables)
     let accepts = this._getArgSpecs(this.callback) // ['tzuyu', 'param1']
     let send = []
 
