@@ -10,20 +10,20 @@ class PriorityQueue {
       }
     }
   }
-  
-  next(){
-    if(this.index >= this.length){
+
+  next () {
+    if (this.index >= this.length) {
       return null
     }
     let res = this.get(this.index)
-    
+
     this.index++
 
     return res
   }
 
-  done(){
-    this.index=0
+  done () {
+    this.index = 0
   }
 
   get length () {
@@ -38,12 +38,12 @@ class PriorityQueue {
     }
     if (this.queue.length === 0 || this.queue[this.queue.length - 1].priority > priority) {
       this.queue.push(toPush)
-    }else if(priority > this.queue[0].priority){
+    } else if (priority > this.queue[0].priority) {
       this.queue.splice(0, 0, toPush)
     }
-    for (let i = 0; i < this.queue.length-1; i++) {
-      if (this.queue[i+1].priority < priority) {
-        return this.queue.splice(i+1, 0, toPush)
+    for (let i = 0; i < this.queue.length - 1; i++) {
+      if (this.queue[i + 1].priority < priority) {
+        return this.queue.splice(i + 1, 0, toPush)
       }
     }
     this.queue.push(toPush)

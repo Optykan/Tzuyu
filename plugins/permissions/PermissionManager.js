@@ -18,7 +18,7 @@ class PermissionManager {
     return new Promise((resolve, reject) => {
       this.db.initializeTables(message).then(res => {
         resolve(true)
-      }).catch(e=>{
+      }).catch(e => {
         console.error(e)
       })
     })
@@ -35,24 +35,24 @@ class PermissionManager {
     return new Promise((resolve, reject) => {
       this.db.getCommand(trigger, server, role).then(command => {
         resolve(command)
-      }).catch(e=>{
+      }).catch(e => {
         console.error(e)
       })
     })
   }
 
   getUser (database, id, server) {
-    console.log('SERVER (get): '+server)
+    console.log('SERVER (get): ' + server)
     this._ensureDBConnection(database)
     return new Promise((resolve, reject) => {
       this.db.getUser(id, server).then(user => {
         resolve(user)
-      }).catch(e=>{
+      }).catch(e => {
         console.error(e)
       })
     })
   }
-  
+
   _canPerformAction (database, requester, action) {
     this._ensureDBConnection(database)
     return new Promise((resolve, reject) => {

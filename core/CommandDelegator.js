@@ -1,6 +1,6 @@
 const Command = require('./Command')
 const PriorityQueue = require('./PriorityQueue')
-const PermissionError = require('./ext/FatalError')
+// const FatalError = require('./ext/FatalError')
 
 class CommandDelegator {
   constructor (injectables) {
@@ -86,12 +86,12 @@ class CommandDelegator {
     }
   }
 
-  _nextCommand(callback){
+  _nextCommand (callback) {
     console.log('next')
     let command = this.commands.next()
-    if(command){
+    if (command) {
       callback(command)
-    }else{
+    } else {
       this.commands.done()
     }
   }
@@ -104,15 +104,14 @@ class CommandDelegator {
       console.log(c.command.trigger)
       if (c.command.trigger === '*' || c.command.trigger.toLowerCase() === trigger.toLowerCase()) {
         this.addInjectable('Trigger', trigger)
-        console.log('testing '+c.command.trigger)
-        Promise.resolve(c.command.execute(this.injectables, injectedParams)).then(result=>{
+        Promise.resolve(c.command.execute(this.injectables, injectedParams)).then(result => {
           this._nextCommand(commandIteration)
-        }).catch(e=>{
+        }).catch(e => {
           let tzuyu = this.getInjectable('Tzuyu')
           tzuyu.message(e.message)
           console.error(e)
         })
-      }else{
+      } else {
         this._nextCommand(commandIteration)
       }
         /* temp(?) disable chaining
@@ -122,13 +121,13 @@ class CommandDelegator {
         } else {
           // if we dont get a result then set it back to the passed values
           injectedParams = params
-        }*/
-      }
-
-      this._nextCommand(commandIteration)
+        } */
     }
 
-    resolveParamsFromMessage (message) {
+    this._nextCommand(commandIteration)
+  }
+
+  resolveParamsFromMessage (message) {
     // should return {command: command, params: []}
     if (!message.startsWith(this.prefix)) {
       return false

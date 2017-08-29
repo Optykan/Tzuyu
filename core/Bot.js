@@ -185,7 +185,7 @@ class Bot {
       status: 'online',
       afk: false,
       game: {
-        name: status,
+        name: status
         // url: 'http://www.twitch.tv/.',
         // type: 1
       }
