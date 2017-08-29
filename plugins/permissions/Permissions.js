@@ -4,9 +4,7 @@ const Plugin = require('../Plugin')
 const PermissionManager = require('./PermissionManager')
 const PermissionError = require('./PermissionError')
 
-const PERM_ADMIN = 3
-const PERM_MOD = 2
-const PERM_USER = 1
+const PermissionLevel = require('./PermissionLevel')
 
 class Permissions extends Plugin {
   constructor () {
@@ -62,7 +60,7 @@ class Permissions extends Plugin {
     let server = message.member.guild.id
 
     console.log('SERVER: ' + server)
-    
+
     return new Promise((resolve, reject) => {
       this.permissionManager.getUser(database, author, server).then(user => {
         this.current.user = user
@@ -84,7 +82,7 @@ class Permissions extends Plugin {
     let id = this._getIdFromMessage(target)
     return new Promise((resolve, reject) => {
       this.permissionManager.getUser(database, id, this.current.user.serverId).then(user => {
-        user.permission = PERM_MOD
+        user.permission = PermissionLevel.MOD
         this.permissionManager.save(user).then(res => {
           tzuyu.message('Promoted user to moderator', {messageDelay: -1})
           resolve()

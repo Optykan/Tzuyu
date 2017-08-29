@@ -1,13 +1,10 @@
 // its like an enum but i didnt want to import enums
 
 var levels = {
-  PERM_USER: 1,
-  PERM_MOD: 2,
-  PERM_ADMIN: 3,
-
-  get () {
-
-  }
+  USER: 1,
+  MOD: 2,
+  ADMIN: 3,
+  DEFAULT: 1
 }
 
 var PermissionLevel = new Proxy(levels, {

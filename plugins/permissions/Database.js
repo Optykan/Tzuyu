@@ -1,9 +1,6 @@
 const Command = require('./Command')
 const User = require('./User')
-
-const PERM_ADMIN = 3
-const PERM_MOD = 2
-const PERM_USER = 1
+const PermissionLevel = require('./PermissionLevel')
 
 class Database {
   provideConnection (connection) {
@@ -77,7 +74,7 @@ class Database {
   _ensureUserExists (dbResult, id, server) {
     return new Promise((resolve, reject) => {
       if (dbResult.rowCount === 0) {
-        return this._createNewUser(id, PERM_USER, server).then(user => {
+        return this._createNewUser(id, PermissionLevel.DEFAULT, server).then(user => {
           resolve(user)
         }).catch(e => {
           console.error(e)
@@ -138,7 +135,7 @@ class Database {
     }
     return new Promise((resolve, reject) => {
       this.query(query, params).then(res => {
-        this._ensureCommandExists(res, trigger, PERM_USER, role, server).then(command => {
+        this._ensureCommandExists(res, trigger, PermissionLevel.DEFAULT, role, server).then(command => {
           resolve(command)
         }).catch(e => {
           console.error(e)
@@ -158,7 +155,7 @@ class Database {
           // table doesnt exist... start creating them
           this.query('CREATE TABLE users (user_id VARCHAR(18) NOT NULL, permission BYTE NOT NULL, server_id VARCHAR(18), UNIQUE(user_id, server_id))').then(res => {
             console.log('Created users table...')
-            this.query('INSERT INTO users (user_id, permission, server_id) VALUES ($1, $2, $3)', [message.channel.guild.ownerID, PERM_ADMIN, message.channel.guild.id]).then(res => {
+            this.query('INSERT INTO users (user_id, permission, server_id) VALUES ($1, $2, $3)', [message.channel.guild.ownerID, PermissionLevel.ADMIN, message.channel.guild.id]).then(res => {
               console.log('Added superadmin...')
               this.query('CREATE TABLE commands (trigger VARCHAR(25) NOT NULL, permission BYTE NOT NULL, role_id VARCHAR(18), server_id VARCHAR(18), UNIQUE(trigger, server_id))').then(res => {
                 console.log('Created commands table...')
