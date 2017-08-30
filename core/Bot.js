@@ -187,7 +187,7 @@ class Bot {
       game: {
         name: status
         // url: 'http://www.twitch.tv/.',
-        // type: 1
+        // type: 0
       }
     })
   }
