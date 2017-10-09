@@ -78,7 +78,7 @@ class Permissions extends Plugin {
   }
 
   mod (tzuyu, database, target) {
-    console.log('RUNNING MOD')
+    // console.log('RUNNING MOD')
     let id = this._getIdFromMessage(target)
     return new Promise((resolve, reject) => {
       this.permissionManager.getUser(database, id, this.current.user.serverId).then(user => {

@@ -1,8 +1,8 @@
 class FatalError extends Error {
-  constructor (message) {
+  constructor (message, name) {
     super(message)
     this.message = message
-    this.name = 'FatalError'
+    this.name = name || 'FatalError'
   }
 }
 

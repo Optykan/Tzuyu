@@ -20,11 +20,6 @@ class Bot {
     }
     this.isConnecting = false
 
-    this.permlist = {
-      users: [],
-      isActive: true,
-      type: 'blacklist'
-    }
     this.mediaPlayer = new MediaPlayer()
     this.mediaPlayer.on('start', song => {
       this.message('Now playing: ' + song.title)
@@ -34,25 +29,6 @@ class Bot {
       this.message('Queue is empty, leaving...')
       this.stop()
     })
-  }
-
-  addToPermlist (id) {
-    this.permlist.users.push(id)
-  }
-
-  isPermitted (id) {
-    if (this.permlist.isActive) {
-      if (this.permlist.type === 'whitelist') {
-        return this.permlist.users.includes(id)
-      } else {
-        return !this.permlist.users.includes(id)
-      }
-    } else {
-      return true
-    }
-  }
-  setPermlistStatus (status) {
-    this.permlist.type = status
   }
 
   join (id) {
@@ -87,7 +63,7 @@ class Bot {
         };
       }
     }
-    this.setPlaying('Overwatch') // well...
+    this.setStatus('Overwatch') // well...
   }
 
   message (m, options, callback) {
@@ -178,16 +154,24 @@ class Bot {
     this.mediaPlayer.shuffle()
   }
   setPlaying (status) {
-    this.setStatus(status)
-  }
-  setStatus (status) {
     this.client.user.setPresence({
       status: 'online',
       afk: false,
       game: {
-        name: status
+        name: status,
+        url: 'http://www.twitch.tv/.',
+        type: 0
+      }
+    })
+  }
+  setStatus (status) {
+        this.client.user.setPresence({
+      status: 'online',
+      afk: false,
+      game: {
+        name: status,
         // url: 'http://www.twitch.tv/.',
-        // type: 0
+        type: 0
       }
     })
   }
