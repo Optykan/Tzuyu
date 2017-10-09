@@ -65,7 +65,10 @@ class Bot {
     }
     this.setStatus('Overwatch') // well...
   }
-
+  //a backwrapper in case you dont need any of the message options
+  send(content, options){
+    this.text.channel.send(content, options)
+  }
   message (m, options, callback) {
     this.text.channel.send(m).then(message => {
       if (typeof callback === 'function') {

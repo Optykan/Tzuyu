@@ -33,3 +33,10 @@ Optionally, add a `BOT_CHANNEL` which holds the id of the default text channel t
 7. Try `$help` and see if its alive.
 
 Notes: Make sure the bot is actually a bot (see [https://discordapp.com/developers/applications/me](https://discordapp.com/developers/applications/me))
+
+
+<h2> Windows Dependencies </h2>
+
+Follow this thingy and just listen to it: [https://github.com/Automattic/node-canvas/wiki/Installation---Windows](https://github.com/Automattic/node-canvas/wiki/Installation---Windows)
+
+Run `npm install --global --production windows-build-tools` after all that

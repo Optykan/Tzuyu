@@ -57,6 +57,8 @@ let injectables = {
 }
 
 var CommandDelegator = new Delegator(injectables)
+CommandDelegator.setPrefix(process.env.BOT_PREFIX)
+
 require('./plugins/init')(CommandDelegator)
 // yes, we're adding itself as an injectable
 CommandDelegator.addInjectable('CommandDelegator', CommandDelegator)
@@ -76,10 +78,10 @@ Tzuyu.client.on('ready', () => {
 Tzuyu.client.on('message', message => {
   CommandDelegator.addInjectable('Message', message)
 
-  if (message.channel.type === 'dm') {
+  // if (message.channel.type === 'dm') {
     // Tzuyu.message("zzz...");
-    return false
-  }
+    // return false
+  // }
 
   CommandDelegator.parseIncomingMessage(Tzuyu, message)
 })
