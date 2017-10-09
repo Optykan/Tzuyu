@@ -81,9 +81,6 @@ Tzuyu.client.on('message', message => {
     return false
   }
 
-  if (!Tzuyu.isPermitted(message.author.id)) {
-    return false
-  }
   CommandDelegator.parseIncomingMessage(Tzuyu, message)
 })
 

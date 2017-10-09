@@ -165,7 +165,7 @@ class Bot {
     })
   }
   setStatus (status) {
-        this.client.user.setPresence({
+    this.client.user.setPresence({
       status: 'online',
       afk: false,
       game: {

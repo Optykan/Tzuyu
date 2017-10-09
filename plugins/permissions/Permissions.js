@@ -26,7 +26,7 @@ class Permissions extends Plugin {
     return {
       trigger: ['*', 'mod', 'perms_generateTables', 'restrict'],
       action: [this.checkPermission, this.mod, this.initialize, this.restrict],
-      injects: ['Trigger@trigger,Tzuyu@tzuyu,Message@message,Database@database', 'Tzuyu@tzuyu,Database@database', 'Database@database,Tzuyu@tzuyu,Message@message', 'Tzuyu@tzuyu,Database@database'],
+      injects: ['Trigger@trigger,Tzuyu@tzuyu,Message@message,Database@database,CommandDelegator@delegator', 'Tzuyu@tzuyu,Database@database', 'Database@database,Tzuyu@tzuyu,Message@message', 'Tzuyu@tzuyu,Database@database'],
       priority: [99, 10, 10, 10],
       help: {
         '*': ' - ',
@@ -54,10 +54,15 @@ class Permissions extends Plugin {
     throw new Error('Could not resolve ID of user')
   }
 
-  checkPermission (trigger, tzuyu, message, database, target) {
+  checkPermission (trigger, tzuyu, message, database, delegator, target) {
     // always implicity called through the * command trigger
     let author = message.author.id
     let server = message.member.guild.id
+
+    if(!delegator.isTriggerRegistered(trigger)){
+      //buddy that isnt even a legit command
+      return false
+    }
 
     console.log('SERVER: ' + server)
 
