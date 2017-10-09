@@ -40,7 +40,7 @@ rl.on('line', (line) => {
   })
 }).on('close', () => {
   console.log('Closed postgres connection')
-  Tzuyu.client.destroy().then(()=>{
+  Tzuyu.client.destroy().then(() => {
     process.exit(0)
   })
 })
@@ -69,7 +69,7 @@ Tzuyu.client.on('ready', () => {
   console.log('Loaded!')
   Tzuyu.setTextChannel(process.env.BOT_CHANNEL)
   Tzuyu.setVoiceChannel(process.env.BOT_VOICE_CHANNEL)
-  Tzuyu.setPlaying('Overwatch') // hehe
+  Tzuyu.setStatus('Overwatch') // hehe
 })
 
 // handle message events (really the only thing we need to do)
