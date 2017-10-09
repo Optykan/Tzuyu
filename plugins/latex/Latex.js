@@ -83,26 +83,10 @@ class Latex extends Plugin {
             console.log(data)
             let fname = '/'+Date.now()+'.png'
             let attachment = new Discord.Attachment(buffer)
-              tzuyu.send('', attachment)
-            })
-
-            // const attachment = new Discord.Attachment().setAttachment(buffer)
-            // var embed = new Discord.RichEmbed()
-            // .setTitle('math')
-
-            // console.log(embed)
-
-            // embed.attachFile({
-            //   attachment: buffer,
-            //   name: 'math.jpg'
-            // })
-
-            // fs.writeFile("dest.png", buffer)
+            tzuyu.send('', attachment)
           }).catch(e => console.error(e));
       }
     });
-
-
   }
 
 }
