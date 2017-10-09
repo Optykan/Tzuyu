@@ -18,6 +18,7 @@ class Command {
   _getArgSpecs (fncDef) {
     // theres no way this can go wrong
     let signature = fncDef.toString().split('\n')[0]
+    // console.log('signature: ' + signature)
     let params = /(?:.*?)\(([\S\s]+)\)\s(?:.*)|(\S+)\s=>\s{\s?}?$/m.exec(signature)
     if (params[1]) {
       return params[1].split(',').map(elem => {
@@ -33,6 +34,7 @@ class Command {
     // accepts is an array of parameters of what the callback accepts
     // injectables is the stuff we CAN inject
     // this.injects is mapping thingToInject@accepts
+    // console.log(injectables)
     let accepts = this._getArgSpecs(this.callback) // ['tzuyu', 'param1']
     let send = []
 
@@ -72,7 +74,7 @@ class Command {
         )
     }
 
-    this.callback.call(this.context, ...send, ...params)
+    return this.callback.call(this.context, ...send, ...params)
   }
 }
 

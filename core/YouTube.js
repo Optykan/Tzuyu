@@ -1,3 +1,4 @@
+'use strict'
 // youtube stuff
 const MediaResolvable = require('./media/MediaResolvable')
 const Net = require('./Net')

@@ -18,7 +18,7 @@ class DM extends Plugin {
     return {
       trigger: ['roll', 'lastroll'],
       action: [this.roll, this.rollstats],
-      injects: ['Tzuyu@tzuyu' , 'Tzuyu@tzuyu'],
+      injects: ['Tzuyu@tzuyu', 'Tzuyu@tzuyu'],
       help: {
         roll: 'Accept a roll of format "xdn" to roll an n-sided die x times',
         lastroll: 'Display the result and statistical information of last diceroll'
