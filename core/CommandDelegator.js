@@ -4,7 +4,7 @@ const PriorityQueue = require('./PriorityQueue')
 
 class CommandDelegator {
   constructor (injectables) {
-    this.prefix = '$'
+    this.prefix = process.env.BOT_PREFIX || '%'
     this.commands = new PriorityQueue()
     this.injectables = injectables
     this.verbose = false
