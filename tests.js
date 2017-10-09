@@ -29,13 +29,17 @@ const MediaResolver = require('./core/media/MediaResolver')
 const Playlist = require('./core/media/Playlist')
 const Song = require('./core/media/Song')
 const Delegator = require('./core/CommandDelegator')
+const { Client } = require('pg')
+var Postgres = new Client()
+Postgres.connect()
 
 var Tzuyu = new Bot()
 
 let injectables = {
   'Tzuyu': Tzuyu,
   'YouTube': YouTube,
-  'MediaResolver': MediaResolver
+  'MediaResolver': MediaResolver,
+  'Database': Postgres
 }
 
 var CommandDelegator = new Delegator(injectables)
@@ -50,7 +54,23 @@ CommandDelegator.registerPluginHook('test', (yt, tzuyu) => {
   expect(yt.name).toEqual('YouTube')
   pass('Command delegation passed')
 }, 'Tzuyu@tzuyu,YouTube@yt')
-CommandDelegator.parseIncomingMessage({content: CommandDelegator.prefix + 'test here are some params'})
+
+let testMessage = {
+  content: CommandDelegator.prefix + 'test here are some params',
+  channel: {
+    id: process.env.BOT_CHANNEL
+  },
+  author: {
+    id: '000000000000000000'
+  },
+  member: {
+    guild: {
+      id: '000000000000000000'
+    }
+  }
+}
+CommandDelegator.addInjectable('Message', testMessage)
+CommandDelegator.parseIncomingMessage(Tzuyu, testMessage)
 
 Tzuyu.login(process.env.BOT_TOKEN)
 
