@@ -178,6 +178,29 @@ class Bot {
       }
     })
   }
+  setRichPresence(status){
+    this.client.user.setPresence({
+      status: 'online',
+      game:{
+        name: status,
+        type: 1,
+        details: 'details',
+        state: 'state',
+        url: 'http://www.twitch.tv/.',
+        timestamps: {
+            end: 1607588040436,
+        },
+        assets: {
+            large_image: 367072957752672256,
+            large_text: 'sample text',
+            small_image: 367072262005719060,
+            small_text: 'smlal text'
+        },
+        application_id: 204744592350904320
+      }
+
+    })
+  }
   setVoiceChannel (chanID) {
     this.voice.channel = this.client.channels.get(chanID)
   }

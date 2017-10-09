@@ -82,6 +82,9 @@ class Latex extends Plugin {
           .then(buffer => {
             console.log(data)
             let fname = '/'+Date.now()+'.png'
+            
+            let attachment = new Discord.Attachment(buffer)
+
             fs.writeFile(__dirname+fname, buffer).then(()=> {
               tzuyu.send('', {
                 //this is deprecated...

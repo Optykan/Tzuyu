@@ -71,7 +71,8 @@ Tzuyu.client.on('ready', () => {
   console.log('Loaded!')
   Tzuyu.setTextChannel(process.env.BOT_CHANNEL)
   Tzuyu.setVoiceChannel(process.env.BOT_VOICE_CHANNEL)
-  Tzuyu.setStatus('Overwatch') // hehe
+  // Tzuyu.setStatus('Overwatch') // hehe
+  Tzuyu.setRichPresence('game name')
 })
 
 // handle message events (really the only thing we need to do)
