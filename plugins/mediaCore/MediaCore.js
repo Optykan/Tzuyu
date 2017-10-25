@@ -75,7 +75,7 @@ class MediaCore extends Plugin {
     tzuyu.bump(param1)
   }
   remove (tzuyu, param1) {
-    tzuyu.remove(param1)
+    tzuyu.removeFromQueue(param1)
   }
 }
 
