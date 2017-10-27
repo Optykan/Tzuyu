@@ -9,7 +9,7 @@ class CommandDelegator {
     this.verbose = false
   }
 
-  setPrefix(prefix){
+  setPrefix (prefix) {
     this.prefix = prefix
   }
 

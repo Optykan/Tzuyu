@@ -59,8 +59,8 @@ class Permissions extends Plugin {
     let author = message.author.id
     let server = message.member.guild.id
 
-    if(!delegator.isTriggerRegistered(trigger)){
-      //buddy that isnt even a legit command
+    if (!delegator.isTriggerRegistered(trigger)) {
+      // buddy that isnt even a legit command
       return false
     }
 

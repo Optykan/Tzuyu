@@ -78,10 +78,10 @@ Tzuyu.client.on('ready', () => {
 Tzuyu.client.on('message', message => {
   CommandDelegator.addInjectable('Message', message)
 
-  // if (message.channel.type === 'dm') {
+  if (message.channel.type === 'dm') {
     // Tzuyu.message("zzz...");
-    // return false
-  // }
+    return false
+  }
 
   CommandDelegator.parseIncomingMessage(Tzuyu, message)
 })

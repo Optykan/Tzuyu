@@ -45,6 +45,8 @@ let injectables = {
 var CommandDelegator = new Delegator(injectables)
 require('./plugins/init')(CommandDelegator)
 
+CommandDelegator.addInjectable('CommandDelegator', CommandDelegator)
+
 log('Testing command delegation')
 isTesting.push(true)
 
@@ -53,7 +55,7 @@ CommandDelegator.registerPluginHook('test', (yt, tzuyu) => {
   expect(tzuyu.constructor.name).toEqual('Bot')
   expect(yt.name).toEqual('YouTube')
   pass('Command delegation passed')
-}, 'Tzuyu@tzuyu,YouTube@yt')
+}, 'Tzuyu@tzuyu,YouTube@yt', 'help', true, CommandDelegator)
 
 let testMessage = {
   content: CommandDelegator.prefix + 'test here are some params',

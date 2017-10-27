@@ -14,7 +14,7 @@ class LeagueOfLegends extends Plugin {
       action: [this.search],
       injects: ['Tzuyu@tzuyu'],
       help: {
-        search:"Active game lookup"
+        search: 'Active game lookup'
       }
     }
   }
@@ -22,7 +22,6 @@ class LeagueOfLegends extends Plugin {
   search (summ, region) {
     return summ
   }
-
 }
 
 module.exports = LeagueOfLegends // more like plugin.exports haha end me
