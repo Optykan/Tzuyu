@@ -38,12 +38,17 @@ rl.on('line', (line) => {
     var time = new Date().getTime() - start
     console.log('\x1b[31m[POSTGRES]\x1b[0m (' + time + 'ms) Query failed: ' + err.message)
   })
-}).on('close', () => {
-  console.log('Closed postgres connection')
-  Tzuyu.client.destroy().then(() => {
-    process.exit(0)
-  })
 })
+
+if(process.env.ENV === 'dev'){
+  rl.on('close', () => {
+    console.log('Closed postgres connection')
+    Tzuyu.client.destroy().then(() => {
+      process.exit(0)
+    })
+  })
+}
+
 
 console.log('Establishing database connection...')
 Postgres.connect()
