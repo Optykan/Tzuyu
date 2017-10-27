@@ -20,11 +20,6 @@ class Bot {
     }
     this.isConnecting = false
 
-    this.permlist = {
-      users: [116399321661833218, 304780284077801472],
-      isActive: true,
-      type: 'blacklist'
-    }
     this.mediaPlayer = new MediaPlayer()
     this.mediaPlayer.on('start', song => {
       this.message('Now playing: ' + song.title)
@@ -34,25 +29,6 @@ class Bot {
       this.message('Queue is empty, leaving...')
       this.stop()
     })
-  }
-
-  addToPermlist (id) {
-    this.permlist.users.push(id)
-  }
-
-  isPermitted (id) {
-    if (this.permlist.isActive) {
-      if (this.permlist.type === 'whitelist') {
-        return this.permlist.users.includes(id)
-      } else {
-        return !this.permlist.users.includes(id)
-      }
-    } else {
-      return true
-    }
-  }
-  setPermlistStatus (status) {
-    this.permlist.type = status
   }
 
   join (id) {
@@ -81,13 +57,18 @@ class Bot {
       // console.log(conns);
       if (conns.length > 0) {
         for (var i = conns.length - 1; i >= 0; i--) {
-          conns[i].leave()
+          if (conns[i]) {
+            conns[i].leave()
+          }
         };
       }
     }
-    this.setPlaying('Overwatch') // well...
+    this.setStatus('Overwatch') // well...
   }
-
+  // a backwrapper in case you dont need any of the message options
+  send (content, options) {
+    this.text.channel.send(content, options)
+  }
   message (m, options, callback) {
     this.text.channel.send(m).then(message => {
       if (typeof callback === 'function') {
@@ -140,23 +121,11 @@ class Bot {
   skip () {
     this.mediaPlayer.skip()
   }
-  listQueue () {
-    var output = ''
-
+  returnQueue () {
     if (this.mediaPlayer.isQueueEmpty()) {
-      return this.message('Queue is empty')
+      return null
     }
-    var q = this.mediaPlayer.returnQueue()
-
-    for (var j = 0; j < Math.ceil((q.length) / 25); j++) {
-      for (let i = j * 25; i < (j * 25) + 25; i++) {
-        if (!q[i]) { break }
-
-        output += (i + 1).toString() + '. **' + q[i].title + '**\n'
-      }
-      this.message(output)
-      output = ''
-    }
+    return this.mediaPlayer.returnQueue()
   }
   bump (songIndex) {
     let t = parseInt(songIndex)
@@ -188,10 +157,26 @@ class Bot {
     this.mediaPlayer.shuffle()
   }
   setPlaying (status) {
-    this.client.user.setGame(status)
+    this.client.user.setPresence({
+      status: 'online',
+      afk: false,
+      game: {
+        name: status,
+        url: 'http://www.twitch.tv/.',
+        type: 0
+      }
+    })
   }
   setStatus (status) {
-    this.client.user.setStatus(status)
+    this.client.user.setPresence({
+      status: 'online',
+      afk: false,
+      game: {
+        name: status,
+        // url: 'http://www.twitch.tv/.',
+        type: 0
+      }
+    })
   }
   setVoiceChannel (chanID) {
     this.voice.channel = this.client.channels.get(chanID)

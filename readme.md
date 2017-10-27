@@ -16,7 +16,9 @@
 
 If you're using Heroku, follow all the steps except for the ones marked (Local). If you're running this locally, follow all the steps except the ones marked (Heroku).
 
-1. Create a `.env` file, and add keys for `BOT_TOKEN` (the token that discord developer page gives you) and `YT_API_KEY` (from the [google developer console](https://console.developers.google.com)). Optionally, add a `BOT_CHANNEL` which holds the id of the default text channel the bot should message in. Syntax: `KEY_NAME=KEY_VALUE`.
+1. Create a `.env` file, and add keys for `BOT_TOKEN` (the token that discord developer page gives you) and `YT_API_KEY` (from the [google developer console](https://console.developers.google.com)). We require postgres for handling permissions (this should be changed later) but for now see: https://www.postgresql.org/docs/9.3/static/libpq-envars.html, and add keys/value pairs for `PGHOST`, `PGUSER`, `PGDATABASE`, `PGPASSWORD`, `PGSSLMODE` (hint, the value is `require`), and `PGPORT`.
+Finally, add `BOT_PREFIX` to change what the prefix for commands should be (default is `%`)
+Optionally, add a `BOT_CHANNEL` which holds the id of the default text channel the bot should message in. Syntax: `KEY_NAME=KEY_VALUE`.
 
 2. (Heroku) Navigate to Settings > Config Variables and copy the key/value pairs from step 1.
 
@@ -31,3 +33,10 @@ If you're using Heroku, follow all the steps except for the ones marked (Local).
 7. Try `$help` and see if its alive.
 
 Notes: Make sure the bot is actually a bot (see [https://discordapp.com/developers/applications/me](https://discordapp.com/developers/applications/me))
+
+
+<h2> Windows Dependencies </h2>
+
+Follow this thingy and just listen to it: [https://github.com/Automattic/node-canvas/wiki/Installation---Windows](https://github.com/Automattic/node-canvas/wiki/Installation---Windows)
+
+Run `npm install --global --production windows-build-tools` after all that

@@ -29,19 +29,24 @@ const MediaResolver = require('./core/media/MediaResolver')
 const Playlist = require('./core/media/Playlist')
 const Song = require('./core/media/Song')
 const Delegator = require('./core/CommandDelegator')
+const { Client } = require('pg')
+var Postgres = new Client()
+Postgres.connect()
 
 var Tzuyu = new Bot()
 
 let injectables = {
   'Tzuyu': Tzuyu,
   'YouTube': YouTube,
-  'MediaResolver': MediaResolver
+  'MediaResolver': MediaResolver,
+  'Database': Postgres
 }
 
 var CommandDelegator = new Delegator(injectables)
 require('./plugins/init')(CommandDelegator)
 
 CommandDelegator.addInjectable('CommandDelegator', CommandDelegator)
+
 
 // log('Testing command delegation')
 // isTesting.push(true)

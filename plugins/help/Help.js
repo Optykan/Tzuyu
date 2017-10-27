@@ -41,8 +41,13 @@ class Help extends Plugin {
       }
     } else {
       var description = ''
+      // console.log(delegator.commands.length)
+      // console.log(delegator.commands.get(1))
       for (let i = 0; i < delegator.commands.length; i++) {
-        description += '-' + delegator.commands[i].trigger + '\n'
+        let trigger = delegator.commands.get(i).command.trigger
+        if (trigger !== '*') {
+          description += '-' + trigger + '\n'
+        }
       }
       embed = new Discord.RichEmbed()
       .setTitle('Help: All Commands')
