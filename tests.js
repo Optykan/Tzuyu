@@ -41,16 +41,34 @@ let injectables = {
 var CommandDelegator = new Delegator(injectables)
 require('./plugins/init')(CommandDelegator)
 
-log('Testing command delegation')
-isTesting.push(true)
+CommandDelegator.addInjectable('CommandDelegator', CommandDelegator)
 
-CommandDelegator.registerPluginHook('test', (yt, tzuyu) => {
-  isTesting.pop()
-  expect(tzuyu.constructor.name).toEqual('Bot')
-  expect(yt.name).toEqual('YouTube')
-  pass('Command delegation passed')
-}, 'Tzuyu@tzuyu,YouTube@yt')
-CommandDelegator.parseIncomingMessage({content: CommandDelegator.prefix + 'test here are some params'})
+// log('Testing command delegation')
+// isTesting.push(true)
+
+// CommandDelegator.registerPluginHook('test', (yt, tzuyu) => {
+//   isTesting.pop()
+//   expect(tzuyu.constructor.name).toEqual('Bot')
+//   expect(yt.name).toEqual('YouTube')
+//   pass('Command delegation passed')
+// }, 'Tzuyu@tzuyu,YouTube@yt', 'help', true, CommandDelegator)
+
+// let testMessage = {
+//   content: CommandDelegator.prefix + 'test here are some params',
+//   channel: {
+//     id: process.env.BOT_CHANNEL
+//   },
+//   author: {
+//     id: '000000000000000000'
+//   },
+//   member: {
+//     guild: {
+//       id: '000000000000000000'
+//     }
+//   }
+// }
+// CommandDelegator.addInjectable('Message', testMessage)
+// CommandDelegator.parseIncomingMessage(Tzuyu, testMessage)
 
 Tzuyu.login(process.env.BOT_TOKEN)
 
