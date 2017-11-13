@@ -1,12 +1,13 @@
 const Command = require('./Command')
 const PriorityQueue = require('./PriorityQueue')
+require('dotenv').config()
 // const FatalError = require('./ext/FatalError')
 
 class CommandDelegator {
   constructor (injectables) {
     this.commands = new PriorityQueue()
     this.injectables = injectables
-    this.verbose = false
+    this.verbose = (process.env.ENV===dev)
   }
 
   setPrefix (prefix) {

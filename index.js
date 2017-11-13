@@ -7,6 +7,8 @@ const MediaResolver = require('./core/media/MediaResolver')
 const Delegator = require('./core/CommandDelegator')
 const { Client } = require('pg')
 const readline = require('readline')
+const events = require('events')
+
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -15,6 +17,8 @@ const rl = readline.createInterface({
 
 var Postgres = new Client()
 var Tzuyu = new Bot()
+var Events = new events.EventEmitter()
+
 
 rl.prompt()
 
@@ -58,7 +62,8 @@ let injectables = {
   'Tzuyu': Tzuyu,
   'YouTube': YouTube,
   'MediaResolver': MediaResolver,
-  'Net': Net
+  'Net': Net,
+  'Events': Events
 }
 
 var CommandDelegator = new Delegator(injectables)
