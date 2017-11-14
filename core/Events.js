@@ -4,11 +4,13 @@
 // appropriate delegators
 
 var eventList = []
+const events = require('events')
 
 class Event{
-	constructor(event, callback, context=this){
+	constructor(event, injectables, context=this){
+		this.eventEmitter = new events.eventEmitter()
 		this.event=event
-		this.callback=callback
+		this.injectables=injectables
 		this.context=context
 	}
 	invoke(args){
@@ -17,7 +19,9 @@ class Event{
 }
 
 class Events{
-	on(event, callback){
-		//eventList.push(new )
+	on(event, injectables, callback){
+		eventList.push(new Event(event, injectables, callback))
 	}	
 }
+
+module.exports = Events

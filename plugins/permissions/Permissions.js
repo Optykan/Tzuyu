@@ -7,7 +7,7 @@ const PermissionError = require('./PermissionError')
 const PermissionLevel = require('./PermissionLevel')
 
 class Permissions extends Plugin {
-  constructor () {
+  constructor (events) {
     super()
     this.title = 'Permissions'
     this.desc = 'Does things for moderation'
@@ -20,6 +20,8 @@ class Permissions extends Plugin {
       user: {},
       command: {}
     }
+
+    events.on('ready', 'Database@database,Tzuyu@tzuyu', this.initialize)
   }
 
   register () {
