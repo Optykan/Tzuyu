@@ -2,26 +2,37 @@
 
 // this module should handle all the events emitted by the bot and invoke the
 // appropriate delegators
+// really I should be using the eventEmitter but I'll figure that out later...
 
+const injectables = []
 var eventList = []
 const events = require('events')
+const eventEmitter = new events.eventEmitter()
 
 class Event{
-	constructor(event, injectables, context=this){
-		this.eventEmitter = new events.eventEmitter()
+	constructor(event, context=this){
 		this.event=event
-		this.injectables=injectables
 		this.context=context
 	}
-	invoke(args){
-		callback.apply(this.context, args)
+	invoke(){
+		callback.apply(this.context, injectables)
 	}
 }
 
 class Events{
-	on(event, injectables, callback){
-		eventList.push(new Event(event, injectables, callback))
-	}	
+	provideInjectables(inj){
+		injectables = inj
+	}
+	on(event, callback){
+		eventList.push(new Event(event, callback))
+	}
+	emit(event){
+		for(let e in eventList){
+			if(e.event === event){
+				e.event.invoke()
+			}
+		}
+	}
 }
 
 module.exports = Events

@@ -21,27 +21,26 @@ class Permissions extends Plugin {
       command: {}
     }
 
-    events.on('ready', 'Database@database,Tzuyu@tzuyu', this.initialize)
+    events.on('ready', this.initialize)
   }
 
   register () {
     return {
-      trigger: ['*', 'mod', 'perms_generateTables', 'restrict'],
+      trigger: ['*', 'mod', 'restrict'],
       action: [this.checkPermission, this.mod, this.initialize, this.restrict],
-      injects: ['Trigger@trigger,Tzuyu@tzuyu,Message@message,Database@database,CommandDelegator@delegator', 'Tzuyu@tzuyu,Database@database', 'Database@database,Tzuyu@tzuyu,Message@message', 'Tzuyu@tzuyu,Database@database'],
+      injects: ['Trigger@trigger,Tzuyu@tzuyu,Message@message,Database@database,CommandDelegator@delegator', 'Tzuyu@tzuyu,Database@database', 'Tzuyu@tzuyu,Database@database'],
       priority: [99, 10, 10, 10],
       help: {
         '*': ' - ',
         mod: 'Format: `mod @user`. Gives a user elevated privileges, granting them the ability to access restricted commands (restricted: mod)',
-        perms_generateTables: 'Generates the tables required for the Permissions plugin to work. Run this once (restricted: server owner)',
         restrict: 'Format: `restrict <command>`, where <command> does not include the prefix (!, &, whatever is set). Only allows moderators to use these commands (restricted: mod)'
       }
     }
   }
 
-  initialize (database, tzuyu, message) {
+  initialize (injectables) {
     tzuyu.message('Creating tables...')
-    this.permissionManager.initialize(database, message).then(res => {
+    this.permissionManager.initialize(injectables['Database']).then(res => {
       tzuyu.message('Done')
     }).catch(err => {
       tzuyu.message('An error occured: ' + err.message)
