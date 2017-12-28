@@ -64,7 +64,7 @@ class Permissions extends Plugin {
       return false
     }
 
-    console.log('SERVER: ' + server)
+    // console.log('SERVER: ' + server)
 
     return new Promise((resolve, reject) => {
       this.permissionManager.getUser(database, author, server).then(user => {

@@ -47,7 +47,6 @@ require('./plugins/init')(CommandDelegator)
 
 CommandDelegator.addInjectable('CommandDelegator', CommandDelegator)
 
-
 // log('Testing command delegation')
 // isTesting.push(true)
 

@@ -40,7 +40,7 @@ rl.on('line', (line) => {
   })
 })
 
-if(process.env.ENV === 'dev'){
+if (process.env.ENV === 'dev') {
   rl.on('close', () => {
     console.log('Closed postgres connection')
     Tzuyu.client.destroy().then(() => {
@@ -48,7 +48,6 @@ if(process.env.ENV === 'dev'){
     })
   })
 }
-
 
 console.log('Establishing database connection...')
 Postgres.connect()
