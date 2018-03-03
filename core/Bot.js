@@ -25,6 +25,15 @@ class Bot {
       this.message('Now playing: ' + song.title)
       this.setPlaying(song.title)
     })
+    this.mediaPlayer.on('end', ()=>{
+      let connectedMembers = this.client.voiceConnections.first().channel.members.array()
+      console.log(connectedMembers)
+      if(connectedMembers.length<=1){
+        console.log('empty channel')
+        this.message('Channel is empty, leaving...')
+        this.stop()
+      }
+    })
     this.mediaPlayer.on('finished', () => {
       this.message('Queue is empty, leaving...')
       this.stop()

@@ -42,7 +42,7 @@ class Latex extends Plugin {
             console.log(data)
             let attachment = new Discord.Attachment(buffer)
             tzuyu.send('', attachment)
-          }).catch(e => {tzuyu.message(e)})
+          }).catch(e => { tzuyu.message(e) })
       }
     })
   }
