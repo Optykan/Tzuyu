@@ -20,9 +20,8 @@
     "parse-time": "^0.1.4",
     "pg": "7.4.1",
     "pn": "^1.1.0",
-    "sodium": "^3.0.2",
     "svg2png": "^4.1.1",
-    "ytdl-core": "^0.29.2",
+    "ytdl-core": "^1.0.3",
     "ytdl-core-discord": "^1.0.3"
   },
   "devDependencies": {
