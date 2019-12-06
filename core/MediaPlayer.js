@@ -27,7 +27,7 @@ class MediaPlayer {
       this.nowPlaying = current
       this._emit('start', current)
 
-      let stream = ytdl(current.url, {filter: 'audioonly', quality: 'lowest'})
+      let stream = ytdl(current.url, {filter: 'audioonly', quality: 'highestaudio', highWaterMark: 1<<25 })
       this.dispatcher = this.connection.playOpusStream(stream)
 
       this.dispatcher.on('end', () => {
