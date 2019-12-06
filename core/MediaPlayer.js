@@ -15,24 +15,20 @@ class MediaPlayer {
     this.connection = null
     this.streamOptions = {
       seek: 0,
-      volume: 0.5
+      volume: 1
     }
     this.nowPlaying = null
     this.queue = new Queue()
     this.eventEmitter = new EventEmitter()
   }
-  async play () {
+  play () {
     if (!this.queue.isEmpty()) {
       let current = this.queue.dequeue()
       this.nowPlaying = current
       this._emit('start', current)
 
-      let info = await ytdl.getInfo(current.url)
-
-      let stream = ytdl.downloadFromInfo(info, {filter: 'audioonly'})
-      stream.on('error', console.error)
-
-      this.dispatcher = this.connection.playStream(stream)
+      let stream = ytdl(current.url, {filter: 'audioonly'})
+      this.dispatcher = this.connection.playOpusStream(stream)
 
       this.dispatcher.on('end', () => {
         if (!this.queue.isEmpty()) {
@@ -44,7 +40,6 @@ class MediaPlayer {
           this._emit('finished')
         }
       })
-      this.dispatcher.on('error', console.error)
     }
   }
 
