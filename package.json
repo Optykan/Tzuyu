@@ -14,7 +14,8 @@
     "pg": "7.4.1",
     "pn": "^1.1.0",
     "svg2png": "^4.1.1",
-    "ytdl-core": "^0.20.2"
+    "ytdl-core": "^0.20.2",
+    "ytdl-core-discord": "^1.0.3"
   },
   "devDependencies": {
     "expect": "^22.4.0",

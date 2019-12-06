@@ -15,19 +15,23 @@ class MediaPlayer {
     this.connection = null
     this.streamOptions = {
       seek: 0,
-      volume: 0.1
+      volume: 0.5
     }
     this.nowPlaying = null
     this.queue = new Queue()
     this.eventEmitter = new EventEmitter()
   }
-  play () {
+  async play () {
     if (!this.queue.isEmpty()) {
       let current = this.queue.dequeue()
       this.nowPlaying = current
       this._emit('start', current)
 
-      let stream = ytdl(current.url, {filter: 'audioonly', quality: 'lowest'})
+      let info = await ytdl.getInfo(current.url)
+
+      let stream = ytdl.downloadFromInfo(info, {filter: 'audioonly'})
+      stream.on('error', console.error)
+
       this.dispatcher = this.connection.playStream(stream)
 
       this.dispatcher.on('end', () => {
@@ -40,6 +44,7 @@ class MediaPlayer {
           this._emit('finished')
         }
       })
+      this.dispatcher.on('error', console.error)
     }
   }
 

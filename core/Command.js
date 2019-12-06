@@ -71,7 +71,7 @@ class Command {
           }
           return res
         })(this.injects)
-        )
+      )
     }
 
     return this.callback.call(this.context, ...send, ...params)

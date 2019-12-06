@@ -37,9 +37,9 @@ class DM extends Plugin {
       return tzuyu.message('Something was wrong with that input.')
     }
 
-  // if (!nums[1]){
-  //   this.lastroll.times = 1
-  // }
+    // if (!nums[1]){
+    //   this.lastroll.times = 1
+    // }
     this.lastroll.times = nums[1] || 1
     this.lastroll.sides = nums[2]
 

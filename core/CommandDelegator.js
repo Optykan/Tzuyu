@@ -116,7 +116,7 @@ class CommandDelegator {
       } else {
         this._nextCommand(commandIteration)
       }
-        /* temp(?) disable chaining
+      /* temp(?) disable chaining
         if (typeof result !== 'undefined' && Array.isArray(result)) {
           // if we get a result then chain it further
           injectedParams = result

@@ -23,18 +23,18 @@ class Help extends Plugin {
     if (trigger) {
       if (trigger === 'me') {
         embed = new Discord.RichEmbed()
-        .setTitle('Help: ' + trigger)
-        .setColor(0xe74c3c)
-        .setDescription('Only the Lord may offer salvation.')
-        .setFooter('Matthew 19:25-26', 'http://i.imgur.com/paHhYtW.jpg')
+          .setTitle('Help: ' + trigger)
+          .setColor(0xe74c3c)
+          .setDescription('Only the Lord may offer salvation.')
+          .setFooter('Matthew 19:25-26', 'http://i.imgur.com/paHhYtW.jpg')
       } else {
         let command = delegator.findCommand(trigger)
         if (command) {
           embed = new Discord.RichEmbed()
-          .setTitle('Help: ' + trigger)
-          .setColor(0x3498db)
-          .setDescription(command.help)
-          .setFooter('-' + tzuyu.client.user.username, 'http://i.imgur.com/paHhYtW.jpg')
+            .setTitle('Help: ' + trigger)
+            .setColor(0x3498db)
+            .setDescription(command.help)
+            .setFooter('-' + tzuyu.client.user.username, 'http://i.imgur.com/paHhYtW.jpg')
         } else {
           tzuyu.message('Command ' + command + ' not found')
         }
@@ -50,10 +50,10 @@ class Help extends Plugin {
         }
       }
       embed = new Discord.RichEmbed()
-      .setTitle('Help: All Commands')
-      .setColor(0x3498db)
-      .setDescription(description)
-      .setFooter('-' + tzuyu.client.user.username, 'http://i.imgur.com/paHhYtW.jpg')
+        .setTitle('Help: All Commands')
+        .setColor(0x3498db)
+        .setDescription(description)
+        .setFooter('-' + tzuyu.client.user.username, 'http://i.imgur.com/paHhYtW.jpg')
     }
     // console.log(tzuyu.client.user)
     // console.log(tzuyu.client.user.avatarURL)
