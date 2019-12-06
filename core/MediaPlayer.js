@@ -15,7 +15,8 @@ class MediaPlayer {
     this.connection = null
     this.streamOptions = {
       seek: 0,
-      volume: 0.5
+      volume: 0.5,
+      highWaterMark: 1
     }
     this.nowPlaying = null
     this.queue = new Queue()
@@ -27,8 +28,8 @@ class MediaPlayer {
       this.nowPlaying = current
       this._emit('start', current)
 
-      let stream = ytdl(current.url, {filter: 'audioonly', quality: 'highestaudio', highWaterMark: 1<<25 })
-      this.dispatcher = this.connection.playOpusStream(stream)
+      let stream = ytdl(current.url, {filter: 'audio', highWaterMark: 1<<25 })
+      this.dispatcher = this.connection.playStream(stream)
 
       this.dispatcher.on('end', () => {
         if (!this.queue.isEmpty()) {
