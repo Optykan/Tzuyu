@@ -6,7 +6,7 @@ class CommandDelegator {
   constructor (injectables) {
     this.commands = new PriorityQueue()
     this.injectables = injectables
-    this.verbose = false
+    this.verbose = true
   }
 
   setPrefix (prefix) {
@@ -102,7 +102,9 @@ class CommandDelegator {
     var injectedParams = params
 
     let commandIteration = c => {
-      if (c.command.trigger === '*' || c.command.trigger.toLowerCase() === trigger.toLowerCase()) {
+      if (!c.command.context.enabled) {
+        this._nextCommand(commandIteration)
+      } else if (c.command.trigger === '*' || c.command.trigger.toLowerCase() === trigger.toLowerCase()) {
         this.addInjectable('Trigger', trigger)
         Promise.resolve(c.command.execute(this.injectables, injectedParams)).then(result => {
           this._nextCommand(commandIteration)

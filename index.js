@@ -50,7 +50,7 @@ if (process.env.ENV === 'dev') {
 }
 
 console.log('Establishing database connection...')
-Postgres.connect()
+// Postgres.connect()
 
 // we can add things here because things pass by reference here in JS land
 let injectables = {

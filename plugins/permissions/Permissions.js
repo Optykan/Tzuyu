@@ -12,7 +12,7 @@ class Permissions extends Plugin {
     this.title = 'Permissions'
     this.desc = 'Does things for moderation'
     // this.help = undefined
-    this.enabled = true
+    this.enabled = false
     this.permissionManager = new PermissionManager()
 
     // the current running command
