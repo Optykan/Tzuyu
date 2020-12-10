@@ -10,7 +10,7 @@
     "dotenv": "^5.0.1",
     "erlpack": "github:hammerandchisel/erlpack",
     "ffmpeg-static": "^2.7.0",
-    "ini": "^1.3.5",
+    "ini": "^1.3.6",
     "libsodium-wrappers": "^0.7.6",
     "m3u8stream": "^0.6.3",
     "mathjax-node": "^2.0.1",
