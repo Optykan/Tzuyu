@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "ajv": "^6.10.2",
+    "ajv": "^6.12.3",
     "bufferutil": "^4.0.1",
     "discord.js": "^11.5.1",
     "dotenv": "^5.0.1",
